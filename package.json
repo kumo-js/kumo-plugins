@@ -1,0 +1,31 @@
+{
+  "name": "kumo-plugins",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha tests --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MYOB-Technology/kumo-plugins.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MYOB-Technology/kumo-plugins/issues"
+  },
+  "homepage": "https://github.com/MYOB-Technology/kumo-plugins#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.5.3"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.4.7",
+    "bluebird": "^3.4.1",
+    "chdir-promise": "^0.2.1",
+    "lodash": "^4.13.1",
+    "tempfile2": "^2.0.1"
+  }
+}
