@@ -7,6 +7,7 @@ const s3 = new aws.S3();
 const CollectOutputsStep = require('./action-steps/collect-outputs');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
 const DirChainBuilder = require('../../common-lib/dir-chain-builder');
+const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
 const OutputsCollector = require('./outputs-collector');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const PluginContext = require('./plugin-context');
@@ -21,7 +22,8 @@ class ActionFactory {
         return new StepsExecutor({
             steps: [
                 this._createOutputsBucketStep(context),
-                this._collectOutputsStep(context, params)
+                this._collectOutputsStep(context, params),
+                this._expandTaskDefsStep(context)
             ]
         });
     }
@@ -39,6 +41,10 @@ class ActionFactory {
     _collectOutputsStep(context, actionParams) {
         const outputsCollector = this._outputsCollector(actionParams);
         return new CollectOutputsStep({context, fs, outputsCollector});
+    }
+
+    _expandTaskDefsStep(context) {
+        return new ExpandTaskDefsStep({context});
     }
 
     _outputsCollector(actionParams) {

@@ -18,6 +18,10 @@ class PluginContext {
         return new Env(this._options.env);
     }
 
+    region() {
+        return this._options.region;
+    }
+
     appDir() {
         return path.dirname(this.settingsFile());
     }

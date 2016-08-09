@@ -13,6 +13,10 @@ class Settings {
         return this._app().name;
     }
 
+    tasks() {
+        return this._app().tasks;
+    }
+
     outputsBucket() {
         const name = _.get(this._kumoSettings, 'appDeployer.outputsBucket.name');
         return _.assign({name}, this._app().outputsBucket);
