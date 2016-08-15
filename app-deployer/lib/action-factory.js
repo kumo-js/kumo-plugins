@@ -4,16 +4,19 @@ const _ = require('lodash');
 const aws = require('aws-sdk');
 const fs = require('fs');
 const s3 = new aws.S3();
-const CollectOutputsStep = require('./action-steps/collect-outputs');
+const AppChainOutputsCollector = require('./app-chain-outputs-collector');
+const CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
 const DirChainBuilder = require('../../common-lib/dir-chain-builder');
 const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
-const OutputsCollector = require('./outputs-collector');
+const ExecuteTasksStep = require('./action-steps/execute-tasks');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const PluginContext = require('./plugin-context');
 const S3Helper = require('../../common-lib/s3-helper');
 const SettingsFileReader = require('./settings-file-reader');
 const StepsExecutor = require('../../common-lib/steps-executor');
+const TaskExecutor = require('./task-executor');
+const TaskFactory = require('./task-factory');
 
 class ActionFactory {
 
@@ -22,8 +25,9 @@ class ActionFactory {
         return new StepsExecutor({
             steps: [
                 this._createOutputsBucketStep(context),
-                this._collectOutputsStep(context, params),
-                this._expandTaskDefsStep(context)
+                this._collectAppChainOutputsStep(context, params),
+                this._expandTaskDefsStep(context),
+                this._executeTasksStep(context)
             ]
         });
     }
@@ -38,21 +42,32 @@ class ActionFactory {
         return new CreateOutputsBucketStep({context, s3Helper});
     }
 
-    _collectOutputsStep(context, actionParams) {
-        const outputsCollector = this._outputsCollector(actionParams);
-        return new CollectOutputsStep({context, fs, outputsCollector});
+    _collectAppChainOutputsStep(context, actionParams) {
+        const appChainOutputsCollector = this._appChainOutputsCollector(actionParams);
+        return new CollectAppChainOutputsStep({context, fs, appChainOutputsCollector});
     }
 
     _expandTaskDefsStep(context) {
         return new ExpandTaskDefsStep({context});
     }
 
-    _outputsCollector(actionParams) {
+    _executeTasksStep(context) {
+        const outputsStoreFactory = this._outputsStoreFactory();
+        const taskFactory = this._taskFactory(context);
+        const taskExecutor = new TaskExecutor({context, outputsStoreFactory, taskFactory});
+        return new ExecuteTasksStep({taskExecutor});
+    }
+
+    _appChainOutputsCollector(actionParams) {
         const dirChainBuilder = new DirChainBuilder({fs});
-        const s3Helper = this._s3Helper();
-        const outputsStoreFactory = new OutputsStoreFactory({s3Helper});
+        const outputsStoreFactory = this._outputsStoreFactory();
         const settingsFileReader = this._settingsFileReader(actionParams);
-        return new OutputsCollector({dirChainBuilder, outputsStoreFactory, settingsFileReader});
+        return new AppChainOutputsCollector({dirChainBuilder, outputsStoreFactory, settingsFileReader});
+    }
+
+    _outputsStoreFactory() {
+        const s3Helper = this._s3Helper();
+        return new OutputsStoreFactory({s3Helper});
     }
 
     _settingsFileReader(actionParams) {
@@ -62,6 +77,10 @@ class ActionFactory {
 
     _s3Helper() {
         return new S3Helper({s3});
+    }
+
+    _taskFactory(context) {
+        return new TaskFactory({context});
     }
 }
 

@@ -4,7 +4,7 @@ const _ = require('lodash');
 const path = require('path');
 const Promise = require('bluebird');
 
-class OutputsCollector {
+class AppChainOutputsCollector {
 
     constructor(params) {
         this._dirChainBuilder = params.dirChainBuilder;
@@ -40,4 +40,4 @@ class OutputsCollector {
     }
 }
 
-module.exports = OutputsCollector;
+module.exports = AppChainOutputsCollector;

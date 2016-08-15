@@ -9,6 +9,7 @@ class PluginContext {
     constructor(params) {
         this._fs = params.fs;
         this._kumoContext = params.kumoContext;
+        this._logger = params.logger;
         this._options = params.options;
         this._settingsReader = params.settingsReader;
     }
@@ -16,6 +17,10 @@ class PluginContext {
     env() {
         // Default to current user??
         return new Env(this._options.env);
+    }
+
+    logger() {
+        return this._logger;
     }
 
     region() {
@@ -37,7 +42,7 @@ class PluginContext {
     }
 
     settingsFilename() {
-        return 'app-settings.json'
+        return 'deploy-settings.json'
     }
 
     tempFile() {

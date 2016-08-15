@@ -9,15 +9,15 @@ class OutputsStoreFactory {
         this._s3Helper = params.s3Helper;
     }
 
-    createStore(appSettings, env) {
+    createStore(settings, env) {
         return new OutputsS3Store({
-            outputsS3Config: this._outputsS3Config(appSettings, env),
+            outputsS3Config: this._outputsS3Config(settings, env),
             s3Helper: this._s3Helper
         });
     }
 
-    _outputsS3Config(appSettings, env) {
-        return new OutputsS3Config({appSettings, env});
+    _outputsS3Config(settings, env) {
+        return new OutputsS3Config({settings, env});
     }
 }
 
