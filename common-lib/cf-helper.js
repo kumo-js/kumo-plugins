@@ -1,6 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
+const Promise = require('bluebird');
 
 class CfHelper {
 
@@ -8,49 +9,59 @@ class CfHelper {
         this._cf = params.cf;
     }
 
-    provisionStack(params, options) {
-        return this._checkStackExists(params.StackName)
-            .then(exists => exists ? this._updateStack : this._createStack)
-            .then(handlerFn => handlerFn(params, options));
+    provisionStack(params) {
+        return this._searchStack(params.StackName)
+            .then(stack => stack ? this._updateStack : this._createStack)
+            .then(handlerFn => handlerFn.call(this, params));
     }
 
     extractOutputs(stackName) {
-        return this._getStack(stackName).then(stack =>
+        return this._findStack(stackName).then(stack =>
             stack.Outputs.reduce((outputs, o) =>
                 _.assign(outputs, {[o.OutputKey]: o.OutputValue}), {})
         );
     }
 
-    _checkStackExists(stackName) {
-        return this._cf.describeStacks({StackName: stackName}).promise()
-            .then(data => data.stacks.length > 0);
-    }
-
-    _getStack(stackName) {
-        return this._cf.describeStacks({StackName: stackName}).promise().then(data => {
-            const stack = _.find(data.stacks, s => s.StackName === stackName);
+    _findStack(stackName) {
+        return this._searchStack(stackName).then(stack => {
             if (!stack) throw new Error(`Stack ${stackName} not found`);
             return stack;
-        });
+        })
     }
 
-    _createStack(params, options) {
+    _searchStack(stackName) {
+        return this._cf.describeStacks({StackName: stackName}).promise().then(
+            data => data.Stacks[0],
+            err => {
+                const notExistErr = err.message.match(/does not exist/i);
+                if (err.code === 'ValidationError' && notExistErr) return null;
+                throw err;
+            }
+        );
+    }
+
+    _createStack(params) {
         return this._cf.createStack(params).promise().then(data => {
-            return this._waitForCompletion(params.StackName, 'CREATE_COMPLETE', options)
+            return this._waitForCompletion(params.StackName, 'CREATE_COMPLETE')
                 .then(() => data.StackId);
         });
     }
 
-    _updateStack(params, options) {
-        return this._cf.updateStack(params).promise().then(() => {
-            return this._waitForCompletion(params.StackName, 'UPDATE_COMPLETE', options);
-        });
+    _updateStack(params) {
+        return this._cf.updateStack(params).promise().then(
+            () => this._waitForCompletion(params.StackName, 'UPDATE_COMPLETE'),
+            err => {
+                const noUpdatesErr = err.message.match(/no updates are to be performed/i);
+                if (err.code === 'ValidationError' && noUpdatesErr) return null;
+                throw err;
+            }
+        );
     }
 
-    _waitForCompletion(stackName, desiredState, options) {
-        options = _.assign({interval: 10, retries: 60}, options);
-        return this._getStack(stackName).then(stack => {
-            const status = stack.StackStatus;
+    _waitForCompletion(stackName, desiredState) {
+        let options = {interval: 3000, retries: 100};
+        return this._searchStack(stackName).then(stack => {
+            const status = (stack || {}).StackStatus;
             if (status === desiredState) return;
             if (status.match(/FAILED|COMPLETE$/i)) throw new Error('Stack operation not successful');
             if (options.retries === 0) throw new Error('Timed out waiting for stack completion');

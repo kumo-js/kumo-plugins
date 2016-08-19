@@ -6,13 +6,13 @@ const OutputsS3Store = require('./outputs-s3-store');
 class OutputsStoreFactory {
 
     constructor(params) {
-        this._s3Helper = params.s3Helper;
+        this._awsHelpers = params.awsHelpers;
     }
 
     createStore(settings, env) {
         return new OutputsS3Store({
             outputsS3Config: this._outputsS3Config(settings, env),
-            s3Helper: this._s3Helper
+            awsHelpers: this._awsHelpers
         });
     }
 

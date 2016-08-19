@@ -1,9 +1,8 @@
 'use strict';
 
 const _ = require('lodash');
-const aws = require('aws-sdk');
 const fs = require('fs');
-const s3 = new aws.S3();
+const AwsHelpers = require('../../common-lib/aws-helpers');
 const AppChainOutputsCollector = require('./app-chain-outputs-collector');
 const CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
@@ -12,7 +11,6 @@ const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
 const ExecuteTasksStep = require('./action-steps/execute-tasks');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const PluginContext = require('./plugin-context');
-const S3Helper = require('../../common-lib/s3-helper');
 const SettingsFileReader = require('./settings-file-reader');
 const StepsExecutor = require('../../common-lib/steps-executor');
 const TaskExecutor = require('./task-executor');
@@ -38,8 +36,8 @@ class ActionFactory {
     }
 
     _createOutputsBucketStep(context) {
-        const s3Helper = this._s3Helper();
-        return new CreateOutputsBucketStep({context, s3Helper});
+        const awsHelpers = this._awsHelpers();
+        return new CreateOutputsBucketStep({awsHelpers, context});
     }
 
     _collectAppChainOutputsStep(context, actionParams) {
@@ -66,17 +64,18 @@ class ActionFactory {
     }
 
     _outputsStoreFactory() {
-        const s3Helper = this._s3Helper();
-        return new OutputsStoreFactory({s3Helper});
+        const awsHelpers = this._awsHelpers();
+        return new OutputsStoreFactory({awsHelpers});
     }
 
     _settingsFileReader(actionParams) {
         const kumoSettings = actionParams.kumoContext.settings();
-        return new SettingsFileReader({fs, kumoSettings});
+        const options = actionParams.options;
+        return new SettingsFileReader({fs, kumoSettings, options});
     }
 
-    _s3Helper() {
-        return new S3Helper({s3});
+    _awsHelpers() {
+        return new AwsHelpers();
     }
 
     _taskFactory(context) {

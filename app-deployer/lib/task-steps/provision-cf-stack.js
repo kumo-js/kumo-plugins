@@ -1,30 +1,26 @@
 'use strict';
 
+const _ = require('lodash');
 const Promise = require('bluebird');
 
 class ProvisionCfStack {
 
     constructor(params) {
-        this._cfHelper = params.cfHelper;
-        this._context = params.context;
+        this._awsHelpers = params.awsHelpers;
         this._fs = Promise.promisifyAll(params.fs);
+        this._stackNameExpander = params.stackNameExpander;
     }
 
     execute(state) {
-        const stackName = this._stackName(state.taskDef);
+        const stackName = this._stackNameExpander.expand(state.taskDef.stackName);
         const templateFile = state.envVars.templateOutputFile;
+        const cfHelper = this._awsHelpers.cf({region: state.taskDef.region});
 
         return this._fs.readFileAsync(templateFile)
-            .then(template => this._cfHelper.provisionStack(stackName, template))
-            .then(() => this._cfHelper.extractOutputs(stackName))
+            .then(template => template.toString())
+            .then(template => cfHelper.provisionStack({StackName: stackName, TemplateBody: template}))
+            .then(() => cfHelper.extractOutputs(stackName))
             .then(outputs => _.assign({}, state, {outputs: outputs}));
-    }
-
-    _stackName(taskDef) {
-        const appName = this._context.settings().appName();
-        const env = this._context.env().value();
-        const name = `${env}-${appName}-${taskDef.stackName}`;
-        return name.replace(/\s/, '-').toLowerCase();
     }
 }
 

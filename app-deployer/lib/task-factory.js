@@ -1,9 +1,7 @@
 'use strict';
 
-const aws = require('aws-sdk');
-const cf = new aws.CloudFormation();
 const fs = require('fs');
-const CfHelper = require('../../common-lib/cf-helper');
+const AwsHelpers = require('../../common-lib/aws-helpers');
 const CreateEnvVarsStep = require('./task-steps/create-env-vars');
 const CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars');
 const ExecuteScriptStep = require('./task-steps/execute-script');
@@ -11,6 +9,7 @@ const InitTaskStep = require('./task-steps/init-task');
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
 const Shell = require('../../common-lib/shell');
 const StepsExecutor = require('../../common-lib/steps-executor');
+const StackNameExpander = require('./stack-name-expander');
 
 class TaskFactory {
 
@@ -74,9 +73,18 @@ class TaskFactory {
     }
 
     _provisionCfStackStep() {
+        const awsHelpers = this._awsHelpers();
+        const stackNameExpander = this._stackNameExpander();
+        return new ProvisionCfStackStep({awsHelpers, fs, stackNameExpander});
+    }
+
+    _stackNameExpander() {
         const context = this._context;
-        const cfHelper = new CfHelper({cf});
-        return new ProvisionCfStackStep({context, cfHelper, fs});
+        return new StackNameExpander({context});
+    }
+
+    _awsHelpers() {
+        return new AwsHelpers();
     }
 }
 

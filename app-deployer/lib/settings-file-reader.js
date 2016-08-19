@@ -8,24 +8,26 @@ class SettingsFileReader {
     constructor(params) {
         this._fs = Promise.promisifyAll(params.fs);
         this._kumoSettings = params.kumoSettings;
+        this._options = params.options;
     }
 
     read(file) {
         return this._fs.readFileAsync(file).then(
-            rawSettings => this._createSettings(rawSettings)
+            deploySettings => this._createSettings(deploySettings)
         );
     }
 
     readSync(file) {
-        const rawSettings = this._fs.readFileSync(file);
-        return this._createSettings(rawSettings);
+        const deploySettings = this._fs.readFileSync(file);
+        return this._createSettings(deploySettings);
     }
 
-    _createSettings(rawSettings) {
-        rawSettings = JSON.parse(rawSettings);
+    _createSettings(deploySettings) {
+        deploySettings = JSON.parse(deploySettings);
         return new Settings({
-            rawSettings: rawSettings,
-            kumoSettings: this._kumoSettings
+            deploySettings: deploySettings,
+            kumoSettings: this._kumoSettings,
+            options: this._options
         });
     }
 }

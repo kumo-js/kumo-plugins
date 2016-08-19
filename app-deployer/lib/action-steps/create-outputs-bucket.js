@@ -4,7 +4,7 @@ class CreateOutputsBucket {
 
     constructor(params) {
         this._context = params.context;
-        this._s3Helper = params.s3Helper;
+        this._awsHelpers = params.awsHelpers;
     }
 
     execute(state) {
@@ -14,15 +14,19 @@ class CreateOutputsBucket {
     }
 
     _bucketExists() {
-        return this._s3Helper.bucketExists(this._outputsBucketName());
+        return this._s3Helper().bucketExists(this._outputsBucket().name);
     }
 
     _createBucket() {
-        return this._s3Helper.createBucket({Bucket: this._outputsBucketName()});
+        return this._s3Helper().createBucket({Bucket: this._outputsBucket().name});
     }
 
-    _outputsBucketName() {
-        return this._context.settings().outputsBucket().name;
+    _s3Helper() {
+        return this._awsHelpers.s3({region: this._outputsBucket().region});
+    }
+
+    _outputsBucket() {
+        return this._context.settings().outputsBucket();
     }
 }
 
