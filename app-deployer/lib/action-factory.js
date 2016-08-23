@@ -4,6 +4,7 @@ const _ = require('lodash');
 const fs = require('fs');
 const AwsHelpers = require('../../common-lib/aws-helpers');
 const AppChainOutputsCollector = require('./app-chain-outputs-collector');
+const CleanOutputsStep = require('./action-steps/clean-outputs');
 const CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
 const DirChainBuilder = require('../../common-lib/dir-chain-builder');
@@ -25,7 +26,8 @@ class ActionFactory {
                 this._createOutputsBucketStep(context),
                 this._collectAppChainOutputsStep(context, params),
                 this._expandTaskDefsStep(context),
-                this._executeTasksStep(context)
+                this._executeTasksStep(context),
+                this._cleanOutputsStep(context)
             ]
         });
     }
@@ -54,6 +56,11 @@ class ActionFactory {
         const taskFactory = this._taskFactory(context);
         const taskExecutor = new TaskExecutor({context, outputsStoreFactory, taskFactory});
         return new ExecuteTasksStep({taskExecutor});
+    }
+
+    _cleanOutputsStep(context) {
+        const outputsStoreFactory = this._outputsStoreFactory();
+        return new CleanOutputsStep({context, outputsStoreFactory});
     }
 
     _appChainOutputsCollector(actionParams) {

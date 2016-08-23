@@ -1,7 +1,6 @@
 'use strict';
 
 const _ = require('lodash');
-const path = require('path');
 
 class OutputsS3Config {
 
@@ -12,9 +11,14 @@ class OutputsS3Config {
 
     bucket() {
         const appName = this._settings.appName();
-        const prefix = path.join(this._env, appName);
+        const prefix = `${this._env}/${appName}`;
         const outputsBucket = this._settings.outputsBucket();
-        return _.assign({prefix}, outputsBucket);
+        const bucket = _.assign({prefix}, outputsBucket);
+        return _.assign({}, bucket, {prefix: this._addTrailingSlash(bucket.prefix)});
+    }
+
+    _addTrailingSlash(prefix) {
+        return prefix && !prefix.endsWith('/') ? `${prefix}/` : prefix;
     }
 }
 

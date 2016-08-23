@@ -1,6 +1,6 @@
 'use strict';
 
-const path = require('path');
+const _ = require('lodash');
 
 class OutputsS3Store {
 
@@ -19,15 +19,34 @@ class OutputsS3Store {
     save(id, outputs) {
         return this._s3Helper().putObject({
             Bucket: this._bucket().name,
-            Key: path.join(this._bucket().prefix, id),
+            Key: this._getKey(id),
             Body: JSON.stringify(outputs)
         });
     }
 
-    remove(id) {
-        return this._s3Helper().deleteObject({
+    removeAllExcept(ids) {
+        return this._listItems()
+            .then(items => items.map(i => i.Key))
+            .then(keys => this._getInvalidKeys(keys, ids))
+            .then(keysToRemove => this._s3Helper().deleteObjects({
+                Bucket: this._bucket().name,
+                Delete: {Objects: keysToRemove.map(k => ({Key: k}))}
+            }));
+    }
+
+    _getInvalidKeys(keys, ids) {
+        const validKeys = ids.map(id => this._getKey(id));
+        return _.reject(keys, k => validKeys.indexOf(k) >= 0);
+    }
+
+    _getKey(id) {
+        return this._bucket().prefix + id;
+    }
+
+    _listItems() {
+        return this._s3Helper().listObjects({
             Bucket: this._bucket().name,
-            Key: path.join(this._bucket().prefix, id)
+            Prefix: this._bucket().prefix
         });
     }
 
