@@ -28,10 +28,23 @@ class OutputsS3Store {
         return this._listItems()
             .then(items => items.map(i => i.Key))
             .then(keys => this._getInvalidKeys(keys, ids))
-            .then(keysToRemove => this._s3Helper().deleteObjects({
+            .then(keysToRemove => this._deleteObjects(keysToRemove));
+    }
+
+    _listItems() {
+        return this._s3Helper().listObjects({
+            Bucket: this._bucket().name,
+            Prefix: this._bucket().prefix
+        });
+    }
+
+    _deleteObjects(keys) {
+        return keys.length === 0 ?
+            Promise.resolve() :
+            this._s3Helper().deleteObjects({
                 Bucket: this._bucket().name,
-                Delete: {Objects: keysToRemove.map(k => ({Key: k}))}
-            }));
+                Delete: {Objects: keys.map(k => ({Key: k}))}
+            });
     }
 
     _getInvalidKeys(keys, ids) {
@@ -41,13 +54,6 @@ class OutputsS3Store {
 
     _getKey(id) {
         return this._bucket().prefix + id;
-    }
-
-    _listItems() {
-        return this._s3Helper().listObjects({
-            Bucket: this._bucket().name,
-            Prefix: this._bucket().prefix
-        });
     }
 
     _s3Helper() {

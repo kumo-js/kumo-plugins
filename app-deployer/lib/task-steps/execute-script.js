@@ -12,10 +12,11 @@ class ExecuteScript {
     }
 
     execute(state) {
-        const envVars = this._formatEnvVars(state.envVars);
+        let envVars = this._formatEnvVars(state.envVars);
+        envVars = Object.assign({}, process.env, envVars);
         const script = state.taskDef.scripts[this._options.scriptType];
-        const scriptParams = {env: envVars, cwd: this._context.appDir()};
-        return this._shell.run(script, scriptParams).then(() => state);
+        const runParams = {env: envVars, cwd: this._context.appDir()};
+        return this._shell.run(script, runParams).then(() => state);
     }
 
     _formatEnvVars(envVars) {

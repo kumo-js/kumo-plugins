@@ -9,7 +9,7 @@ class Shell {
     }
 
     run(cmd, options) {
-        this._logger.debug(`Running cmd: ${cmd}`, options);
+        this._logger.debug(`Running cmd: ${cmd}`);
         return runCmd(cmd, options).then(
             output => this._logger.debug(output.join(''))
         );
