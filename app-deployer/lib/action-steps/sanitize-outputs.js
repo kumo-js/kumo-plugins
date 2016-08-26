@@ -1,6 +1,6 @@
 'use strict';
 
-class CleanOutputs {
+class SanitizeOutputs {
 
     constructor(params) {
         this._context = params.context;
@@ -22,4 +22,4 @@ class CleanOutputs {
     }
 }
 
-module.exports = CleanOutputs;
+module.exports = SanitizeOutputs;

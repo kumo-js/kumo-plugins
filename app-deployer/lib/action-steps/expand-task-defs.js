@@ -15,7 +15,13 @@ class ExpandTaskDefs {
     }
 
     _expandTaskDef(taskDef) {
-        return this._assignRegion(taskDef);
+        taskDef = this._assignTaskType(taskDef);
+        taskDef = this._assignRegion(taskDef);
+        return taskDef;
+    }
+
+    _assignTaskType(taskDef) {
+        return _.assign({}, taskDef, {type: taskDef.type || 'custom'});
     }
 
     _assignRegion(taskDef) {

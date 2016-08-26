@@ -2,6 +2,8 @@
 
 const fs = require('fs');
 const AwsHelpers = require('../../common-lib/aws-helpers');
+const DeleteCfStackStep = require('./task-steps/delete-cf-stack');
+const CollectOutputsStep = require('./task-steps/collect-outputs');
 const CreateEnvVarsStep = require('./task-steps/create-env-vars');
 const CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars');
 const ExecuteScriptStep = require('./task-steps/execute-script');
@@ -11,6 +13,8 @@ const Shell = require('../../common-lib/shell');
 const StepsExecutor = require('../../common-lib/steps-executor');
 const StackNameExpander = require('./stack-name-expander');
 
+// TODO: Simplify / break down this class
+
 class TaskFactory {
 
     constructor(params) {
@@ -18,18 +22,24 @@ class TaskFactory {
     }
 
     createTask(params) {
-        return new StepsExecutor({
-            initialState: params,
-            steps: this._createTaskSteps(params.taskDef.type)
-        });
+        return this._createTask(params, () => ({
+            'cf-stack': this._cfTaskSteps,
+            'custom': this._customTaskSteps
+        }));
     }
 
-    _createTaskSteps(taskType) {
-        return {
-            'cf-stack': this._cfTaskSteps,
-            undefined: this._customTaskSteps
+    createUndoTask(params) {
+        return this._createTask(params, () => ({
+            'cf-stack': this._undoCfTaskSteps,
+            'custom': this._undoCustomTaskSteps
+        }));
+    }
 
-        }[taskType].bind(this)();
+    _createTask(params, stepCreatorsFn) {
+        const stepCreators = stepCreatorsFn.call(this);
+        const stepCreator = stepCreators[params.taskDef.type];
+        const steps = stepCreator.call(this);
+        return new StepsExecutor({initialState: params, steps: steps});
     }
 
     _cfTaskSteps() {
@@ -46,8 +56,20 @@ class TaskFactory {
         return [
             this._initStep(),
             this._createEnvVarsStep(),
-            this._executeScriptStep()
-            //this._collectOutputsStep()
+            this._executeScriptStep(),
+            this._collectOutputsStep()
+        ]
+    }
+
+    _undoCfTaskSteps() {
+        return [this._deleteCfStackStep()];
+    }
+
+    _undoCustomTaskSteps() {
+        return [
+            this._initStep(),
+            this._createEnvVarsStep(),
+            this._executeScriptStep({scriptType: 'undo'})
         ]
     }
 
@@ -64,6 +86,16 @@ class TaskFactory {
     _createCfEnvVarsStep() {
         const context = this._context;
         return new CreateCfEnvVarsStep({context});
+    }
+
+    _collectOutputsStep() {
+        return new CollectOutputsStep({fs});
+    }
+
+    _deleteCfStackStep() {
+        const awsHelpers = this._awsHelpers();
+        const stackNameExpander = this._stackNameExpander();
+        return new DeleteCfStackStep({awsHelpers, stackNameExpander});
     }
 
     _executeScriptStep(options) {

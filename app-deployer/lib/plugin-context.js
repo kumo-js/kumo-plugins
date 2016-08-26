@@ -16,15 +16,19 @@ class PluginContext {
 
     env() {
         // Default to current user??
-        return new Env(this._options.env);
+        return new Env(this.options().env);
     }
 
     logger() {
         return this._logger;
     }
 
+    options() {
+        return this._options;
+    }
+
     region() {
-        return this._options.region;
+        return this.options().region;
     }
 
     appDir() {

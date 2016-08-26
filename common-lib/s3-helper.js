@@ -25,6 +25,10 @@ class S3Helper {
         return this._s3.putObject(params).promise();
     }
 
+    deleteObject(params) {
+        return this._s3.deleteObject(params).promise();
+    }
+
     deleteObjects(params) {
         return this._s3.deleteObjects(params).promise();
     }

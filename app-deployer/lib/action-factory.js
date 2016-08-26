@@ -1,10 +1,8 @@
 'use strict';
 
-const _ = require('lodash');
 const fs = require('fs');
 const AwsHelpers = require('../../common-lib/aws-helpers');
 const AppChainOutputsCollector = require('./app-chain-outputs-collector');
-const CleanOutputsStep = require('./action-steps/clean-outputs');
 const CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
 const DirChainBuilder = require('../../common-lib/dir-chain-builder');
@@ -12,10 +10,13 @@ const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
 const ExecuteTasksStep = require('./action-steps/execute-tasks');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const PluginContext = require('./plugin-context');
+const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
 const SettingsFileReader = require('./settings-file-reader');
 const StepsExecutor = require('../../common-lib/steps-executor');
-const TaskExecutor = require('./task-executor');
 const TaskFactory = require('./task-factory');
+const TaskExecutor = require('./task-executor');
+const TaskUndoer = require('./task-undoer');
+const UndoTasksStep = require('./action-steps/undo-tasks');
 
 class ActionFactory {
 
@@ -27,14 +28,26 @@ class ActionFactory {
                 this._collectAppChainOutputsStep(context, params),
                 this._expandTaskDefsStep(context),
                 this._executeTasksStep(context),
-                this._cleanOutputsStep(context)
+                this._sanitizeOutputsStep(context)
+            ]
+        });
+    }
+
+    createDestroyAction(params) {
+        const context = this._pluginContext(params);
+        return new StepsExecutor({
+            steps: [
+                this._collectAppChainOutputsStep(context, params),
+                this._expandTaskDefsStep(context),
+                this._undoTasksStep(context)
             ]
         });
     }
 
     _pluginContext(actionParams) {
         const settingsReader = this._settingsFileReader(actionParams);
-        return new PluginContext(_.assign({}, actionParams, {fs, settingsReader}));
+        const params = Object.assign({}, actionParams, {fs, settingsReader});
+        return new PluginContext(params);
     }
 
     _createOutputsBucketStep(context) {
@@ -58,9 +71,16 @@ class ActionFactory {
         return new ExecuteTasksStep({taskExecutor});
     }
 
-    _cleanOutputsStep(context) {
+    _undoTasksStep(context) {
         const outputsStoreFactory = this._outputsStoreFactory();
-        return new CleanOutputsStep({context, outputsStoreFactory});
+        const taskFactory = this._taskFactory(context);
+        const taskUndoer = new TaskUndoer({context, outputsStoreFactory, taskFactory});
+        return new UndoTasksStep({taskUndoer});
+    }
+
+    _sanitizeOutputsStep(context) {
+        const outputsStoreFactory = this._outputsStoreFactory();
+        return new SanitizeOutputsStep({context, outputsStoreFactory});
     }
 
     _appChainOutputsCollector(actionParams) {

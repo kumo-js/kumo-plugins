@@ -2,6 +2,7 @@
 
 const _ = require('lodash');
 const inflect = require('i')();
+const Promise = require('bluebird');
 
 class ExecuteScript {
 
@@ -12,11 +13,16 @@ class ExecuteScript {
     }
 
     execute(state) {
-        let envVars = this._formatEnvVars(state.envVars);
-        envVars = Object.assign({}, process.env, envVars);
         const script = state.taskDef.scripts[this._options.scriptType];
-        const runParams = {env: envVars, cwd: this._context.appDir()};
-        return this._shell.run(script, runParams).then(() => state);
+        const result = script ? this._execute(script, state.envVars) : Promise.resolve();
+        return result.then(() => state);
+    }
+
+    _execute(script, envVars) {
+        envVars = this._formatEnvVars(envVars);
+        envVars = Object.assign({}, process.env, envVars);
+        const params = {env: envVars, cwd: this._context.appDir()};
+        return this._shell.run(script, params);
     }
 
     _formatEnvVars(envVars) {

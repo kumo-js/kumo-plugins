@@ -24,6 +24,13 @@ class OutputsS3Store {
         });
     }
 
+    remove(id) {
+        return this._s3Helper().deleteObject({
+            Bucket: this._bucket().name,
+            Key: this._getKey(id)
+        });
+    }
+
     removeAllExcept(ids) {
         return this._listItems()
             .then(items => items.map(i => i.Key))

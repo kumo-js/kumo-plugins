@@ -9,27 +9,34 @@ class CfHelper {
         this._cf = params.cf;
     }
 
-    provisionStack(params) {
-        return this._searchStack(params.StackName)
-            .then(stack => stack ? this._updateStack : this._createStack)
-            .then(handlerFn => handlerFn.call(this, params));
-    }
-
-    extractOutputs(stackName) {
-        return this._findStack(stackName).then(stack =>
-            stack.Outputs.reduce((outputs, o) =>
-                _.assign(outputs, {[o.OutputKey]: o.OutputValue}), {})
-        );
-    }
-
-    _findStack(stackName) {
-        return this._searchStack(stackName).then(stack => {
+    findStack(stackName) {
+        return this.searchStack(stackName).then(stack => {
             if (!stack) throw new Error(`Stack ${stackName} not found`);
             return stack;
         })
     }
 
-    _searchStack(stackName) {
+    extractOutputs(stackName) {
+        return this.findStack(stackName).then(stack =>
+            stack.Outputs.reduce((outputs, o) =>
+                _.assign(outputs, {[o.OutputKey]: o.OutputValue}), {})
+        );
+    }
+
+    deleteStack(stackName) {
+        const params = {StackName: stackName};
+        return this._cf.deleteStack(params).promise().then(() =>
+            this._waitForCompletion(params.StackName, '')
+        );
+    }
+
+    provisionStack(params) {
+        return this.searchStack(params.StackName)
+            .then(stack => stack ? this._updateStack : this._createStack)
+            .then(handlerFn => handlerFn.call(this, params));
+    }
+
+    searchStack(stackName) {
         return this._cf.describeStacks({StackName: stackName}).promise().then(
             data => data.Stacks[0],
             err => {
@@ -58,10 +65,10 @@ class CfHelper {
         );
     }
 
-    _waitForCompletion(stackName, desiredState) {
-        let options = {interval: 3000, retries: 100};
-        return this._searchStack(stackName).then(stack => {
-            const status = (stack || {}).StackStatus;
+    _waitForCompletion(stackName, desiredState, options) {
+        options = _.assign({interval: 3000, retries: 100}, options);
+        return this.searchStack(stackName).then(stack => {
+            const status = (stack || {}).StackStatus || '';
             if (status === desiredState) return;
             if (status.match(/FAILED|COMPLETE$/i)) throw new Error('Stack operation not successful');
             if (options.retries === 0) throw new Error('Timed out waiting for stack completion');

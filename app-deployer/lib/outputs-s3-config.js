@@ -11,13 +11,13 @@ class OutputsS3Config {
 
     bucket() {
         const appName = this._settings.appName();
-        const prefix = `${this._env}/${appName}`;
+        const defaultPrefix = `${this._env}/${appName}`;
         const outputsBucket = this._settings.outputsBucket();
-        const bucket = _.assign({prefix}, outputsBucket);
-        return _.assign({}, bucket, {prefix: this._addTrailingSlash(bucket.prefix)});
+        const prefix = this._addSlash(outputsBucket.prefix || defaultPrefix);
+        return _.assign(outputsBucket, {prefix});
     }
 
-    _addTrailingSlash(prefix) {
+    _addSlash(prefix) {
         return prefix && !prefix.endsWith('/') ? `${prefix}/` : prefix;
     }
 }

@@ -14,6 +14,7 @@ class CreateEnvVars {
             envVars: {
                 appInputsFile: state.appOutputsFile,
                 appChainInputsFile: state.appChainOutputsFile,
+                configFile: this._context.options().configFile,
                 env: this._context.env().value(),
                 region: state.taskDef.region,
                 taskOutputsFile: this._context.tempFile()
