@@ -7,11 +7,14 @@ class TaskUndoer {
 
     constructor(params) {
         this._context = params.context;
+        this._logger = this._context.logger();
         this._outputsStoreFactory = params.outputsStoreFactory;
         this._taskFactory = params.taskFactory;
     }
 
     undo(taskDef, appChainOutputs) {
+        this._logger.info(`Undoing task: ${taskDef.id}`);
+
         return Promise.resolve()
             .then(() => this._undoTask(taskDef, appChainOutputs))
             .then(() => this._outputsStore().remove(taskDef.id))

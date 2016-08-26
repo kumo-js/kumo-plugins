@@ -94,20 +94,22 @@ class TaskFactory {
 
     _deleteCfStackStep() {
         const awsHelpers = this._awsHelpers();
+        const context = this._context;
         const stackNameExpander = this._stackNameExpander();
-        return new DeleteCfStackStep({awsHelpers, stackNameExpander});
+        return new DeleteCfStackStep({awsHelpers, context, stackNameExpander});
     }
 
     _executeScriptStep(options) {
         const context = this._context;
-        const shell = new Shell({logger: context.logger()});
+        const shell = new Shell({logger: this._context.logger()});
         return new ExecuteScriptStep({context, options, shell});
     }
 
     _provisionCfStackStep() {
         const awsHelpers = this._awsHelpers();
+        const context = this._context;
         const stackNameExpander = this._stackNameExpander();
-        return new ProvisionCfStackStep({awsHelpers, fs, stackNameExpander});
+        return new ProvisionCfStackStep({awsHelpers, context, fs, stackNameExpander});
     }
 
     _stackNameExpander() {

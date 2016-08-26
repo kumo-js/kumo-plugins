@@ -7,11 +7,14 @@ class TaskExecutor {
 
     constructor(params) {
         this._context = params.context;
+        this._logger = this._context.logger();
         this._outputsStoreFactory = params.outputsStoreFactory;
         this._taskFactory = params.taskFactory;
     }
 
     execute(taskDef, appChainOutputs) {
+        this._logger.info(`Executing task: ${taskDef.id}`);
+        
         return Promise.resolve()
             .then(() => this._executeTask(taskDef, appChainOutputs))
             .then(taskResult => this._extractAppOutputs(taskResult))
