@@ -12,8 +12,8 @@ class CreateEnvVars {
     execute(state) {
         return Promise.resolve(_.merge({}, state, {
             envVars: {
-                appInputsFile: state.appOutputsFile,
-                appChainInputsFile: state.appChainOutputsFile,
+                appResourcesFile: state.appOutputsFile,
+                appChainResourcesFile: state.appChainOutputsFile,
                 configFile: this._context.options().configFile,
                 env: this._context.env().value(),
                 region: state.taskDef.region,
