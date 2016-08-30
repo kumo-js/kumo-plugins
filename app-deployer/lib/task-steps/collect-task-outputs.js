@@ -2,7 +2,7 @@
 
 const Promise = require('bluebird');
 
-class CollectOutputs {
+class CollectTaskOutputs {
 
     constructor(params) {
         this._fs = Promise.promisifyAll(params.fs);
@@ -23,4 +23,4 @@ class CollectOutputs {
     }
 }
 
-module.exports = CollectOutputs;
+module.exports = CollectTaskOutputs;

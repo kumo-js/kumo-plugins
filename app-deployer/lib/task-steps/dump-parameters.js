@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-class InitTask {
+class DumpParameters {
 
     constructor(params) {
         this._context = params.context;
@@ -11,11 +11,11 @@ class InitTask {
     }
 
     execute(state) {
-        return this._dumpOutputs(state)
+        return this._dumpParameters(state)
             .then(files => _.assign({}, state, files));
     }
 
-    _dumpOutputs(state) {
+    _dumpParameters(state) {
         const contents = [state.appOutputs, state.appChainOutputs];
         return Promise.all(contents.map(c => this._dumpTempFile(c)))
             .then(files => ({appOutputsFile: files[0], appChainOutputsFile: files[1]}));
@@ -27,4 +27,4 @@ class InitTask {
     }
 }
 
-module.exports = InitTask;
+module.exports = DumpParameters;

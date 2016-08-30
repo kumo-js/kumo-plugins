@@ -11,9 +11,10 @@ class UndoTasks {
     }
 
     _undoTasks(state) {
+        const config = state.config;
         const appChainOutputs = state.appChainOutputs;
         return state.taskDefs.reverse().reduce((promise, taskDef) => {
-            return promise.then(() => this._taskUndoer.undo(taskDef, appChainOutputs));
+            return promise.then(() => this._taskUndoer.undo({taskDef, appChainOutputs, config}))
         }, Promise.resolve());
     }
 }

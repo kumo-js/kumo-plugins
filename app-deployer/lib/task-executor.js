@@ -12,29 +12,24 @@ class TaskExecutor {
         this._taskFactory = params.taskFactory;
     }
 
-    execute(taskDef, appChainOutputs) {
-        this._logger.info(`Executing task: ${taskDef.id}`);
-        
+    execute(params) {
+        const taskId = params.taskDef.id;
+        this._logger.info(`\n--->Executing task: ${taskId}`);
+
         return Promise.resolve()
-            .then(() => this._executeTask(taskDef, appChainOutputs))
-            .then(taskResult => this._extractAppOutputs(taskResult))
-            .then(appOutputs => this._outputsStore().save(taskDef.id, appOutputs))
-            .then(appOutputs => _.assign({}, appChainOutputs, appOutputs));
+            .then(() => this._createTask(params).execute())
+            .then(taskResult => this._extractOutputs(taskResult))
+            .then(outputs => this._outputsStore().save(taskId, outputs))
+            .then(outputs => _.assign({}, params.appChainOutputs, outputs));
     }
 
-    _executeTask(taskDef, appChainOutputs) {
-        return this._createTask(taskDef, appChainOutputs).execute();
+    _createTask(params) {
+        const appChainOutputs = params.appChainOutputs;
+        const appOutputs = _.get(appChainOutputs, this._appNamespace(), {});
+        return this._taskFactory.createTask(_.assign({}, params, {appOutputs}));
     }
 
-    _createTask(taskDef, appChainOutputs) {
-        return this._taskFactory.createTask({
-            taskDef: taskDef,
-            appChainOutputs: appChainOutputs,
-            appOutputs: _.get(appChainOutputs, this._appNamespace(), {})
-        });
-    }
-
-    _extractAppOutputs(taskResult) {
+    _extractOutputs(taskResult) {
         const outputs = _.get(taskResult, 'outputs', {});
         return {[this._appNamespace()]: outputs};
     }

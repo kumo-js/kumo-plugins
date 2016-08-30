@@ -14,6 +14,10 @@ class Settings {
         return this._app().name;
     }
 
+    config() {
+        return this._app().config;
+    }
+
     tasks() {
         return this._app().tasks;
     }

@@ -10,14 +10,17 @@ class ExecuteTasks {
     }
 
     execute(state) {
-        return this._executeTasks(state).then(
-            outputs => _.assign({}, state, {appChainOutputs: outputs})
+        return this._executeTasks(state).then(appChainOutputs =>
+            _.assign({}, state, {appChainOutputs: appChainOutputs})
         );
     }
 
     _executeTasks(state) {
+        const config = state.config;
         return state.taskDefs.reduce((promise, taskDef) => {
-            return promise.then(outputs => this._taskExecutor.execute(taskDef, outputs));
+            return promise.then(appChainOutputs =>
+                this._taskExecutor.execute({taskDef, appChainOutputs, config})
+            );
         }, Promise.resolve(state.appChainOutputs));
     }
 }

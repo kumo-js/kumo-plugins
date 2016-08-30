@@ -12,24 +12,19 @@ class TaskUndoer {
         this._taskFactory = params.taskFactory;
     }
 
-    undo(taskDef, appChainOutputs) {
-        this._logger.info(`Undoing task: ${taskDef.id}`);
+    undo(params) {
+        const taskId = params.taskDef.id;
+        this._logger.info(`\n--->Undoing task: ${taskId}`);
 
         return Promise.resolve()
-            .then(() => this._undoTask(taskDef, appChainOutputs))
-            .then(() => this._outputsStore().remove(taskDef.id))
+            .then(() => this._createUndoTask(params).execute())
+            .then(() => this._outputsStore().remove(taskId));
     }
 
-    _undoTask(taskDef, appChainOutputs) {
-        return this._createUndoTask(taskDef, appChainOutputs).execute();
-    }
-
-    _createUndoTask(taskDef, appChainOutputs) {
-        return this._taskFactory.createUndoTask({
-            taskDef: taskDef,
-            appChainOutputs: appChainOutputs,
-            appOutputs: _.get(appChainOutputs, this._appNamespace(), {})
-        });
+    _createUndoTask(params) {
+        const appChainOutputs = params.appChainOutputs;
+        const appOutputs = _.get(appChainOutputs, this._appNamespace(), {});
+        return this._taskFactory.createUndoTask(_.assign({}, params, {appOutputs}));
     }
 
     _appNamespace() {
