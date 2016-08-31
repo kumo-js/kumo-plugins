@@ -11,7 +11,7 @@ class ExpandTaskDefs {
     execute(state) {
         return Promise.resolve()
             .then(() => this._taskDefs().map(taskDef => this._expandTaskDef(taskDef)))
-            .then(taskDefs => _.assign({}, state, {taskDefs: taskDefs}));
+            .then(taskDefs => Object.assign({}, state, {taskDefs: taskDefs}));
     }
 
     _expandTaskDef(taskDef) {
@@ -21,13 +21,13 @@ class ExpandTaskDefs {
     }
 
     _assignTaskType(taskDef) {
-        return _.assign({}, taskDef, {type: taskDef.type || 'custom'});
+        return Object.assign({}, taskDef, {type: taskDef.type || 'custom'});
     }
 
     _assignRegion(taskDef) {
         const regionOverrides = taskDef.regionOverrides || [];
         const region = regionOverrides[this._region()] || this._region();
-        return _.assign(_.omit(taskDef, 'regionOverrides'), {region});
+        return Object.assign(_.omit(taskDef, 'regionOverrides'), {region});
     }
 
     _region() {

@@ -1,26 +1,26 @@
 'use strict';
 
-const fs = require('fs');
-const runScript = require('command-promise');
-const AwsHelpers = require('../../common-lib/aws-helpers');
-const AppChainOutputsCollector = require('./app-chain-outputs-collector');
-const CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs');
-const CollectConfigStep = require('./action-steps/collect-config');
-const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
-const DirChainBuilder = require('../../common-lib/dir-chain-builder');
-const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
-const ExecuteTasksStep = require('./action-steps/execute-tasks');
-const EnvVarsFormatter = require('../../common-lib/env-vars-formatter');
-const OutputsStoreFactory = require('./outputs-store-factory');
-const PluginContext = require('./plugin-context');
-const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
-const SettingsFileReader = require('./settings-file-reader');
-const ScriptExecutor = require('../../common-lib/script-executor');
-const StepsExecutor = require('../../common-lib/steps-executor');
-const TaskFactory = require('./task-factory');
-const TaskExecutor = require('./task-executor');
-const TaskUndoer = require('./task-undoer');
-const UndoTasksStep = require('./action-steps/undo-tasks');
+const fs = require('fs'),
+    runScript = require('command-promise'),
+    AwsHelpers = require('../../common-lib/aws-helpers'),
+    AppChainOutputsCollector = require('./app-chain-outputs-collector'),
+    CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs'),
+    CollectConfigStep = require('./action-steps/collect-config'),
+    CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket'),
+    DirChainBuilder = require('../../common-lib/dir-chain-builder'),
+    ExpandTaskDefsStep = require('./action-steps/expand-task-defs'),
+    ExecuteTasksStep = require('./action-steps/execute-tasks'),
+    EnvVarsFormatter = require('../../common-lib/env-vars-formatter'),
+    OutputsStoreFactory = require('./outputs-store-factory'),
+    PluginContext = require('./plugin-context'),
+    SanitizeOutputsStep = require('./action-steps/sanitize-outputs'),
+    SettingsFileReader = require('./settings-file-reader'),
+    ScriptExecutor = require('../../common-lib/script-executor'),
+    StepsExecutor = require('../../common-lib/steps-executor'),
+    TaskFactory = require('./task-factory'),
+    TaskExecutor = require('./task-executor'),
+    TaskUndoer = require('./task-undoer'),
+    UndoTasksStep = require('./action-steps/undo-tasks');
 
 // TODO: Simplify / break down this class ??
 

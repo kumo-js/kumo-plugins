@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
 const path = require('path');
 const Promise = require('bluebird');
 
@@ -11,7 +10,7 @@ class DirChainBuilder {
     }
 
     build(startDir, settingsFilename, options) {
-        options = _.assign(this._defaultOptions(), options);
+        options = Object.assign(this._defaultOptions(), options);
         return this._getDirChain(startDir, settingsFilename).then(chain => {
             chain = options.reverse ? chain.reverse() : chain;
             return chain;

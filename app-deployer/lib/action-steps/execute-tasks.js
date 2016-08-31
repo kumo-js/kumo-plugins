@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
 const Promise = require('bluebird');
 
 class ExecuteTasks {
@@ -11,7 +10,7 @@ class ExecuteTasks {
 
     execute(state) {
         return this._executeTasks(state).then(appChainOutputs =>
-            _.assign({}, state, {appChainOutputs: appChainOutputs})
+            Object.assign({}, state, {appChainOutputs: appChainOutputs})
         );
     }
 

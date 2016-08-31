@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
 const Promise = require('bluebird');
 
 class ProvisionCfStack {
@@ -22,7 +21,7 @@ class ProvisionCfStack {
             .then(template => template.toString())
             .then(template => cfHelper.provisionStack({StackName: stackName, TemplateBody: template}))
             .then(() => cfHelper.extractOutputs(stackName))
-            .then(outputs => _.assign({}, state, {outputs: outputs}));
+            .then(outputs => Object.assign({}, state, {outputs: outputs}));
     }
 }
 

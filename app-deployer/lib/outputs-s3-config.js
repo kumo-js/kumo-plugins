@@ -1,7 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
-
 class OutputsS3Config {
 
     constructor(params) {
@@ -14,7 +12,7 @@ class OutputsS3Config {
         const defaultPrefix = `${this._env}/${appName}`;
         const outputsBucket = this._settings.outputsBucket();
         const prefix = this._addSlash(outputsBucket.prefix || defaultPrefix);
-        return _.assign(outputsBucket, {prefix});
+        return Object.assign(outputsBucket, {prefix});
     }
 
     _addSlash(prefix) {

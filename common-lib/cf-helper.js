@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
 const Promise = require('bluebird');
 
 class CfHelper {
@@ -19,7 +18,7 @@ class CfHelper {
     extractOutputs(stackName) {
         return this.findStack(stackName).then(stack =>
             stack.Outputs.reduce((outputs, o) =>
-                _.assign(outputs, {[o.OutputKey]: o.OutputValue}), {})
+                Object.assign(outputs, {[o.OutputKey]: o.OutputValue}), {})
         );
     }
 
@@ -66,14 +65,14 @@ class CfHelper {
     }
 
     _waitForCompletion(stackName, desiredState, options) {
-        options = _.assign({interval: 3000, retries: 100}, options);
+        options = Object.assign({interval: 3000, retries: 100}, options);
         return this.searchStack(stackName).then(stack => {
             const status = (stack || {}).StackStatus || '';
             if (status === desiredState) return;
             if (status.match(/FAILED|COMPLETE$/i)) throw new Error('Stack operation not successful');
             if (options.retries === 0) throw new Error('Timed out waiting for stack completion');
             return Promise.delay(options.interval).then(() => {
-                options = _.assign({}, options, {retries: options.retries - 1});
+                options = Object.assign({}, options, {retries: options.retries - 1});
                 return this._waitForCompletion(stackName, desiredState, options)
             });
         });

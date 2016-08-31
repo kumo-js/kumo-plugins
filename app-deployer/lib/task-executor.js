@@ -20,13 +20,14 @@ class TaskExecutor {
             .then(() => this._createTask(params).execute())
             .then(taskResult => this._extractOutputs(taskResult))
             .then(outputs => this._outputsStore().save(taskId, outputs))
-            .then(outputs => _.assign({}, params.appChainOutputs, outputs));
+            .then(outputs => Object.assign({}, params.appChainOutputs, outputs));
     }
 
     _createTask(params) {
         const appChainOutputs = params.appChainOutputs;
         const appOutputs = _.get(appChainOutputs, this._appNamespace(), {});
-        return this._taskFactory.createTask(_.assign({}, params, {appOutputs}));
+        params = Object.assign({}, params, {appOutputs});
+        return this._taskFactory.createTask(params);
     }
 
     _extractOutputs(taskResult) {

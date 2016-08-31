@@ -26,7 +26,7 @@ class Settings {
         const defaultRegion = this._options.region;
         const defaultBucket = _.get(this._kumoSettings, 'appDeployer.outputsBucket');
         const appBucket = this._app().outputsBucket;
-        return _.assign({region: defaultRegion}, defaultBucket, appBucket);
+        return Object.assign({region: defaultRegion}, defaultBucket, appBucket);
     }
 
     _app() {

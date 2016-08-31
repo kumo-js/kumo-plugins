@@ -24,7 +24,8 @@ class TaskUndoer {
     _createUndoTask(params) {
         const appChainOutputs = params.appChainOutputs;
         const appOutputs = _.get(appChainOutputs, this._appNamespace(), {});
-        return this._taskFactory.createUndoTask(_.assign({}, params, {appOutputs}));
+        params = Object.assign({}, params, {appOutputs});
+        return this._taskFactory.createUndoTask(params);
     }
 
     _appNamespace() {

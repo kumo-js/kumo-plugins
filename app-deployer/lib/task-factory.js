@@ -1,19 +1,19 @@
 'use strict';
 
-const fs = require('fs');
-const runScript = require('command-promise');
-const AwsHelpers = require('../../common-lib/aws-helpers');
-const DeleteCfStackStep = require('./task-steps/delete-cf-stack');
-const CollectTaskOutputsStep = require('./task-steps/collect-task-outputs');
-const CreateEnvVarsStep = require('./task-steps/create-env-vars');
-const CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars');
-const DumpParametersStep = require('./task-steps/dump-parameters');
-const ExecuteScriptStep = require('./task-steps/execute-script');
-const EnvVarsFormatter = require('../../common-lib/env-vars-formatter');
-const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
-const ScriptExecutor = require('../../common-lib/script-executor');
-const StepsExecutor = require('../../common-lib/steps-executor');
-const StackNameExpander = require('./stack-name-expander');
+const fs = require('fs'),
+    runScript = require('command-promise'),
+    AwsHelpers = require('../../common-lib/aws-helpers'),
+    DeleteCfStackStep = require('./task-steps/delete-cf-stack'),
+    CollectTaskOutputsStep = require('./task-steps/collect-task-outputs'),
+    CreateEnvVarsStep = require('./task-steps/create-env-vars'),
+    CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars'),
+    DumpParametersStep = require('./task-steps/dump-parameters'),
+    ExecuteScriptStep = require('./task-steps/execute-script'),
+    EnvVarsFormatter = require('../../common-lib/env-vars-formatter'),
+    ProvisionCfStackStep = require('./task-steps/provision-cf-stack'),
+    ScriptExecutor = require('../../common-lib/script-executor'),
+    StepsExecutor = require('../../common-lib/steps-executor'),
+    StackNameExpander = require('./stack-name-expander');
 
 // TODO: Simplify / break down this class ??
 

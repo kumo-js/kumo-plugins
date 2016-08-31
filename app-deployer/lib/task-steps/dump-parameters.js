@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
 const Promise = require('bluebird');
 
 class DumpParameters {
@@ -12,7 +11,7 @@ class DumpParameters {
 
     execute(state) {
         return this._dumpParameters(state)
-            .then(files => _.assign({}, state, files));
+            .then(files => Object.assign({}, state, files));
     }
 
     _dumpParameters(state) {

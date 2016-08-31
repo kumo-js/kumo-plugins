@@ -1,7 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
-
 class CollectAppChainOutputs {
 
     constructor(params) {
@@ -11,7 +9,7 @@ class CollectAppChainOutputs {
 
     execute(state) {
         return this._collectAppChainOutputs().then(
-            outputs => _.assign({}, state, {appChainOutputs: outputs})
+            outputs => Object.assign({}, state, {appChainOutputs: outputs})
         );
     }
 

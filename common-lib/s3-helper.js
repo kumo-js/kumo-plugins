@@ -45,13 +45,11 @@ class S3Helper {
     }
 
     _listObjectsInBuckets(buckets) {
-        return Promise.all(
-            buckets.map(bucket => {
-                return this._s3.listObjects(bucket).promise().then(response =>
-                    response.Contents.map(obj => _.assign({Bucket: bucket.Bucket, Key: obj.Key}))
-                )
-            })
-        ).then(items => _.flatten(items));
+        return Promise.all(buckets.map(bucket => {
+            return this._s3.listObjects(bucket).promise().then(response =>
+                response.Contents.map(obj => Object.assign({Bucket: bucket.Bucket, Key: obj.Key}))
+            )
+        })).then(items => _.flatten(items));
     }
 
     _fetch(items) {
