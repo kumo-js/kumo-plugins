@@ -17,25 +17,25 @@ class TaskExecutor {
         this._logger.info(`\n--->Executing task: ${taskId}`);
 
         return Promise.resolve()
-            .then(() => this._createTask(params).execute())
-            .then(taskResult => this._extractOutputs(taskResult))
-            .then(outputs => this._outputsStore().save(taskId, outputs))
-            .then(outputs => Object.assign({}, params.appChainOutputs, outputs));
+            .then(() => this._executeTask(params))
+            .then(taskResult => _.get(taskResult, 'outputs', {}))
+            .then(outputs => this._saveOutputs(taskId, outputs))
+            .then(outputs => this._mergeOutputs(params.appChainOutputs, outputs));
     }
 
-    _createTask(params) {
-        const appChainOutputs = params.appChainOutputs;
-        const appOutputs = _.get(appChainOutputs, this._appNamespace(), {});
-        params = Object.assign({}, params, {appOutputs});
-        return this._taskFactory.createTask(params);
+    _executeTask(params) {
+        return this._taskFactory.createTask(params).execute();
     }
 
-    _extractOutputs(taskResult) {
-        const outputs = _.get(taskResult, 'outputs', {});
-        return {[this._appNamespace()]: outputs};
+    _saveOutputs(taskId, outputs) {
+        return this._outputsStore().save(taskId, outputs).then(() => outputs);
     }
 
-    _appNamespace() {
+    _mergeOutputs(source, outputs) {
+        return Object.assign({}, source, {[this._appName()]: outputs});
+    }
+
+    _appName() {
         return this._context.settings().appName();
     }
 

@@ -7,7 +7,6 @@ const fs = require('fs'),
     CollectTaskOutputsStep = require('./task-steps/collect-task-outputs'),
     CreateEnvVarsStep = require('./task-steps/create-env-vars'),
     CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars'),
-    DumpParametersStep = require('./task-steps/dump-parameters'),
     ExecuteScriptStep = require('./task-steps/execute-script'),
     EnvVarsFormatter = require('../../common-lib/env-vars-formatter'),
     ProvisionCfStackStep = require('./task-steps/provision-cf-stack'),
@@ -46,7 +45,6 @@ class TaskFactory {
 
     _cfTaskSteps() {
         return [
-            this._dumpParametersStep(),
             this._createEnvVarsStep(),
             this._createCfEnvVarsStep(),
             this._executeScriptStep(),
@@ -56,7 +54,6 @@ class TaskFactory {
 
     _customTaskSteps() {
         return [
-            this._dumpParametersStep(),
             this._createEnvVarsStep(),
             this._executeScriptStep(),
             this._collectTaskOutputsStep()
@@ -69,20 +66,14 @@ class TaskFactory {
 
     _undoCustomTaskSteps() {
         return [
-            this._dumpParametersStep(),
             this._createEnvVarsStep(),
             this._executeScriptStep({scriptType: 'undo'})
         ]
     }
 
-    _dumpParametersStep() {
-        const context = this._context;
-        return new DumpParametersStep({context, fs});
-    }
-
     _createEnvVarsStep() {
         const context = this._context;
-        return new CreateEnvVarsStep({context});
+        return new CreateEnvVarsStep({context, fs});
     }
 
     _createCfEnvVarsStep() {

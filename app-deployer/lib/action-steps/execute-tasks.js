@@ -15,10 +15,10 @@ class ExecuteTasks {
     }
 
     _executeTasks(state) {
-        const config = state.config;
+        const appChainConfig = state.appChainConfig;
         return state.taskDefs.reduce((promise, taskDef) => {
             return promise.then(appChainOutputs =>
-                this._taskExecutor.execute({taskDef, appChainOutputs, config})
+                this._taskExecutor.execute({taskDef, appChainOutputs, appChainConfig})
             );
         }, Promise.resolve(state.appChainOutputs));
     }

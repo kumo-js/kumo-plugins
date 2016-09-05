@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
 const Promise = require('bluebird');
 
 class TaskUndoer {
@@ -17,19 +16,12 @@ class TaskUndoer {
         this._logger.info(`\n--->Undoing task: ${taskId}`);
 
         return Promise.resolve()
-            .then(() => this._createUndoTask(params).execute())
+            .then(() => this._undoTask(params))
             .then(() => this._outputsStore().remove(taskId));
     }
 
-    _createUndoTask(params) {
-        const appChainOutputs = params.appChainOutputs;
-        const appOutputs = _.get(appChainOutputs, this._appNamespace(), {});
-        params = Object.assign({}, params, {appOutputs});
-        return this._taskFactory.createUndoTask(params);
-    }
-
-    _appNamespace() {
-        return this._context.settings().appName();
+    _undoTask(params) {
+        return this._taskFactory.createUndoTask(params).execute();
     }
 
     _outputsStore() {

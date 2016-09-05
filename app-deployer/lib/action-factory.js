@@ -3,9 +3,9 @@
 const fs = require('fs'),
     runScript = require('command-promise'),
     AwsHelpers = require('../../common-lib/aws-helpers'),
-    AppChainOutputsCollector = require('./app-chain-outputs-collector'),
+    AppChainBuilder = require('./app-chain-builder'),
     CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs'),
-    CollectConfigStep = require('./action-steps/collect-config'),
+    CollectAppChainConfigStep = require('./action-steps/collect-app-chain-config'),
     CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket'),
     DirChainBuilder = require('../../common-lib/dir-chain-builder'),
     ExpandTaskDefsStep = require('./action-steps/expand-task-defs'),
@@ -32,7 +32,7 @@ class ActionFactory {
             steps: [
                 this._createOutputsBucketStep(context),
                 this._collectAppChainOutputsStep(context, params),
-                this._collectConfigStep(context),
+                this._collectAppChainConfigStep(context, params),
                 this._expandTaskDefsStep(context),
                 this._executeTasksStep(context),
                 this._sanitizeOutputsStep(context)
@@ -45,7 +45,7 @@ class ActionFactory {
         return new StepsExecutor({
             steps: [
                 this._collectAppChainOutputsStep(context, params),
-                this._collectConfigStep(context),
+                this._collectAppChainConfigStep(context, params),
                 this._expandTaskDefsStep(context),
                 this._undoTasksStep(context)
             ]
@@ -64,13 +64,15 @@ class ActionFactory {
     }
 
     _collectAppChainOutputsStep(context, actionParams) {
-        const appChainOutputsCollector = this._appChainOutputsCollector(actionParams);
-        return new CollectAppChainOutputsStep({context, fs, appChainOutputsCollector});
+        const appChainBuilder = this._appChainBuilder(context, actionParams);
+        const outputsStoreFactory = this._outputsStoreFactory();
+        return new CollectAppChainOutputsStep({appChainBuilder, context, outputsStoreFactory});
     }
 
-    _collectConfigStep(context) {
+    _collectAppChainConfigStep(context, actionParams) {
+        const appChainBuilder = this._appChainBuilder(context, actionParams);
         const scriptExecutor = this._scriptExecutor(context);
-        return new CollectConfigStep({context, scriptExecutor});
+        return new CollectAppChainConfigStep({appChainBuilder, context, scriptExecutor});
     }
 
     _expandTaskDefsStep(context) {
@@ -96,11 +98,14 @@ class ActionFactory {
         return new SanitizeOutputsStep({context, outputsStoreFactory});
     }
 
-    _appChainOutputsCollector(actionParams) {
+    _appChainBuilder(context, actionParams) {
         const dirChainBuilder = new DirChainBuilder({fs});
-        const outputsStoreFactory = this._outputsStoreFactory();
         const settingsFileReader = this._settingsFileReader(actionParams);
-        return new AppChainOutputsCollector({dirChainBuilder, outputsStoreFactory, settingsFileReader});
+        return new AppChainBuilder({context, dirChainBuilder, settingsFileReader})
+    }
+
+    _awsHelpers() {
+        return new AwsHelpers();
     }
 
     _outputsStoreFactory() {
@@ -108,20 +113,16 @@ class ActionFactory {
         return new OutputsStoreFactory({awsHelpers});
     }
 
-    _settingsFileReader(actionParams) {
-        const kumoSettings = actionParams.kumoContext.settings();
-        const options = actionParams.options;
-        return new SettingsFileReader({fs, kumoSettings, options});
-    }
-
-    _awsHelpers() {
-        return new AwsHelpers();
-    }
-
     _scriptExecutor(context) {
         const logger = context.logger();
         const options = {envVarsFormatter: new EnvVarsFormatter({})};
         return new ScriptExecutor({logger, runScript, options});
+    }
+
+    _settingsFileReader(actionParams) {
+        const kumoSettings = actionParams.kumoContext.settings();
+        const options = actionParams.options;
+        return new SettingsFileReader({fs, kumoSettings, options});
     }
 
     _taskFactory(context) {
