@@ -9,12 +9,11 @@ const fs = require('fs'),
     CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars'),
     ExecuteScriptStep = require('./task-steps/execute-script'),
     EnvVarsFormatter = require('../../common-lib/env-vars-formatter'),
+    JsonCompatibleFileReader = require('../../common-lib/json-compatible-file-reader'),
     ProvisionCfStackStep = require('./task-steps/provision-cf-stack'),
     ScriptExecutor = require('../../common-lib/script-executor'),
     StepsExecutor = require('../../common-lib/steps-executor'),
     StackNameExpander = require('./stack-name-expander');
-
-// TODO: Simplify / break down this class ??
 
 class TaskFactory {
 
@@ -82,7 +81,8 @@ class TaskFactory {
     }
 
     _collectTaskOutputsStep() {
-        return new CollectTaskOutputsStep({fs});
+        const fileReader = this._fileReader();
+        return new CollectTaskOutputsStep({fileReader});
     }
 
     _deleteCfStackStep() {
@@ -101,17 +101,21 @@ class TaskFactory {
     _provisionCfStackStep() {
         const awsHelpers = this._awsHelpers();
         const context = this._context;
+        const fileReader = this._fileReader();
         const stackNameExpander = this._stackNameExpander();
-        return new ProvisionCfStackStep({awsHelpers, context, fs, stackNameExpander});
+        return new ProvisionCfStackStep({awsHelpers, context, fileReader, stackNameExpander});
+    }
+
+    _fileReader() {
+        return new JsonCompatibleFileReader();
     }
 
     _stackNameExpander() {
-        const context = this._context;
-        return new StackNameExpander({context});
+        return new StackNameExpander({context: this._context});
     }
 
     _scriptExecutor(context) {
-        const logger = context.logger();
+        const logger = context.logger;
         const options = {envVarsFormatter: new EnvVarsFormatter({})};
         return new ScriptExecutor({logger, runScript, options});
     }

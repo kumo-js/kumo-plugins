@@ -15,9 +15,9 @@ class CreateEnvVars {
                 envVars: {
                     appResourcesFile: files.appChainOutputsFile,
                     appConfig: JSON.stringify(state.appChainConfig),
-                    env: this._context.env().value(),
+                    env: this._context.env.value(),
                     region: state.taskDef.region,
-                    taskOutputsFile: this._context.tempFile()
+                    taskOutputsFile: this._context.generateTempFile()
                 }
             })
         );
@@ -30,7 +30,7 @@ class CreateEnvVars {
     }
 
     _dumpTempFile(content) {
-        const file = this._context.tempFile();
+        const file = this._context.generateTempFile();
         return this._fs.writeFileAsync(file, JSON.stringify(content)).then(() => file);
     }
 }

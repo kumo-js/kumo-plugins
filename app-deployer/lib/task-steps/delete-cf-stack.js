@@ -4,7 +4,7 @@ class DeleteCfStack {
 
     constructor(params) {
         this._awsHelpers = params.awsHelpers;
-        this._logger = params.context.logger();
+        this._logger = params.context.logger;
         this._stackNameExpander = params.stackNameExpander;
     }
 

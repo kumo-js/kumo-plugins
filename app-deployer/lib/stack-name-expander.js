@@ -7,8 +7,8 @@ class StackNameExpander {
     }
 
     expand(stackName) {
-        const appName = this._context.settings().appName();
-        const env = this._context.env().value();
+        const appName = this._context.settings.appName();
+        const env = this._context.env.value();
         const name = `${env}-${appName}-${stackName}`;
         return name.replace(/\s/, '-').toLowerCase();
     }

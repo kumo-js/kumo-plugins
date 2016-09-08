@@ -6,7 +6,7 @@ const Promise = require('bluebird');
 class DirChainBuilder {
 
     constructor(params) {
-        this._fs = Promise.promisifyAll(params.fs);
+        this._fileReader = Promise.promisifyAll(params.fileReader);
     }
 
     build(startDir, settingsFilename, options) {
@@ -36,9 +36,7 @@ class DirChainBuilder {
     }
 
     _readSettings(settingsFilename) {
-        return this._fs.readFileAsync(settingsFilename).then(
-            settings => JSON.parse(settings.toString())
-        );
+        return this._fileReader.readJson(settingsFilename);
     }
 
     _defaultOptions() {

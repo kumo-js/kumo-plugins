@@ -1,7 +1,8 @@
 'use strict';
 
 const PLUGINS = [
-    'app-deployer'
+    'app-deployer',
+    'secrets-manager'
 ];
 
 module.exports = {

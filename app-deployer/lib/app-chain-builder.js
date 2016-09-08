@@ -33,11 +33,11 @@ class AppChainBuilder {
     }
 
     _appDir() {
-        return this._context.appDir();
+        return this._context.appDir;
     }
 
     _settingsFilename() {
-        return this._context.settingsFilename();
+        return this._context.settingsFilename;
     }
 }
 

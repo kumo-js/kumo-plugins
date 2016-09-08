@@ -25,7 +25,7 @@ class CollectAppChainConfig {
     _collectAppConfig(settings) {
         const script = _.get(settings.config(), 'script');
         if (!script) return Promise.resolve({});
-        const envVars = {env: this._context.env().value()};
+        const envVars = {env: this._context.env.value()};
         const scriptOptions = {env: envVars, logOutput: false};
         return this._scriptExecutor.execute(script, scriptOptions)
             .then(jsonConfigStr =>JSON.parse(jsonConfigStr || '{}'));

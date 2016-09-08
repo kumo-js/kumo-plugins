@@ -33,7 +33,7 @@ class CollectAppChainOutputs {
     }
 
     _envs() {
-        const env = this._context.env();
+        const env = this._context.env;
         return _.compact([env.prefix(), env.value()]);
     }
 

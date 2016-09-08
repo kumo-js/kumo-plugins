@@ -12,7 +12,7 @@ class ExecuteScript {
 
     execute(state) {
         const script = state.taskDef.scripts[this._options.scriptType];
-        const options = {env: state.envVars, cwd: this._context.appDir()};
+        const options = {env: state.envVars, cwd: this._context.appDir};
         const result = script ? this._scriptExecutor.execute(script, options) : Promise.resolve();
         return result.then(() => state);
     }

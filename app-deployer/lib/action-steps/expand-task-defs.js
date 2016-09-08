@@ -31,11 +31,11 @@ class ExpandTaskDefs {
     }
 
     _region() {
-        return this._context.region();
+        return this._context.options.region;
     }
 
     _taskDefs() {
-        return this._context.settings().tasks();
+        return this._context.settings.tasks();
     }
 }
 

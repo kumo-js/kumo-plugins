@@ -16,8 +16,8 @@ class SanitizeOutputs {
 
     _outputsStore() {
         return this._outputsStoreFactory.createStore(
-            this._context.settings(),
-            this._context.env().value()
+            this._context.settings,
+            this._context.env.value()
         );
     }
 }

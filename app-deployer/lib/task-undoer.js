@@ -6,7 +6,7 @@ class TaskUndoer {
 
     constructor(params) {
         this._context = params.context;
-        this._logger = this._context.logger();
+        this._logger = this._context.logger;
         this._outputsStoreFactory = params.outputsStoreFactory;
         this._taskFactory = params.taskFactory;
     }
@@ -26,8 +26,8 @@ class TaskUndoer {
 
     _outputsStore() {
         return this._outputsStoreFactory.createStore(
-            this._context.settings(),
-            this._context.env().value()
+            this._context.settings,
+            this._context.env.value()
         );
     }
 }

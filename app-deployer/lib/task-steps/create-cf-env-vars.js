@@ -12,7 +12,7 @@ class CreateCfEnvVars {
     execute(state) {
         return Promise.resolve(_.merge({}, state, {
             envVars: {
-                templateOutputFile: this._context.tempFile()
+                templateOutputFile: this._context.generateTempFile()
             }
         }));
     }
