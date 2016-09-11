@@ -2,13 +2,14 @@
 
 const path = require('path');
 const Promise = require('bluebird');
+const Settings = require('./settings');
 
 class AppChainBuilder {
 
     constructor(params) {
         this._context = params.context;
         this._dirChainBuilder = params.dirChainBuilder;
-        this._settingsFileReader = params.settingsFileReader;
+        this._fileReader = params.fileReader;
     }
 
     build() {
@@ -27,9 +28,19 @@ class AppChainBuilder {
         return Promise.all(
             appDirs.map(appDir => {
                 const settingsFile = path.join(appDir, this._settingsFilename());
-                return this._settingsFileReader.read(settingsFile);
+                return this._fileReader.readJson(settingsFile).then(
+                    appSettings => this._createSettingsObj(appSettings)
+                );
             })
         );
+    }
+
+    _createSettingsObj(appSettings) {
+        return new Settings({
+            appSettings: appSettings,
+            kumoSettings: this._context.kumoSettings,
+            options: this._context.options
+        });
     }
 
     _appDir() {

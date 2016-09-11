@@ -1,27 +1,24 @@
 'use strict';
 
 const ActionFactory = require('./lib/action-factory');
-const ContextBuilderFactory = require('./lib/context-builder-factory');
-const contextBuilderFactory = new ContextBuilderFactory();
+const ContextFactory = require('./lib/context-factory');
+const JsonCompatibleFileReader = require('../common-lib/json-compatible-file-reader');
+const PluginActionsBuilder = require('../common-lib/plugin-actions-builder');
 
-function execute(params, createAction) {
-    const contextBuilder = contextBuilderFactory.createBuilder(params);
-    return contextBuilder.build().then(context => {
-        const factory = new ActionFactory({context});
-        return createAction(factory).execute();
-    });
-}
+const fileReader = new JsonCompatibleFileReader();
+const actionFactory = new ActionFactory();
+const contextFactory = new ContextFactory({fileReader});
 
-module.exports = {
-
-    actions: () => [
+module.exports = new PluginActionsBuilder({
+    contextFactory: contextFactory,
+    actionDefs: [
         {
             name: 'deploy-app',
-            execute: params => execute(params, factory => factory.createDeployAction())
+            createAction: context => actionFactory.createDeployAction(context)
         },
         {
             name: 'destroy-app',
-            execute: params => execute(params, factory => factory.createDestroyAction())
+            createAction: context => actionFactory.createDestroyAction(context)
         }
     ]
-};
+}).build();

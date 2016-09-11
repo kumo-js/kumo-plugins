@@ -13,7 +13,6 @@ const runScript = require('command-promise'),
     JsonCompatibleFileReader = require('../../common-lib/json-compatible-file-reader'),
     OutputsStoreFactory = require('./outputs-store-factory'),
     SanitizeOutputsStep = require('./action-steps/sanitize-outputs'),
-    SettingsFileReader = require('./settings-file-reader'),
     ScriptExecutor = require('../../common-lib/script-executor'),
     StepsExecutor = require('../../common-lib/steps-executor'),
     TaskFactory = require('./task-factory'),
@@ -21,89 +20,88 @@ const runScript = require('command-promise'),
     TaskUndoer = require('./task-undoer'),
     UndoTasksStep = require('./action-steps/undo-tasks');
 
+// TODO: Break down this class ??
+
 class ActionFactory {
 
-    constructor(params) {
-        this._context = params.context;
-    }
-
-    createDeployAction() {
+    createDeployAction(context) {
         return new StepsExecutor({
             steps: [
-                this._createOutputsBucketStep(),
-                this._collectAppChainOutputsStep(),
-                this._collectAppChainConfigStep(),
-                this._expandTaskDefsStep(),
-                this._executeTasksStep(),
-                this._sanitizeOutputsStep()
+                this._createOutputsBucketStep(context),
+                this._collectAppChainOutputsStep(context),
+                this._collectAppChainConfigStep(context),
+                this._expandTaskDefsStep(context),
+                this._executeTasksStep(context),
+                this._sanitizeOutputsStep(context)
             ]
         });
     }
 
-    createDestroyAction() {
+    createDestroyAction(context) {
         return new StepsExecutor({
             steps: [
-                this._collectAppChainOutputsStep(),
-                this._collectAppChainConfigStep(),
-                this._expandTaskDefsStep(),
-                this._undoTasksStep()
+                this._collectAppChainOutputsStep(context),
+                this._collectAppChainConfigStep(context),
+                this._expandTaskDefsStep(context),
+                this._undoTasksStep(context)
             ]
         });
     }
 
-    _createOutputsBucketStep() {
+    _createOutputsBucketStep(context) {
         const awsHelpers = this._awsHelpers();
-        const context = this._context;
         return new CreateOutputsBucketStep({awsHelpers, context});
     }
 
-    _collectAppChainOutputsStep() {
-        const appChainBuilder = this._appChainBuilder();
-        const context = this._context;
+    _collectAppChainOutputsStep(context) {
+        const appChainBuilder = this._appChainBuilder(context);
         const outputsStoreFactory = this._outputsStoreFactory();
         return new CollectAppChainOutputsStep({appChainBuilder, context, outputsStoreFactory});
     }
 
-    _collectAppChainConfigStep() {
-        const appChainBuilder = this._appChainBuilder();
-        const context = this._context;
-        const scriptExecutor = this._scriptExecutor();
+    _collectAppChainConfigStep(context) {
+        const appChainBuilder = this._appChainBuilder(context);
+        const scriptExecutor = this._scriptExecutor(context);
         return new CollectAppChainConfigStep({appChainBuilder, context, scriptExecutor});
     }
 
-    _expandTaskDefsStep() {
-        const context = this._context;
+    _expandTaskDefsStep(context) {
         return new ExpandTaskDefsStep({context});
     }
 
-    _executeTasksStep() {
-        const context = this._context;
+    _executeTasksStep(context) {
         const outputsStoreFactory = this._outputsStoreFactory();
-        const taskFactory = this._taskFactory();
+        const taskFactory = this._taskFactory(context);
         const taskExecutor = new TaskExecutor({context, outputsStoreFactory, taskFactory});
         return new ExecuteTasksStep({taskExecutor});
     }
 
-    _undoTasksStep() {
-        const context = this._context;
+    _undoTasksStep(context) {
         const outputsStoreFactory = this._outputsStoreFactory();
-        const taskFactory = this._taskFactory();
+        const taskFactory = this._taskFactory(context);
         const taskUndoer = new TaskUndoer({context, outputsStoreFactory, taskFactory});
         return new UndoTasksStep({taskUndoer});
     }
 
-    _sanitizeOutputsStep() {
-        const context = this._context;
+    _sanitizeOutputsStep(context) {
         const outputsStoreFactory = this._outputsStoreFactory();
         return new SanitizeOutputsStep({context, outputsStoreFactory});
     }
 
-    _appChainBuilder() {
-        const context = this._context;
+    _appChainBuilder(context) {
         const fileReader = this._fileReader();
         const dirChainBuilder = new DirChainBuilder({fileReader});
-        const settingsFileReader = this._settingsFileReader();
-        return new AppChainBuilder({context, dirChainBuilder, settingsFileReader})
+        return new AppChainBuilder({context, dirChainBuilder, fileReader})
+    }
+
+    _scriptExecutor(context) {
+        const logger = context.logger;
+        const options = {envVarsFormatter: new EnvVarsFormatter({})};
+        return new ScriptExecutor({logger, runScript, options});
+    }
+
+    _taskFactory(context) {
+        return new TaskFactory({context});
     }
 
     _awsHelpers() {
@@ -117,23 +115,6 @@ class ActionFactory {
     _outputsStoreFactory() {
         const awsHelpers = this._awsHelpers();
         return new OutputsStoreFactory({awsHelpers});
-    }
-
-    _scriptExecutor() {
-        const logger = this._context.logger;
-        const options = {envVarsFormatter: new EnvVarsFormatter({})};
-        return new ScriptExecutor({logger, runScript, options});
-    }
-
-    _settingsFileReader() {
-        const fileReader = this._fileReader();
-        const kumoSettings = this._context.kumoContext.settings();
-        const options = this._context.options;
-        return new SettingsFileReader({fileReader, kumoSettings, options});
-    }
-
-    _taskFactory() {
-        return new TaskFactory({context: this._context});
     }
 }
 
