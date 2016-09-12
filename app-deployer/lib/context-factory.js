@@ -15,7 +15,7 @@ class ContextFactory {
         return this._loadSettings(params).then(result => ({
             appDir: path.dirname(result.settingsFile),
             env: new Env(params.options.env),
-            kumoSettings: params.kumoContext.settings(),
+            kumoSettings: params.kumoContext.settings,
             logger: params.logger,
             options: params.options,
             settings: result.settings,
@@ -26,9 +26,8 @@ class ContextFactory {
 
     _loadSettings(params) {
         const settingsFile = this._settingsFile(params);
-        const kumoSettings = params.kumoContext.settings();
+        const kumoSettings = params.kumoContext.settings;
         const options = params.options;
-
         return this._fileReader.readJson(settingsFile)
             .then(appSettings => new Settings({appSettings, kumoSettings, options}))
             .then(settings => ({settingsFile, settings}));
@@ -36,7 +35,7 @@ class ContextFactory {
 
     _settingsFile(params) {
         const filename = params.options.settingsFilename || 'deploy-settings.json';
-        return path.join(params.kumoContext.cwd(), filename);
+        return path.join(params.kumoContext.cwd, filename);
     }
 }
 

@@ -25,14 +25,12 @@ class AppChainBuilder {
     }
 
     _loadAppSettings(appDirs) {
-        return Promise.all(
-            appDirs.map(appDir => {
-                const settingsFile = path.join(appDir, this._settingsFilename());
-                return this._fileReader.readJson(settingsFile).then(
-                    appSettings => this._createSettingsObj(appSettings)
-                );
-            })
-        );
+        return Promise.all(appDirs.map(appDir => {
+            const settingsFile = path.join(appDir, this._settingsFilename());
+            return this._fileReader.readJson(settingsFile)
+                .then(settings => this._createSettingsObj(settings))
+                .then(settings => ({dir: appDir, settings}));
+        }));
     }
 
     _createSettingsObj(appSettings) {

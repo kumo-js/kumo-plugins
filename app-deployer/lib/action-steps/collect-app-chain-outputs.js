@@ -21,7 +21,8 @@ class CollectAppChainOutputs {
         return Promise.all(promises).then(outputs => outputs.reduce(_.merge, {}));
     }
 
-    _collectAppOutputs(settings) {
+    _collectAppOutputs(app) {
+        const settings = app.settings;
         const appName = settings.appName();
         const envs = this._envs();
         const promises = envs.map(env => this._outputsStore(settings, env).collect());

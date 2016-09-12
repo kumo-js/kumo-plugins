@@ -22,11 +22,11 @@ class CollectAppChainConfig {
         return Promise.all(promises).then(config => config.reduce(_.merge, {}));
     }
 
-    _collectAppConfig(settings) {
-        const script = _.get(settings.config(), 'script');
+    _collectAppConfig(app) {
+        const script = _.get(app.settings.config(), 'script');
         if (!script) return Promise.resolve({});
         const envVars = {env: this._context.env.value()};
-        const scriptOptions = {env: envVars, logOutput: false};
+        const scriptOptions = {cwd: app.dir, env: envVars, logOutput: false};
         return this._scriptExecutor.execute(script, scriptOptions)
             .then(jsonConfigStr =>JSON.parse(jsonConfigStr || '{}'));
     }
