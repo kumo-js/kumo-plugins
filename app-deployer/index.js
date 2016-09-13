@@ -1,16 +1,19 @@
 'use strict';
 
 const ActionFactory = require('./lib/action-factory');
-const ContextFactory = require('./lib/context-factory');
 const JsonCompatibleFileReader = require('../common-lib/json-compatible-file-reader');
-const PluginActionsBuilder = require('../common-lib/plugin-actions-builder');
+const DefaultContextInitializer = require('../common-lib/default-context-initializer');
+const ContextInitializer = require('./lib/context-initializer');
+const PluginHelper = require('../common-lib/plugin-helper');
 
-const fileReader = new JsonCompatibleFileReader();
 const actionFactory = new ActionFactory();
-const contextFactory = new ContextFactory({fileReader});
+const fileReader = new JsonCompatibleFileReader();
+const defaultSettingsFilename = 'deploy-settings.json';
+const defaultContextInitializer = new DefaultContextInitializer({defaultSettingsFilename, fileReader});
+const contextInitializer = new ContextInitializer({defaultContextInitializer});
 
-module.exports = new PluginActionsBuilder({
-    contextFactory: contextFactory,
+module.exports = new PluginHelper({
+    contextInitializer: contextInitializer,
     actionDefs: [
         {
             name: 'deploy-app',
@@ -21,4 +24,4 @@ module.exports = new PluginActionsBuilder({
             createAction: context => actionFactory.createDestroyAction(context)
         }
     ]
-}).build();
+});
