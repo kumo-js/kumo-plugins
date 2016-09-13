@@ -2,17 +2,17 @@
 
 const fs = require('fs'),
     runScript = require('command-promise'),
-    AwsHelpers = require('../../common-lib/aws-helpers'),
+    AwsHelpers = require('../../../common-lib/aws-helpers'),
     DeleteCfStackStep = require('./task-steps/delete-cf-stack'),
     CollectTaskOutputsStep = require('./task-steps/collect-task-outputs'),
     CreateEnvVarsStep = require('./task-steps/create-env-vars'),
     CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars'),
     ExecuteScriptStep = require('./task-steps/execute-script'),
-    EnvVarsFormatter = require('../../common-lib/env-vars-formatter'),
-    JsonCompatibleFileReader = require('../../common-lib/json-compatible-file-reader'),
+    EnvVarsFormatter = require('../../../common-lib/env-vars-formatter'),
+    JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader'),
     ProvisionCfStackStep = require('./task-steps/provision-cf-stack'),
-    ScriptExecutor = require('../../common-lib/script-executor'),
-    StepsExecutor = require('../../common-lib/steps-executor'),
+    ScriptExecutor = require('../../../common-lib/script-executor'),
+    StepsExecutor = require('../../../common-lib/steps-executor'),
     StackNameExpander = require('./stack-name-expander');
 
 class TaskFactory {

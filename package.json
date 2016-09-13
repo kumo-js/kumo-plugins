@@ -26,6 +26,7 @@
     "bluebird": "^3.4.1",
     "chdir-promise": "^0.2.1",
     "command-promise": "^2.0.0",
+    "glob-promise": "^1.0.6",
     "i": "^0.3.5",
     "lodash": "^4.13.1",
     "tempfile2": "^2.0.1",
