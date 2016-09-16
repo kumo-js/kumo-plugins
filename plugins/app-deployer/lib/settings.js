@@ -5,7 +5,7 @@ const _ = require('lodash');
 class Settings {
 
     constructor(params) {
-        this._appSettings = params.appSettings;
+        this._pluginSettings = params.pluginSettings;
         this._kumoSettings = params.kumoSettings;
         this._options = params.options;
     }
@@ -30,7 +30,7 @@ class Settings {
     }
 
     _app() {
-        return this._appSettings.app;
+        return this._pluginSettings.app;
     }
 }
 

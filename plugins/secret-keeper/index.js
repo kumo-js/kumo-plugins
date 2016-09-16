@@ -8,16 +8,24 @@ const PluginHelper = require('../../common-lib/plugin-helper');
 
 const actionFactory = new ActionFactory();
 const fileReader = new JsonCompatibleFileReader();
-const defaultSettingsFilename = 'secret-keeper-settings.json';
-const defaultContextInitializer = new DefaultContextInitializer({defaultSettingsFilename, fileReader});
+const settingsFileConfig = {defaultFilename: 'secret-profiles.json', required: false};
+const defaultContextInitializer = new DefaultContextInitializer({fileReader, settingsFileConfig});
 const contextInitializer = new ContextInitializer({defaultContextInitializer});
 
 module.exports = new PluginHelper({
     contextInitializer: contextInitializer,
     actionDefs: [
         {
-            name: 'decrypt-file',
-            createAction: context => actionFactory.createDecryptFileAction(context)
+            name: 'encrypt-secret',
+            createAction: context => actionFactory.createEncryptSecretAction(context)
+        },
+        {
+            name: 'decrypt-secret',
+            createAction: context => actionFactory.createDecryptSecretAction(context)
+        },
+        {
+            name: 'store-secret-item',
+            createAction: context => actionFactory.createStoreSecretAction(context)
         }
     ]
 });

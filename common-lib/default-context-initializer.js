@@ -5,8 +5,8 @@ const path = require('path');
 class DefaultContextInitializer {
 
     constructor(params) {
-        this._defaultSettingsFilename = params.defaultSettingsFilename;
         this._fileReader = params.fileReader;
+        this._settingsFileConfig = Object.assign({required: true}, params.settingsFileConfig);
     }
 
     initialize(context, actionParams) {
@@ -25,15 +25,17 @@ class DefaultContextInitializer {
 
     _loadSettings(actionParams) {
         const settingsFile = this._settingsFile(actionParams);
-        return this._fileReader.readJson(settingsFile).then(
-            settings => ({settingsFile, settings})
-        );
+        const options = {ignoreNotFound: !this._settingsFileConfig.required};
+        return this._fileReader.readJson(settingsFile, options)
+            .then(settings => settings || {})
+            .then(settings => ({settingsFile, settings}));
     }
 
     _settingsFile(actionParams) {
         const cwd = actionParams.kumoContext.cwd;
-        const filename = actionParams.options.settingsFilename || this._defaultSettingsFilename;
-        return path.join(cwd, filename);
+        const settingsFilename = actionParams.options.settingsFilename;
+        const defaultSettingsFilename = this._settingsFileConfig.defaultFilename;
+        return path.join(cwd, settingsFilename || defaultSettingsFilename);
     }
 }
 

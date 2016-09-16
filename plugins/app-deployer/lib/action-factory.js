@@ -1,26 +1,26 @@
 'use strict';
 
-const runScript = require('command-promise'),
-    AwsHelpers = require('../../../common-lib/aws-helpers'),
-    AppChainBuilder = require('./app-chain-builder'),
-    CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs'),
-    CollectAppChainConfigStep = require('./action-steps/collect-app-chain-config'),
-    CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket'),
-    DirChainBuilder = require('../../../common-lib/dir-chain-builder'),
-    ExpandTaskDefsStep = require('./action-steps/expand-task-defs'),
-    ExecuteTasksStep = require('./action-steps/execute-tasks'),
-    EnvVarsFormatter = require('../../../common-lib/env-vars-formatter'),
-    JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader'),
-    OutputsStoreFactory = require('./outputs-store-factory'),
-    SanitizeOutputsStep = require('./action-steps/sanitize-outputs'),
-    ScriptExecutor = require('../../../common-lib/script-executor'),
-    StepsExecutor = require('../../../common-lib/steps-executor'),
-    TaskFactory = require('./task-factory'),
-    TaskExecutor = require('./task-executor'),
-    TaskUndoer = require('./task-undoer'),
-    UndoTasksStep = require('./action-steps/undo-tasks');
+const runScript = require('command-promise');
+const AwsHelpers = require('../../../common-lib/aws-helpers');
+const AppChainBuilder = require('./app-chain-builder');
+const CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs');
+const CollectAppChainConfigStep = require('./action-steps/collect-app-chain-config');
+const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
+const DirChainBuilder = require('../../../common-lib/dir-chain-builder');
+const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
+const ExecuteTasksStep = require('./action-steps/execute-tasks');
+const EnvVarsFormatter = require('../../../common-lib/env-vars-formatter');
+const JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader');
+const OutputsStoreFactory = require('./outputs-store-factory');
+const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
+const ScriptExecutor = require('../../../common-lib/script-executor');
+const StepsExecutor = require('../../../common-lib/steps-executor');
+const TaskFactory = require('./task-factory');
+const TaskExecutor = require('./task-executor');
+const TaskUndoer = require('./task-undoer');
+const UndoTasksStep = require('./action-steps/undo-tasks');
 
-// TODO: Break down this class ??
+// TODO: Break down / split this class ??
 
 class ActionFactory {
 
