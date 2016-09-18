@@ -26,7 +26,7 @@ class SecretService {
         const secret = this._secretSerializer.deserialize(value);
         const provider = this._createProvider(secret.provider);
         const decryptParams = Object.assign({}, params, _.omit(secret, 'provider'));
-        return provider.decrypt(decryptParams);
+        return provider.decrypt(decryptParams).then(result => result.toString());
     }
 
     _createProvider(name) {

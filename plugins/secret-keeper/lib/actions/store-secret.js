@@ -17,16 +17,16 @@ class StoreSecret {
     }
 
     _encryptValue() {
-        const params = _.omit(this._options, 'file', 'itemPath');
+        const params = _.omit(this._options, 'file', 'item');
         return this._secretService.encrypt(params);
     }
 
     _storeResult(result) {
         const file = this._options.file;
-        const itemPath = this._options.itemPath;
+        const item = this._options.item;
         return this._fileReader.readJson(file, {ignoreNotFound: true})
-            .then(contents => _.set(contents || {}, itemPath, result))
-            .then(contents => this._fs.writeFileAsync(file, contents));
+            .then(contents => _.set(contents || {}, item, result))
+            .then(contents => this._fs.writeFileAsync(file, JSON.stringify(contents)));
     }
 }
 

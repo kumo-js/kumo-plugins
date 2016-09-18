@@ -22,7 +22,7 @@ class ActionFactory {
 
     createDecryptSecretAction(context) {
         const options = context.options;
-        if (options.file && options.keyPath) return this._decryptSecretsFileItemAction(context);
+        if (options.file && options.item) return this._decryptSecretsFileItemAction(context);
         if (options.file) return this._decryptSecretsFileAction(context);
         return this._decryptSecretAction(context);
     }

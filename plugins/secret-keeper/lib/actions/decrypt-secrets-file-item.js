@@ -13,13 +13,13 @@ class DecryptSecretsFileItem {
 
     execute() {
         return this._readInputFile()
-            .then(obj => _.get(obj, this._options.itemPath, ''))
+            .then(obj => _.get(obj, this._options.item, ''))
             .then(value => this._decryptValue(value))
             .then(result => this._outputter.write(result));
     }
 
     _decryptValue(value) {
-        const params = Object.assign(_.omit(this._options, 'file', 'itemPath'), {value});
+        const params = Object.assign(_.omit(this._options, 'file', 'item'), {value});
         return this._secretService.decrypt(params);
     }
 
