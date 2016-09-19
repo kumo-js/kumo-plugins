@@ -28,7 +28,7 @@ class CollectAppChainConfig {
         const envVars = {env: this._context.env.value()};
         const scriptOptions = {cwd: app.dir, env: envVars, logOutput: false};
         return this._scriptExecutor.execute(script, scriptOptions)
-            .then(jsonConfigStr =>JSON.parse(jsonConfigStr || '{}'));
+            .then(jsonConfigStr => JSON.parse(jsonConfigStr || '{}'));
     }
 }
 

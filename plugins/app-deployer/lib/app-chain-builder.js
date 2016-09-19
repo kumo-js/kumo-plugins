@@ -15,7 +15,7 @@ class AppChainBuilder {
     build() {
         return Promise.resolve()
             .then(() => this._buildAppDirChain())
-            .then(appDirs => this._loadAppSettings(appDirs))
+            .then(appDirs => this._loadAppSettings(appDirs));
     }
 
     _buildAppDirChain() {

@@ -23,7 +23,7 @@ class DirChainBuilder {
             .then(settings => (settings.dependsOn || []).reverse())
             .then(relatedDirs => relatedDirs.map(relatedDir => path.resolve(dir, relatedDir)))
             .then(relatedDirs => this._getDirsChain(relatedDirs, settingsFilename))
-            .then(chain => [path.resolve(dir)].concat(chain))
+            .then(chain => [path.resolve(dir)].concat(chain));
     }
 
     _getDirsChain(dirs, settingsFilename) {

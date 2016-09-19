@@ -11,7 +11,7 @@ class Kms {
         return this._kms(params.region).encrypt(value).then(result => ({
             value: result.CiphertextBlob.toString('base64'),
             region: params.region
-        }))
+        }));
     }
 
     decrypt(params) {

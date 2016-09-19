@@ -15,8 +15,6 @@ const ScriptExecutor = require('../../../common-lib/script-executor');
 const StepsExecutor = require('../../../common-lib/steps-executor');
 const StackNameExpander = require('./stack-name-expander');
 
-// TODO: Break down / split this class ??
-
 class TaskFactory {
 
     constructor(params) {
@@ -26,14 +24,14 @@ class TaskFactory {
     createTask(params) {
         return this._createTask(params, () => ({
             'cf-stack': this._cfTaskSteps,
-            'custom': this._customTaskSteps
+            custom: this._customTaskSteps
         }));
     }
 
     createUndoTask(params) {
         return this._createTask(params, () => ({
             'cf-stack': this._undoCfTaskSteps,
-            'custom': this._undoCustomTaskSteps
+            custom: this._undoCustomTaskSteps
         }));
     }
 
@@ -50,7 +48,7 @@ class TaskFactory {
             this._createCfEnvVarsStep(),
             this._executeScriptStep(),
             this._provisionCfStackStep()
-        ]
+        ];
     }
 
     _customTaskSteps() {
@@ -58,7 +56,7 @@ class TaskFactory {
             this._createEnvVarsStep(),
             this._executeScriptStep(),
             this._collectTaskOutputsStep()
-        ]
+        ];
     }
 
     _undoCfTaskSteps() {
@@ -69,7 +67,7 @@ class TaskFactory {
         return [
             this._createEnvVarsStep(),
             this._executeScriptStep({scriptType: 'undo'})
-        ]
+        ];
     }
 
     _createEnvVarsStep() {

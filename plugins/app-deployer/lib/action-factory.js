@@ -20,8 +20,6 @@ const TaskExecutor = require('./task-executor');
 const TaskUndoer = require('./task-undoer');
 const UndoTasksStep = require('./action-steps/undo-tasks');
 
-// TODO: Break down / split this class ??
-
 class ActionFactory {
 
     createDeployAction(context) {
@@ -91,7 +89,7 @@ class ActionFactory {
     _appChainBuilder(context) {
         const fileReader = this._fileReader();
         const dirChainBuilder = new DirChainBuilder({fileReader});
-        return new AppChainBuilder({context, dirChainBuilder, fileReader})
+        return new AppChainBuilder({context, dirChainBuilder, fileReader});
     }
 
     _scriptExecutor(context) {

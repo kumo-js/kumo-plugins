@@ -12,7 +12,7 @@ class CfHelper {
         return this.searchStack(stackName).then(stack => {
             if (!stack) throw new Error(`Stack ${stackName} not found`);
             return stack;
-        })
+        });
     }
 
     extractOutputs(stackName) {
@@ -73,7 +73,7 @@ class CfHelper {
             if (options.retries === 0) throw new Error('Timed out waiting for stack completion');
             return Promise.delay(options.interval).then(() => {
                 options = Object.assign({}, options, {retries: options.retries - 1});
-                return this._waitForCompletion(stackName, desiredState, options)
+                return this._waitForCompletion(stackName, desiredState, options);
             });
         });
     }
