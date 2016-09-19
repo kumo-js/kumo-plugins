@@ -23,7 +23,7 @@ class JsonCompatibleFileWriter {
     }
 
     _writeJsonFile(file, contents) {
-        return this._writeFile(file, JSON.parse(contents));
+        return this._writeFile(file, JSON.stringify(contents));
     }
 
     _writeFile(file, contents) {

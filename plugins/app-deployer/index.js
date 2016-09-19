@@ -8,8 +8,8 @@ const PluginHelper = require('../../common-lib/plugin-helper');
 
 const actionFactory = new ActionFactory();
 const fileReader = new JsonCompatibleFileReader();
-const pluginSettingsConfig = {defaultFilename: 'deploy-settings.json'};
-const defaultContextInitializer = new DefaultContextInitializer({fileReader, pluginSettingsConfig});
+const settingsFileConfig = {defaultFilename: 'deploy-settings.json'};
+const defaultContextInitializer = new DefaultContextInitializer({fileReader, settingsFileConfig});
 const contextInitializer = new ContextInitializer({defaultContextInitializer});
 
 module.exports = new PluginHelper({

@@ -1,6 +1,5 @@
 'use strict';
 
-const fs = require('fs');
 const runScript = require('command-promise');
 const AwsHelpers = require('../../../common-lib/aws-helpers');
 const DeleteCfStackStep = require('./task-steps/delete-cf-stack');
@@ -10,6 +9,7 @@ const CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars');
 const ExecuteScriptStep = require('./task-steps/execute-script');
 const EnvVarsFormatter = require('../../../common-lib/env-vars-formatter');
 const JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader');
+const JsonCompatibleFileWriter = require('../../../common-lib/json-compatible-file-writer');
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
 const ScriptExecutor = require('../../../common-lib/script-executor');
 const StepsExecutor = require('../../../common-lib/steps-executor');
@@ -74,7 +74,8 @@ class TaskFactory {
 
     _createEnvVarsStep() {
         const context = this._context;
-        return new CreateEnvVarsStep({context, fs});
+        const fileWriter = new JsonCompatibleFileWriter();
+        return new CreateEnvVarsStep({context, fileWriter});
     }
 
     _createCfEnvVarsStep() {

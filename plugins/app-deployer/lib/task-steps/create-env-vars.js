@@ -6,7 +6,7 @@ class CreateEnvVars {
 
     constructor(params) {
         this._context = params.context;
-        this._fs = Promise.promisifyAll(params.fs);
+        this._fileWriter = params.fileWriter;
     }
 
     execute(state) {
@@ -29,9 +29,9 @@ class CreateEnvVars {
         return Promise.all(promises).then(files => ({appChainOutputsFile: files[0]}));
     }
 
-    _dumpTempFile(content) {
+    _dumpTempFile(contents) {
         const file = this._context.generateTempFile();
-        return this._fs.writeFileAsync(file, JSON.stringify(content)).then(() => file);
+        return this._fileWriter.writeJson(file, contents).then(() => file);
     }
 }
 

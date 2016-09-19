@@ -23,10 +23,10 @@ class ContextInitializer {
     }
 
     _wrapSettings(context) {
-        const pluginSettings = context.settings;
+        const appSettings = context.settings;
         const kumoSettings = context.kumoSettings;
         const options = context.options;
-        return new Settings({pluginSettings, kumoSettings, options});
+        return new Settings({appSettings, kumoSettings, options});
     }
 }
 
