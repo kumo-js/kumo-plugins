@@ -37,7 +37,7 @@ class AppChainBuilder {
         return new Settings({
             appSettings: appSettings,
             kumoSettings: this._context.kumoSettings,
-            options: this._context.options
+            args: this._context.args
         });
     }
 

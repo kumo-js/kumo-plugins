@@ -15,7 +15,7 @@ class DefaultContextInitializer {
                 cwd: actionParams.kumoContext.cwd,
                 kumoSettings: actionParams.kumoContext.settings,
                 logger: actionParams.logger,
-                options: actionParams.options,
+                args: actionParams.args,
                 settings: result.settings,
                 settingsFile: result.settingsFile,
                 settingsFilename: path.basename(result.settingsFile)
@@ -33,7 +33,7 @@ class DefaultContextInitializer {
 
     _settingsFile(actionParams) {
         const cwd = actionParams.kumoContext.cwd;
-        const settingsFilename = actionParams.options.settingsFilename;
+        const settingsFilename = actionParams.args.settingsFilename;
         const defaultSettingsFilename = this._settingsFileConfig.defaultFilename;
         return path.join(cwd, settingsFilename || defaultSettingsFilename);
     }

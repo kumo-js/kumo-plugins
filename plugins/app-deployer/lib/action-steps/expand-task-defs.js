@@ -31,7 +31,7 @@ class ExpandTaskDefs {
     }
 
     _region() {
-        return this._context.options.region;
+        return this._context.args.region;
     }
 
     _taskDefs() {

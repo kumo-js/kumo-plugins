@@ -7,7 +7,7 @@ class Settings {
     constructor(params) {
         this._appSettings = params.appSettings;
         this._kumoSettings = params._kumoSettings;
-        this._options = params.options;
+        this._args = params.args;
     }
 
     appName() {
@@ -23,7 +23,7 @@ class Settings {
     }
 
     outputsBucket() {
-        const defaultRegion = this._options.region;
+        const defaultRegion = this._args.region;
         const defaultBucket = _.get(this._kumoSettings, 'appDeployer.outputsBucket');
         const appBucket = this._app().outputsBucket;
         return Object.assign({region: defaultRegion}, defaultBucket, appBucket);

@@ -15,15 +15,15 @@ const StoreSecretAction = require('./actions/store-secret');
 class ActionFactory {
 
     createEncryptSecretAction(context) {
-        const options = context.options;
-        if (options.file) return this._encryptSecretsFileAction(context);
+        const args = context.args;
+        if (args.file) return this._encryptSecretsFileAction(context);
         return this._encryptSecretAction(context);
     }
 
     createDecryptSecretAction(context) {
-        const options = context.options;
-        if (options.file && options.item) return this._decryptSecretsFileItemAction(context);
-        if (options.file) return this._decryptSecretsFileAction(context);
+        const args = context.args;
+        if (args.file && args.item) return this._decryptSecretsFileItemAction(context);
+        if (args.file) return this._decryptSecretsFileAction(context);
         return this._decryptSecretAction(context);
     }
 
@@ -61,10 +61,10 @@ class ActionFactory {
     }
 
     _commonParams(context) {
-        const options = context.options;
+        const args = context.args;
         const outputter = this._outputter();
         const secretService = this._secretService(context);
-        return {options, outputter, secretService};
+        return {args, outputter, secretService};
     }
 
     _secretService(context) {

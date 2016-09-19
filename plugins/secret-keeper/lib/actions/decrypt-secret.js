@@ -3,7 +3,7 @@
 class DecryptSecret {
 
     constructor(params) {
-        this._options = params.options;
+        this._args = params.args;
         this._outputter = params.outputter;
         this._secretService = params.secretService;
     }
@@ -13,7 +13,7 @@ class DecryptSecret {
     }
 
     _decryptValue() {
-        return this._secretService.decrypt(this._options);
+        return this._secretService.decrypt(this._args);
     }
 }
 

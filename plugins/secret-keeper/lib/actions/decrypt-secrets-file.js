@@ -6,8 +6,8 @@ const traverse = require('../../../../common-lib/traverse');
 class DecryptSecretsFile {
 
     constructor(params) {
+        this._args = params.args;
         this._fileReader = params.fileReader;
-        this._options = params.options;
         this._outputter = params.outputter;
         this._secretService = params.secretService;
     }
@@ -19,12 +19,12 @@ class DecryptSecretsFile {
     }
 
     _decryptValue(value) {
-        const params = Object.assign(_.omit(this._options, 'file'), {value});
+        const params = Object.assign(_.omit(this._args, 'file'), {value});
         return this._secretService.decrypt(params);
     }
 
     _readInputFile() {
-        return this._fileReader.readJson(this._options.file);
+        return this._fileReader.readJson(this._args.file);
     }
 }
 
