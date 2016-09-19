@@ -1,12 +1,12 @@
 'use strict';
 
-const fs = require('fs');
 const EncryptSecretAction = require('./actions/encrypt-secret');
 const EncryptSecretsFileAction = require('./actions/encrypt-secrets-file');
 const DecryptSecretAction = require('./actions/decrypt-secret');
 const DecryptSecretsFileAction = require('./actions/decrypt-secrets-file');
 const DecryptSecretsFileItemAction = require('./actions/decrypt-secrets-file-item');
 const JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader');
+const JsonCompatibleFileWriter = require('../../../common-lib/json-compatible-file-writer');
 const ProviderFactory = require('./provider-factory');
 const SecretSerializer = require('./secret-serializer');
 const SecretService = require('./secret-service');
@@ -29,7 +29,8 @@ class ActionFactory {
 
     createStoreSecretAction(context) {
         const fileReader = this._fileReader();
-        const params = Object.assign(this._commonParams(context), {fileReader, fs});
+        const fileWriter = this._fileWriter();
+        const params = Object.assign(this._commonParams(context), {fileReader, fileWriter});
         return new StoreSecretAction(params);
     }
 
@@ -77,8 +78,12 @@ class ActionFactory {
         return new JsonCompatibleFileReader();
     }
 
+    _fileWriter() {
+        return new JsonCompatibleFileWriter();
+    }
+
     _outputter() {
-        return process.stdout;
+        return {write: console.log};
     }
 
     _providerFactory() {

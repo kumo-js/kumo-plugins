@@ -9,7 +9,8 @@ const KEY_VALUE_SEPARATOR = '::';
 class SecretSerializer {
 
     canDeserialize(str) {
-        return str.startsWith(SECRET_DENOTER);
+        str = str || '';
+        return str.toString().startsWith(SECRET_DENOTER);
     }
 
     deserialize(str) {

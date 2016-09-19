@@ -3,7 +3,7 @@
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const path = require('path');
-const yaml = require('yaml');
+const yaml = require('js-yaml');
 
 class JsonCompatibleFileReader {
 
@@ -18,7 +18,7 @@ class JsonCompatibleFileReader {
     _readers() {
         return {
             '.js': file => Promise.resolve(require(file)),
-            '.yaml': file => this._readFile(file).then(yaml.eval),
+            '.yaml': file => this._readFile(file).then(yaml.safeLoad),
             '.json': file => this._parseJsonFile(file),
             '': file => this._parseJsonFile(file)
         };
