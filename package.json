@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/MYOB-Technology/kumo-plugins.git"
   },
-  "keywords": [],
+  "keywords": ["aws", "app-deployer", "secret-keeper", "deployment", "cloud"],
   "author": "",
   "license": "ISC",
   "bugs": {
