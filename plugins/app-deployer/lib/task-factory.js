@@ -9,8 +9,9 @@ const CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars');
 const ExecuteScriptStep = require('./task-steps/execute-script');
 const EnvVarsFormatter = require('../../../common-lib/env-vars-formatter');
 const JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader');
-const JsonCompatibleFileWriter = require('../../../common-lib/json-compatible-file-writer');
+const JsonSchemaHelper = require('../../../common-lib/json-schema-helper');
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
+const ResolveCfStackParamsStep = require('./task-steps/resolve-cf-stack-params');
 const ScriptExecutor = require('../../../common-lib/script-executor');
 const StepsExecutor = require('../../../common-lib/steps-executor');
 const StackNameExpander = require('./stack-name-expander');
@@ -46,7 +47,8 @@ class TaskFactory {
         return [
             this._createEnvVarsStep(),
             this._createCfEnvVarsStep(),
-            this._executeScriptStep(),
+            this._executeScriptStep('stackTemplateScript'),
+            this._resolveCfStackParamsStep(),
             this._provisionCfStackStep()
         ];
     }
@@ -54,7 +56,7 @@ class TaskFactory {
     _customTaskSteps() {
         return [
             this._createEnvVarsStep(),
-            this._executeScriptStep(),
+            this._executeScriptStep('runScript'),
             this._collectTaskOutputsStep()
         ];
     }
@@ -66,14 +68,13 @@ class TaskFactory {
     _undoCustomTaskSteps() {
         return [
             this._createEnvVarsStep(),
-            this._executeScriptStep({scriptType: 'undo'})
+            this._executeScriptStep('undoScript')
         ];
     }
 
     _createEnvVarsStep() {
         const context = this._context;
-        const fileWriter = new JsonCompatibleFileWriter();
-        return new CreateEnvVarsStep({context, fileWriter});
+        return new CreateEnvVarsStep({context});
     }
 
     _createCfEnvVarsStep() {
@@ -93,10 +94,16 @@ class TaskFactory {
         return new DeleteCfStackStep({awsHelpers, context, stackNameExpander});
     }
 
-    _executeScriptStep(options) {
+    _executeScriptStep(scriptKey) {
         const context = this._context;
         const scriptExecutor = this._scriptExecutor(context);
-        return new ExecuteScriptStep({context, options, scriptExecutor});
+        return new ExecuteScriptStep({context, scriptExecutor, scriptKey});
+    }
+
+    _resolveCfStackParamsStep() {
+        const context = this._context;
+        const jsonSchemaHelper = new JsonSchemaHelper();
+        return new ResolveCfStackParamsStep({context, jsonSchemaHelper});
     }
 
     _provisionCfStackStep() {

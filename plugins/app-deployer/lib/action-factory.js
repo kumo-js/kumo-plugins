@@ -16,8 +16,7 @@ const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
 const ScriptExecutor = require('../../../common-lib/script-executor');
 const StepsExecutor = require('../../../common-lib/steps-executor');
 const TaskFactory = require('./task-factory');
-const TaskExecutor = require('./task-executor');
-const TaskUndoer = require('./task-undoer');
+const TaskService = require('./task-service');
 const UndoTasksStep = require('./action-steps/undo-tasks');
 
 class ActionFactory {
@@ -68,17 +67,13 @@ class ActionFactory {
     }
 
     _executeTasksStep(context) {
-        const outputsStoreFactory = this._outputsStoreFactory();
-        const taskFactory = this._taskFactory(context);
-        const taskExecutor = new TaskExecutor({context, outputsStoreFactory, taskFactory});
-        return new ExecuteTasksStep({taskExecutor});
+        const taskService = this._taskService(context);
+        return new ExecuteTasksStep({context, taskService});
     }
 
     _undoTasksStep(context) {
-        const outputsStoreFactory = this._outputsStoreFactory();
-        const taskFactory = this._taskFactory(context);
-        const taskUndoer = new TaskUndoer({context, outputsStoreFactory, taskFactory});
-        return new UndoTasksStep({taskUndoer});
+        const taskService = this._taskService(context);
+        return new UndoTasksStep({taskService});
     }
 
     _sanitizeOutputsStep(context) {
@@ -102,6 +97,12 @@ class ActionFactory {
         return new TaskFactory({context});
     }
 
+    _taskService(context) {
+        const outputsStoreFactory = this._outputsStoreFactory();
+        const taskFactory = this._taskFactory(context);
+        return new TaskService({context, outputsStoreFactory, taskFactory});
+    }
+    
     _awsHelpers() {
         return new AwsHelpers();
     }

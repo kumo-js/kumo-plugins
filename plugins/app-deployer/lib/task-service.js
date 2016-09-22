@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-class TaskExecutor {
+class TaskService {
 
     constructor(params) {
         this._context = params.context;
@@ -12,31 +12,27 @@ class TaskExecutor {
         this._taskFactory = params.taskFactory;
     }
 
-    execute(params) {
+    executeTask(params) {
         const taskId = params.taskDef.id;
         this._logger.info(`\n--->Executing task: ${taskId}`);
-
+        
         return Promise.resolve()
-            .then(() => this._executeTask(params))
+            .then(() => this._taskFactory.createTask(params).execute())
             .then(taskResult => _.get(taskResult, 'outputs', {}))
-            .then(outputs => this._saveOutputs(taskId, outputs))
-            .then(outputs => this._mergeOutputs(params.appChainOutputs, outputs));
+            .then(outputs => this._saveOutputs(taskId, outputs));
     }
 
-    _executeTask(params) {
-        return this._taskFactory.createTask(params).execute();
+    undoTask(params) {
+        const taskId = params.taskDef.id;
+        this._logger.info(`\n--->Undoing task: ${taskId}`);
+        
+        return Promise.resolve()
+            .then(() => this._taskFactory.createUndoTask(params).execute())
+            .then(() => this._outputsStore().remove(taskId));
     }
 
     _saveOutputs(taskId, outputs) {
         return this._outputsStore().save(taskId, outputs).then(() => outputs);
-    }
-
-    _mergeOutputs(source, outputs) {
-        return Object.assign({}, source, {[this._appName()]: outputs});
-    }
-
-    _appName() {
-        return this._context.settings.appName();
     }
 
     _outputsStore() {
@@ -47,4 +43,4 @@ class TaskExecutor {
     }
 }
 
-module.exports = TaskExecutor;
+module.exports = TaskService;

@@ -3,7 +3,7 @@
 class UndoTasks {
 
     constructor(params) {
-        this._taskUndoer = params.taskUndoer;
+        this._taskService = params.taskService;
     }
 
     execute(state) {
@@ -14,8 +14,8 @@ class UndoTasks {
         const appChainConfig = state.appChainConfig;
         const appChainOutputs = state.appChainOutputs;
         return state.taskDefs.reverse().reduce((promise, taskDef) => {
-            const params = {taskDef, appChainOutputs, appChainConfig};
-            return promise.then(() => this._taskUndoer.undo(params));
+            const params = {taskDef, appChainConfig, appChainOutputs};
+            return promise.then(() => this._taskService.undoTask(params));
         }, Promise.resolve());
     }
 }
