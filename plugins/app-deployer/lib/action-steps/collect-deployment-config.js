@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-class CollectAppChainConfig {
+class CollectDeploymentConfig {
 
     constructor(params) {
         this._appChainBuilder = params.appChainBuilder;
@@ -13,23 +13,22 @@ class CollectAppChainConfig {
 
     execute(state) {
         return this._appChainBuilder.build()
-            .then(appChain => this._collectAppChainConfig(appChain))
-            .then(config => Object.assign({}, state, {appChainConfig: config}));
+            .then(appChain => this._collectAllConfig(appChain))
+            .then(config => Object.assign({}, state, {deploymentConfig: config}));
     }
 
-    _collectAppChainConfig(appChain) {
+    _collectAllConfig(appChain) {
         const promises = appChain.map(app => this._collectAppConfig(app));
         return Promise.all(promises).then(config => config.reduce(_.merge, {}));
     }
 
     _collectAppConfig(app) {
-        const script = _.get(app.settings.config(), 'script');
-        if (!script) return Promise.resolve({});
+        const configScript = _.get(app.settings.config(), 'script');
+        if (!configScript) return Promise.resolve({});
         const envVars = {env: this._context.env.value()};
         const scriptOptions = {cwd: app.dir, env: envVars, logOutput: false};
-        return this._scriptExecutor.execute(script, scriptOptions)
-            .then(jsonConfigStr => JSON.parse(jsonConfigStr || '{}'));
+        return this._scriptExecutor.execute(configScript, scriptOptions).then(JSON.parse);
     }
 }
 
-module.exports = CollectAppChainConfig;
+module.exports = CollectDeploymentConfig;

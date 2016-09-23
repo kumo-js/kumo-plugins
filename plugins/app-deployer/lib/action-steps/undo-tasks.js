@@ -11,10 +11,11 @@ class UndoTasks {
     }
 
     _undoTasks(state) {
-        const appChainConfig = state.appChainConfig;
-        const appChainOutputs = state.appChainOutputs;
+        const deploymentConfig = state.deploymentConfig;
+        const deploymentOutputs = state.deploymentOutputs;
+
         return state.taskDefs.reverse().reduce((promise, taskDef) => {
-            const params = {taskDef, appChainConfig, appChainOutputs};
+            const params = {taskDef, deploymentConfig, deploymentOutputs};
             return promise.then(() => this._taskService.undoTask(params));
         }, Promise.resolve());
     }

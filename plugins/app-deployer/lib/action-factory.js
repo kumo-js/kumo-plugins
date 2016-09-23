@@ -3,8 +3,8 @@
 const runScript = require('command-promise');
 const AwsHelpers = require('../../../common-lib/aws-helpers');
 const AppChainBuilder = require('./app-chain-builder');
-const CollectAppChainOutputsStep = require('./action-steps/collect-app-chain-outputs');
-const CollectAppChainConfigStep = require('./action-steps/collect-app-chain-config');
+const CollectDeploymentOutputsStep = require('./action-steps/collect-deployment-outputs');
+const CollectDeploymentConfigStep = require('./action-steps/collect-deployment-config');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
 const DirChainBuilder = require('../../../common-lib/dir-chain-builder');
 const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
@@ -25,8 +25,8 @@ class ActionFactory {
         return new StepsExecutor({
             steps: [
                 this._createOutputsBucketStep(context),
-                this._collectAppChainOutputsStep(context),
-                this._collectAppChainConfigStep(context),
+                this._collectDeploymentOutputsStep(context),
+                this._collectDeploymentConfigStep(context),
                 this._expandTaskDefsStep(context),
                 this._executeTasksStep(context),
                 this._sanitizeOutputsStep(context)
@@ -37,8 +37,8 @@ class ActionFactory {
     createDestroyAction(context) {
         return new StepsExecutor({
             steps: [
-                this._collectAppChainOutputsStep(context),
-                this._collectAppChainConfigStep(context),
+                this._collectDeploymentOutputsStep(context),
+                this._collectDeploymentConfigStep(context),
                 this._expandTaskDefsStep(context),
                 this._undoTasksStep(context)
             ]
@@ -50,16 +50,16 @@ class ActionFactory {
         return new CreateOutputsBucketStep({awsHelpers, context});
     }
 
-    _collectAppChainOutputsStep(context) {
+    _collectDeploymentOutputsStep(context) {
         const appChainBuilder = this._appChainBuilder(context);
         const outputsStoreFactory = this._outputsStoreFactory();
-        return new CollectAppChainOutputsStep({appChainBuilder, context, outputsStoreFactory});
+        return new CollectDeploymentOutputsStep({appChainBuilder, context, outputsStoreFactory});
     }
 
-    _collectAppChainConfigStep(context) {
+    _collectDeploymentConfigStep(context) {
         const appChainBuilder = this._appChainBuilder(context);
         const scriptExecutor = this._scriptExecutor(context);
-        return new CollectAppChainConfigStep({appChainBuilder, context, scriptExecutor});
+        return new CollectDeploymentConfigStep({appChainBuilder, context, scriptExecutor});
     }
 
     _expandTaskDefsStep(context) {
@@ -102,7 +102,7 @@ class ActionFactory {
         const taskFactory = this._taskFactory(context);
         return new TaskService({context, outputsStoreFactory, taskFactory});
     }
-    
+
     _awsHelpers() {
         return new AwsHelpers();
     }

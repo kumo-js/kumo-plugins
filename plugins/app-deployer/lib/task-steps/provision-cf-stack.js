@@ -7,7 +7,7 @@ class ProvisionCfStack {
     constructor(params) {
         this._awsHelpers = params.awsHelpers;
         this._fileReader = params.fileReader;
-        this._logger = this._context.logger;
+        this._logger = params.context.logger;
         this._stackNameExpander = params.stackNameExpander;
     }
 
@@ -29,7 +29,7 @@ class ProvisionCfStack {
     }
 
     _buildCfStackParams(taskDef) {
-        return _.map(taskDef.stackParams, (v, k) =>
+        return _.map(taskDef.stackParams, (value, key) =>
             ({ParameterKey: key, ParameterValue: value})
         );
     }

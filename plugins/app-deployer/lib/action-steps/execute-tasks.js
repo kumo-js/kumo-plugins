@@ -10,24 +10,25 @@ class ExecuteTasks {
     }
 
     execute(state) {
-        return this._executeTasks(state).then(appChainOutputs =>
-            Object.assign({}, state, {appChainOutputs: appChainOutputs})
+        return this._executeTasks(state).then(deploymentOutputs =>
+            Object.assign({}, state, {deploymentOutputs})
         );
     }
 
     _executeTasks(state) {
-        const appChainConfig = state.appChainConfig;
+        const deploymentConfig = state.deploymentConfig;
+
         return state.taskDefs.reduce((promise, taskDef) => {
-            return promise.then(appChainOutputs =>
-                this._executeTask({taskDef, appChainConfig, appChainOutputs})
+            return promise.then(deploymentOutputs =>
+                this._executeTask({taskDef, deploymentConfig, deploymentOutputs})
             );
-        }, Promise.resolve(state.appChainOutputs));
+        }, Promise.resolve(state.deploymentOutputs));
     }
 
     _executeTask(params) {
         const appName = this._context.settings.appName();
-        return this._taskService.executeTask(params).then(outputs =>
-            Object.assign({}, params.appChainOutputs, {[appName]: outputs})
+        return this._taskService.executeTask(params).then(taskOutputs =>
+            Object.assign({}, params.deploymentOutputs, {[appName]: taskOutputs})
         );
     }
 }

@@ -12,8 +12,8 @@ class CreateEnvVars {
         return Promise.resolve(
             Object.assign({}, state, {
                 envVars: {
-                    appConfig: JSON.stringify(state.appChainConfig),
-                    appOutputs: JSON.stringify(state.appChainOutputs),
+                    deploymentConfig: JSON.stringify(state.deploymentConfig),
+                    deploymentOutputs: JSON.stringify(state.deploymentOutputs),
                     env: this._context.env.value(),
                     region: state.taskDef.region,
                     taskOutputsFile: this._context.generateTempFile()

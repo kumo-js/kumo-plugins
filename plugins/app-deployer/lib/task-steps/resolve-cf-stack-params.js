@@ -21,8 +21,8 @@ class ResolveCfStackParams {
         return {
             env: this._context.env.value(),
             region: state.taskDef.region,
-            config: state.appChainConfig,
-            outputs: state.appChainOutputs
+            config: state.deploymentConfig,
+            outputs: state.deploymentOutputs
         };
     }
 }

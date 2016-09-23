@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 
-class CollectAppChainOutputs {
+class CollectDeploymentOutputs {
 
     constructor(params) {
         this._appChainBuilder = params.appChainBuilder;
@@ -12,11 +12,11 @@ class CollectAppChainOutputs {
 
     execute(state) {
         return this._appChainBuilder.build()
-            .then(appChain => this._collectAppChainOutputs(appChain))
-            .then(outputs => Object.assign({}, state, {appChainOutputs: outputs}));
+            .then(appChain => this._collectAllOutputs(appChain))
+            .then(outputs => Object.assign({}, state, {deploymentOutputs: outputs}));
     }
 
-    _collectAppChainOutputs(appChain) {
+    _collectAllOutputs(appChain) {
         const promises = appChain.map(app => this._collectAppOutputs(app));
         return Promise.all(promises).then(outputs => outputs.reduce(_.merge, {}));
     }
@@ -26,6 +26,7 @@ class CollectAppChainOutputs {
         const appName = settings.appName();
         const envs = this._envs();
         const promises = envs.map(env => this._outputsStore(settings, env).collect());
+
         return Promise.all(promises).then(outputs =>
             outputs.reduce((result, output) =>
                 _.merge(result, {[appName]: output}), {}
@@ -43,4 +44,4 @@ class CollectAppChainOutputs {
     }
 }
 
-module.exports = CollectAppChainOutputs;
+module.exports = CollectDeploymentOutputs;
