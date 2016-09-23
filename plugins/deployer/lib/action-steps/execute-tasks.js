@@ -17,7 +17,6 @@ class ExecuteTasks {
 
     _executeTasks(state) {
         const deploymentConfig = state.deploymentConfig;
-
         return state.taskDefs.reduce((promise, taskDef) => {
             return promise.then(deploymentOutputs =>
                 this._executeTask({taskDef, deploymentConfig, deploymentOutputs})
@@ -26,9 +25,9 @@ class ExecuteTasks {
     }
 
     _executeTask(params) {
-        const appName = this._context.settings.appName();
+        const moduleName = this._context.settings.moduleName();
         return this._taskService.executeTask(params).then(taskOutputs =>
-            Object.assign({}, params.deploymentOutputs, {[appName]: taskOutputs})
+            Object.assign({}, params.deploymentOutputs, {[moduleName]: taskOutputs})
         );
     }
 }

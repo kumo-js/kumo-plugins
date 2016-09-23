@@ -14,7 +14,7 @@ class ContextInitializer {
     initialize(context, actionParams) {
         return this._defaultContextInitializer.initialize(context, actionParams).then(
             context => Object.assign({}, context, {
-                appDir: path.dirname(context.settingsFile),
+                moduleDir: path.dirname(context.settingsFile),
                 env: new Env(context.args.env),
                 generateTempFile: tempfile,
                 settings: this._wrapSettings(context)
@@ -23,10 +23,10 @@ class ContextInitializer {
     }
 
     _wrapSettings(context) {
-        const appSettings = context.settings;
+        const moduleSettings = context.settings;
         const kumoSettings = context.kumoSettings;
         const args = context.args;
-        return new Settings({appSettings, kumoSettings, args});
+        return new Settings({moduleSettings, kumoSettings, args});
     }
 }
 

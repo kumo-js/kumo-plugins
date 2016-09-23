@@ -5,8 +5,8 @@ const _ = require('lodash');
 class OutputsS3Store {
 
     constructor(params) {
-        this._config = params.outputsS3Config;
         this._awsHelpers = params.awsHelpers;
+        this._config = params.outputsS3Config;
     }
 
     collect() {

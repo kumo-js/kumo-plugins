@@ -4,7 +4,7 @@ const path = require('path');
 const Promise = require('bluebird');
 const Settings = require('./settings');
 
-class AppChainBuilder {
+class ModuleChainBuilder {
 
     constructor(params) {
         this._context = params.context;
@@ -14,35 +14,35 @@ class AppChainBuilder {
 
     build() {
         return Promise.resolve()
-            .then(() => this._buildAppDirChain())
-            .then(appDirs => this._loadAppSettings(appDirs));
+            .then(() => this._getModuleDirs())
+            .then(moduleDirs => this._loadModules(moduleDirs));
     }
 
-    _buildAppDirChain() {
+    _getModuleDirs() {
         return this._dirChainBuilder.build(
-            this._appDir(), this._settingsFilename(), {reverse: true}
+            this._currentModuleDir(), this._settingsFilename(), {reverse: true}
         );
     }
 
-    _loadAppSettings(appDirs) {
-        return Promise.all(appDirs.map(appDir => {
-            const settingsFile = path.join(appDir, this._settingsFilename());
+    _loadModules(moduleDirs) {
+        return Promise.all(moduleDirs.map(moduleDir => {
+            const settingsFile = path.join(moduleDir, this._settingsFilename());
             return this._fileReader.readJson(settingsFile)
                 .then(settings => this._createSettingsObj(settings))
-                .then(settings => ({dir: appDir, settings}));
+                .then(settings => ({dir: moduleDir, settings}));
         }));
     }
 
-    _createSettingsObj(appSettings) {
+    _createSettingsObj(moduleSettings) {
         return new Settings({
-            appSettings: appSettings,
+            moduleSettings: moduleSettings,
             kumoSettings: this._context.kumoSettings,
             args: this._context.args
         });
     }
 
-    _appDir() {
-        return this._context.appDir;
+    _currentModuleDir() {
+        return this._context.moduleDir;
     }
 
     _settingsFilename() {
@@ -50,4 +50,4 @@ class AppChainBuilder {
     }
 }
 
-module.exports = AppChainBuilder;
+module.exports = ModuleChainBuilder;

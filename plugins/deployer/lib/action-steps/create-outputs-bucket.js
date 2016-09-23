@@ -3,8 +3,8 @@
 class CreateOutputsBucket {
 
     constructor(params) {
-        this._context = params.context;
         this._awsHelpers = params.awsHelpers;
+        this._context = params.context;
     }
 
     execute(state) {

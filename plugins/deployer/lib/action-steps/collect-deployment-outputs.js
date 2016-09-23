@@ -5,31 +5,30 @@ const _ = require('lodash');
 class CollectDeploymentOutputs {
 
     constructor(params) {
-        this._appChainBuilder = params.appChainBuilder;
         this._context = params.context;
+        this._moduleChainBuilder = params.moduleChainBuilder;
         this._outputsStoreFactory = params.outputsStoreFactory;
     }
 
     execute(state) {
-        return this._appChainBuilder.build()
-            .then(appChain => this._collectAllOutputs(appChain))
+        return this._moduleChainBuilder.build()
+            .then(modules => this._collectOutputs(modules))
             .then(outputs => Object.assign({}, state, {deploymentOutputs: outputs}));
     }
 
-    _collectAllOutputs(appChain) {
-        const promises = appChain.map(app => this._collectAppOutputs(app));
+    _collectOutputs(modules) {
+        const promises = modules.map(module => this._collectOutput(module));
         return Promise.all(promises).then(outputs => outputs.reduce(_.merge, {}));
     }
 
-    _collectAppOutputs(app) {
-        const settings = app.settings;
-        const appName = settings.appName();
-        const envs = this._envs();
-        const promises = envs.map(env => this._outputsStore(settings, env).collect());
+    _collectOutput(module) {
+        const settings = module.settings;
+        const moduleName = settings.moduleName();
+        const promises = this._envs().map(env => this._outputsStore(settings, env).collect());
 
         return Promise.all(promises).then(outputs =>
             outputs.reduce((result, output) =>
-                _.merge(result, {[appName]: output}), {}
+                _.merge(result, {[moduleName]: output}), {}
             )
         );
     }

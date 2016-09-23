@@ -2,7 +2,7 @@
 
 const runScript = require('command-promise');
 const AwsHelpers = require('../../../common-lib/aws-helpers');
-const AppChainBuilder = require('./app-chain-builder');
+const ModuleChainBuilder = require('./module-chain-builder');
 const CollectDeploymentOutputsStep = require('./action-steps/collect-deployment-outputs');
 const CollectDeploymentConfigStep = require('./action-steps/collect-deployment-config');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
@@ -51,15 +51,15 @@ class ActionFactory {
     }
 
     _collectDeploymentOutputsStep(context) {
-        const appChainBuilder = this._appChainBuilder(context);
+        const moduleChainBuilder = this._moduleChainBuilder(context);
         const outputsStoreFactory = this._outputsStoreFactory();
-        return new CollectDeploymentOutputsStep({appChainBuilder, context, outputsStoreFactory});
+        return new CollectDeploymentOutputsStep({context, moduleChainBuilder, outputsStoreFactory});
     }
 
     _collectDeploymentConfigStep(context) {
-        const appChainBuilder = this._appChainBuilder(context);
+        const moduleChainBuilder = this._moduleChainBuilder(context);
         const scriptExecutor = this._scriptExecutor(context);
-        return new CollectDeploymentConfigStep({appChainBuilder, context, scriptExecutor});
+        return new CollectDeploymentConfigStep({context, moduleChainBuilder, scriptExecutor});
     }
 
     _expandTaskDefsStep(context) {
@@ -81,10 +81,10 @@ class ActionFactory {
         return new SanitizeOutputsStep({context, outputsStoreFactory});
     }
 
-    _appChainBuilder(context) {
+    _moduleChainBuilder(context) {
         const fileReader = this._fileReader();
         const dirChainBuilder = new DirChainBuilder({fileReader});
-        return new AppChainBuilder({context, dirChainBuilder, fileReader});
+        return new ModuleChainBuilder({context, dirChainBuilder, fileReader});
     }
 
     _scriptExecutor(context) {

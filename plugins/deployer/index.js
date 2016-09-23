@@ -8,7 +8,7 @@ const PluginHelper = require('../../common-lib/plugin-helper');
 
 const actionFactory = new ActionFactory();
 const fileReader = new JsonCompatibleFileReader();
-const settingsFileConfig = {defaultFilename: 'deploy-settings.json'};
+const settingsFileConfig = {defaultFilename: 'deployment-settings.json'};
 const defaultContextInitializer = new DefaultContextInitializer({fileReader, settingsFileConfig});
 const contextInitializer = new ContextInitializer({defaultContextInitializer});
 
@@ -16,11 +16,11 @@ module.exports = new PluginHelper({
     contextInitializer: contextInitializer,
     actionDefs: [
         {
-            name: 'deploy-app',
+            name: 'deploy-module',
             createAction: context => actionFactory.createDeployAction(context)
         },
         {
-            name: 'destroy-app',
+            name: 'destroy-module',
             createAction: context => actionFactory.createDestroyAction(context)
         }
     ]
