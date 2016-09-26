@@ -15,7 +15,7 @@ class TaskService {
     executeTask(params) {
         const taskId = params.taskDef.id;
         this._logger.info(`\n--->Executing task: ${taskId}`);
-        
+
         return Promise.resolve()
             .then(() => this._taskFactory.createTask(params).execute())
             .then(taskResult => _.get(taskResult, 'outputs', {}))
@@ -25,7 +25,7 @@ class TaskService {
     undoTask(params) {
         const taskId = params.taskDef.id;
         this._logger.info(`\n--->Undoing task: ${taskId}`);
-        
+
         return Promise.resolve()
             .then(() => this._taskFactory.createUndoTask(params).execute())
             .then(() => this._outputsStore().remove(taskId));
