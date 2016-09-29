@@ -1,5 +1,7 @@
 'use strict';
 
+const _ = require('lodash');
+
 class ScriptExecutor {
 
     constructor(params) {
@@ -15,7 +17,9 @@ class ScriptExecutor {
     }
 
     _executeScript(script, options) {
+        options = _.merge({env: process.env}, options);
         this._logger.debug(`Running: ${script}`);
+
         return this._runScript(script, options).then(output => {
             output = output.join('').trim();
             const logOutput = (output !== '' && options.logOutput);
