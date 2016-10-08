@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha tests --recursive"
+    "test": "mocha plugins/lambda-package-uploader/test --recursive"
   },
   "repository": {
     "type": "git",
@@ -28,7 +28,8 @@
     "chai": "^3.5.0",
     "eslint": "^3.5.0",
     "eslint-config-xo": "^0.15.4",
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "sinon": "^1.17.6"
   },
   "dependencies": {
     "aws-sdk": "^2.4.7",
@@ -39,6 +40,7 @@
     "i": "^0.3.5",
     "js-yaml": "^3.6.1",
     "json-schema-deref": "^0.3.5",
+    "jszip": "^3.1.2",
     "lodash": "^4.13.1",
     "tempfile2": "^2.0.1",
     "traverse": "^0.6.6",

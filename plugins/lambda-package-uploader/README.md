@@ -1,5 +1,5 @@
 
-# lambda-package-uploader
+# Lambda Package Uploader
 
 ## Usage
 
@@ -48,11 +48,11 @@ MEMO: `config` contents will be merged with settings
   },
   "packages": [
     {
-      "name": "my-lambda-function",   // <package-name>
+      "name": "my-lambda-function",   // <lambda-name>
 
-      // $PACKAGE_OUTPUT_FILE has the format: <dir-path>/<env>-<package-name>-<build-number>.zip
-      // packaging-command has to save a zipped lambda as $PACKAGE_OUTPUT_FILE
-      "package-script": "sample-packaging-command /path/to/lambda --output $PACKAGE_OUTPUT_FILE",
+      // $KUMO_PACKAGE_OUTPUT_FILE has the format: <temp-dir-path>/<env>-<lambda-name>-<build_number>.zip
+      // packaging-command has to save a zipped lambda as $KUMO_PACKAGE_OUTPUT_FILE
+      "package-script": "sample-packaging-command /path/to/lambda --output $KUMO_PACKAGE_OUTPUT_FILE",
 
       // The value of `envFile` will be written into env.json and injected into the root level
       // of the zipped lambda. This will be performed in-memory and won't be written into a file
@@ -67,13 +67,13 @@ MEMO: `config` contents will be merged with settings
 ```
 
 By using the json scheme reference, you can access the values given as the command line arguments.
-They are accessible via `#/_env`, `#/build_number`, `#/_config`, `#/_resources`.
+They are accessible via `#/_env`, `#/_build_number`, `#/_config`, `#/_resources`.
 
 After the successful execution of the `kumo upload-lambda` command, you should get a json file containing
-the locations of uploaded lambdas. The path of the json file is what you have specified with `--output-file` option.
+the locations of uploaded lambdas. The path of the json file is what you have specified with `--output` option.
 
 ```json
 {
-  "<package-name>": "s3://kumo-bucket/packages/<env>-<package-name>-<build-number>.zip"
+  "<lambda-name>": "s3://kumo-bucket/packages/<env>-<lambda-name>-<build_number>.zip"
 }
 ```
