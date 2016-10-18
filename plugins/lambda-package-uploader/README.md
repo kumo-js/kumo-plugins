@@ -29,8 +29,6 @@ Arguments are as follows:
         Path of an output file. Default to package-locations.json
 ```
 
-MEMO: `config` contents will be merged with settings
-
 
 ## Setting file
 
