@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const searchFiles = require('glob-promise');
 
 class DefaultContextInitializer {
 
@@ -24,18 +25,20 @@ class DefaultContextInitializer {
     }
 
     _loadSettings(actionParams) {
-        const settingsFile = this._settingsFile(actionParams);
-        const options = {ignoreNotFound: !this._settingsFileConfig.required};
-        return this._fileReader.readJson(settingsFile, options)
-            .then(settings => settings || {})
-            .then(settings => ({settingsFile, settings}));
+        return this._findSettingsFile(actionParams).then(settingsFile => {
+            const options = {ignoreNotFound: !this._settingsFileConfig.required};
+            return this._fileReader.readJson(settingsFile, options)
+                .then(settings => settings || {})
+                .then(settings => ({settingsFile, settings}));
+        });
     }
 
-    _settingsFile(actionParams) {
+    _findSettingsFile(actionParams) {
         const cwd = actionParams.kumoContext.cwd;
         const settingsFilename = actionParams.args.settingsFilename;
         const defaultSettingsFilename = this._settingsFileConfig.defaultFilename;
-        return path.join(cwd, settingsFilename || defaultSettingsFilename);
+        const searchPattern = path.join(cwd, settingsFilename || (defaultSettingsFilename + '*'));
+        return searchFiles(searchPattern).then(files => files[0]);
     }
 }
 

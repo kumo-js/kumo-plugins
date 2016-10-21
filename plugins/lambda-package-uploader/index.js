@@ -10,7 +10,7 @@ const PluginHelper = require('../../common-lib/plugin-helper');
 const actionFactory = new ActionFactory();
 const fileReader = new JsonCompatibleFileReader();
 const jsonSchemaHelper = new JsonSchemaHelper();
-const settingsFileConfig = {defaultFilename: 'lambda-packages.json', required: true};
+const settingsFileConfig = {defaultFilename: 'lambda-packages', required: true};
 const defaultContextInitializer = new DefaultContextInitializer({fileReader, settingsFileConfig});
 const contextInitializer = new ContextInitializer({defaultContextInitializer, fileReader, jsonSchemaHelper});
 

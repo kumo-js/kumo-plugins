@@ -8,7 +8,7 @@ const PluginHelper = require('../../common-lib/plugin-helper');
 
 const actionFactory = new ActionFactory();
 const fileReader = new JsonCompatibleFileReader();
-const settingsFileConfig = {defaultFilename: 'secret-profiles.json', required: false};
+const settingsFileConfig = {defaultFilename: 'secret-profiles', required: false};
 const defaultContextInitializer = new DefaultContextInitializer({fileReader, settingsFileConfig});
 const contextInitializer = new ContextInitializer({defaultContextInitializer});
 
