@@ -18,8 +18,8 @@ class Env {
     }
 
     _default() {
-        const user = process.env['USER'];
-        return user.replace(/\./, '-');
+        const user = process.env['USER'].replace(/\./, '-');
+        return `dev-${user}`;
     }
 }
 
