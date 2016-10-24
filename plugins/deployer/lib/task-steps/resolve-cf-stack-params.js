@@ -19,10 +19,10 @@ class ResolveCfStackParams {
 
     _stackParamsData(state) {
         return {
-            env: this._context.env.value(),
-            region: state.taskDef.region,
-            config: state.deploymentConfig,
-            outputs: state.deploymentOutputs
+            _env: this._context.env.value(),
+            _region: state.taskDef.region,
+            _config: state.deploymentConfig,
+            _outputs: state.deploymentOutputs
         };
     }
 }
