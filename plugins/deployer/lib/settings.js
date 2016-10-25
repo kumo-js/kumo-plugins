@@ -7,7 +7,7 @@ class Settings {
     constructor(params) {
         this._args = params.args;
         this._moduleSettings = params.moduleSettings;
-        this._kumoSettings = params._kumoSettings;
+        this._kumoSettings = params.kumoSettings;
     }
 
     moduleName() {
