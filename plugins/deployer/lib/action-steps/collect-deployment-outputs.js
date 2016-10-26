@@ -24,18 +24,14 @@ class CollectDeploymentOutputs {
     _collectOutput(module) {
         const settings = module.settings;
         const moduleName = settings.moduleName();
-        const promises = this._envs().map(env => this._outputsStore(settings, env).collect());
+        const envPaths = this._context.env.paths();
+        const promises = envPaths.map(envPath => this._outputsStore(settings, envPath).collect());
 
         return Promise.all(promises).then(outputs =>
             outputs.reduce((result, output) =>
                 _.merge(result, {[moduleName]: output}), {}
             )
         );
-    }
-
-    _envs() {
-        const env = this._context.env;
-        return _.compact([env.prefix(), env.value()]);
     }
 
     _outputsStore(settings, env) {

@@ -10,15 +10,19 @@ class CreateEnvVars {
 
     execute(state) {
         return Promise.resolve(
-            Object.assign({}, state, {
-                envVars: {
-                    deploymentConfig: JSON.stringify(state.deploymentConfig),
-                    deploymentOutputs: JSON.stringify(state.deploymentOutputs),
-                    env: this._context.env.value(),
-                    region: state.taskDef.region,
-                    taskOutputsFile: this._context.generateTempFile()
-                }
-            })
+            Object.assign({}, state, {envVars: this._createEnvVars(state)})
+        );
+    }
+
+    _createEnvVars(state) {
+        return Object.assign(
+            {
+                deploymentConfig: JSON.stringify(state.deploymentConfig),
+                deploymentOutputs: JSON.stringify(state.deploymentOutputs),
+                region: state.taskDef.region,
+                taskOutputsFile: this._context.generateTempFile()
+            },
+            this._context.env.toVars()
         );
     }
 }

@@ -25,7 +25,7 @@ class CollectDeploymentConfig {
     _collectConfig(module) {
         const configScript = _.get(module.settings.config(), 'script');
         if (!configScript) return Promise.resolve({});
-        const envVars = {env: this._context.env.value()};
+        const envVars = this._context.env.toVars();
         const scriptOptions = {cwd: module.dir, env: envVars, logOutput: false};
         return this._scriptExecutor.execute(configScript, scriptOptions).then(JSON.parse);
     }

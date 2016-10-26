@@ -17,12 +17,12 @@ class ContextInitializer {
                 moduleDir: path.dirname(context.settingsFile),
                 env: new Env(context.args.env),
                 generateTempFile: tempfile,
-                settings: this._wrapSettings(context)
+                settings: this._createSettings(context)
             })
         );
     }
 
-    _wrapSettings(context) {
+    _createSettings(context) {
         const moduleSettings = context.settings;
         const kumoSettings = context.kumoSettings;
         const args = context.args;
