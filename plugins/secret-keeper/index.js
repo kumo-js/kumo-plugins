@@ -16,15 +16,15 @@ module.exports = new PluginHelper({
     contextInitializer: contextInitializer,
     actionDefs: [
         {
-            name: 'encrypt-secret',
-            createAction: context => actionFactory.createEncryptSecretAction(context)
+            name: 'encrypt',
+            createAction: context => actionFactory.createEncryptAction(context)
         },
         {
-            name: 'decrypt-secret',
-            createAction: context => actionFactory.createDecryptSecretAction(context)
+            name: 'decrypt',
+            createAction: context => actionFactory.createDecryptAction(context)
         },
         {
-            name: 'store-secret-item',
+            name: 'securely-store',
             createAction: context => actionFactory.createStoreSecretAction(context)
         }
     ]

@@ -1,70 +1,80 @@
 'use strict';
 
-const EncryptSecretAction = require('./actions/encrypt-secret');
-const EncryptSecretsFileAction = require('./actions/encrypt-secrets-file');
-const DecryptSecretAction = require('./actions/decrypt-secret');
-const DecryptSecretsFileAction = require('./actions/decrypt-secrets-file');
-const DecryptSecretsFileItemAction = require('./actions/decrypt-secrets-file-item');
+const fs = require('fs');
+const EncryptValueAction = require('./actions/encrypt-value');
+const EncryptFileAction = require('./actions/encrypt-file');
+const DataFormatter = require('../../../common-lib/data-formatter');
+const DecryptValueAction = require('./actions/decrypt-value');
+const DecryptFileAction = require('./actions/decrypt-file');
+const DecryptFileItemAction = require('./actions/decrypt-file-item');
 const JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader');
-const JsonCompatibleFileWriter = require('../../../common-lib/json-compatible-file-writer');
 const ProviderFactory = require('./provider-factory');
+const ResultFormatter = require('./result-formatter');
 const SecretSerializer = require('./secret-serializer');
 const SecretService = require('./secret-service');
 const StoreSecretAction = require('./actions/store-secret');
 
 class ActionFactory {
 
-    createEncryptSecretAction(context) {
+    createEncryptAction(context) {
         const args = context.args;
-        if (args.file) return this._encryptSecretsFileAction(context);
-        return this._encryptSecretAction(context);
+        if (args.file) return this._encryptFileAction(context);
+        return this._encryptValueAction(context);
     }
 
-    createDecryptSecretAction(context) {
+    createDecryptAction(context) {
         const args = context.args;
-        if (args.file && args.item) return this._decryptSecretsFileItemAction(context);
-        if (args.file) return this._decryptSecretsFileAction(context);
-        return this._decryptSecretAction(context);
+        if (args.file && args.item) return this._decryptFileItemAction(context);
+        if (args.file) return this._decryptFileAction(context);
+        return this._decryptValueAction(context);
     }
 
     createStoreSecretAction(context) {
-        const fileReader = this._fileReader();
-        const fileWriter = this._fileWriter();
-        const params = Object.assign(this._commonParams(context), {fileReader, fileWriter});
-        return new StoreSecretAction(params);
-    }
-
-    _encryptSecretAction(context) {
-        return new EncryptSecretAction(this._commonParams(context));
-    }
-
-    _encryptSecretsFileAction(context) {
-        const fileReader = this._fileReader();
-        const params = Object.assign(this._commonParams(context), {fileReader});
-        return new EncryptSecretsFileAction(params);
-    }
-
-    _decryptSecretAction(context) {
-        return new DecryptSecretAction(this._commonParams(context));
-    }
-
-    _decryptSecretsFileAction(context) {
-        const fileReader = this._fileReader();
-        const params = Object.assign(this._commonParams(context), {fileReader});
-        return new DecryptSecretsFileAction(params);
-    }
-
-    _decryptSecretsFileItemAction(context) {
-        const fileReader = this._fileReader();
-        const params = Object.assign(this._commonParams(context), {fileReader});
-        return new DecryptSecretsFileItemAction(params);
-    }
-
-    _commonParams(context) {
         const args = context.args;
-        const outputter = this._outputter();
+        const fileReader = this._fileReader();
+        const resultFormatter = this._resultFormatter();
         const secretService = this._secretService(context);
-        return {args, outputter, secretService};
+        return new StoreSecretAction({args, fileReader, fs, resultFormatter, secretService});
+    }
+
+    _encryptValueAction(context) {
+        const args = context.args;
+        const secretService = this._secretService(context);
+        const stdOut = this._stdOut();
+        return new EncryptValueAction({args, secretService, stdOut});
+    }
+
+    _encryptFileAction(context) {
+        const args = context.args;
+        const fileReader = this._fileReader();
+        const resultFormatter = this._resultFormatter();
+        const secretService = this._secretService(context);
+        const stdOut = this._stdOut();
+        return new EncryptFileAction({args, fileReader, resultFormatter, secretService, stdOut});
+    }
+
+    _decryptValueAction(context) {
+        const args = context.args;
+        const secretService = this._secretService(context);
+        const stdOut = this._stdOut();
+        return new DecryptValueAction({args, secretService, stdOut});
+    }
+
+    _decryptFileAction(context) {
+        const args = context.args;
+        const fileReader = this._fileReader();
+        const resultFormatter = this._resultFormatter();
+        const secretService = this._secretService(context);
+        const stdOut = this._stdOut();
+        return new DecryptFileAction({args, fileReader, resultFormatter, secretService, stdOut});
+    }
+
+    _decryptFileItemAction(context) {
+        const args = context.args;
+        const fileReader = this._fileReader();
+        const secretService = this._secretService(context);
+        const stdOut = this._stdOut();
+        return new DecryptFileItemAction({args, fileReader, secretService, stdOut});
     }
 
     _secretService(context) {
@@ -78,20 +88,21 @@ class ActionFactory {
         return new JsonCompatibleFileReader();
     }
 
-    _fileWriter() {
-        return new JsonCompatibleFileWriter();
-    }
-
-    _outputter() {
-        return {write: console.log};
-    }
-
     _providerFactory() {
         return new ProviderFactory();
     }
 
+    _resultFormatter() {
+        const dataFormatter = new DataFormatter();
+        return new ResultFormatter({dataFormatter});
+    }
+
     _secretSerializer() {
         return new SecretSerializer();
+    }
+
+    _stdOut() {
+        return process.stdout;
     }
 }
 

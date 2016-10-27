@@ -3,24 +3,26 @@
 const _ = require('lodash');
 const traverse = require('../../../../common-lib/traverse');
 
-class DecryptSecretsFile {
+class EncryptFile {
 
     constructor(params) {
         this._args = params.args;
         this._fileReader = params.fileReader;
-        this._outputter = params.outputter;
+        this._resultFormatter = params.resultFormatter;
         this._secretService = params.secretService;
+        this._stdOut = params.stdOut;
     }
 
     execute() {
         return this._readInputFile()
-            .then(obj => traverse.values(obj, value => this._decryptValue(value)))
-            .then(obj => this._outputter.write(JSON.stringify(obj)));
+            .then(data => traverse.values(data, value => this._encryptValue(value)))
+            .then(result => this._resultFormatter.format(result, this._args))
+            .then(result => this._stdOut.write(result));
     }
 
-    _decryptValue(value) {
+    _encryptValue(value) {
         const params = Object.assign(_.omit(this._args, 'file'), {value});
-        return this._secretService.decrypt(params);
+        return this._secretService.encrypt(params);
     }
 
     _readInputFile() {
@@ -28,4 +30,4 @@ class DecryptSecretsFile {
     }
 }
 
-module.exports = DecryptSecretsFile;
+module.exports = EncryptFile;

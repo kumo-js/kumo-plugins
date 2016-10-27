@@ -17,11 +17,17 @@ class JsonCompatibleFileReader {
 
     _readers() {
         return {
-            '.js': file => Promise.resolve(require(file)),
+            '.js': file => Promise.resolve(this._requireFile(file)),
             '.yaml': file => this._readFile(file).then(yaml.safeLoad),
             '.json': file => this._parseJsonFile(file),
             '': file => this._parseJsonFile(file)
         };
+    }
+
+    _requireFile(file) {
+        const isAbsolute = path.isAbsolute(file);
+        const absolutePath = isAbsolute ? file : path.join(process.cwd(), file);
+        return require(absolutePath);
     }
 
     _parseJsonFile(file) {

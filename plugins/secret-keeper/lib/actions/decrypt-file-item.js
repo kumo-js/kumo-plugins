@@ -2,20 +2,20 @@
 
 const _ = require('lodash');
 
-class DecryptSecretsFileItem {
+class DecryptFileItem {
 
     constructor(params) {
         this._args = params.args;
         this._fileReader = params.fileReader;
-        this._outputter = params.outputter;
         this._secretService = params.secretService;
+        this._stdOut = params.stdOut;
     }
 
     execute() {
         return this._readInputFile()
-            .then(obj => _.get(obj, this._args.item, ''))
+            .then(data => _.get(data, this._args.item, ''))
             .then(value => this._decryptValue(value))
-            .then(result => this._outputter.write(result));
+            .then(result => this._stdOut.write(result));
     }
 
     _decryptValue(value) {
@@ -28,4 +28,4 @@ class DecryptSecretsFileItem {
     }
 }
 
-module.exports = DecryptSecretsFileItem;
+module.exports = DecryptFileItem;
