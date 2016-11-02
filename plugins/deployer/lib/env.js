@@ -10,31 +10,41 @@ class Env {
         this._value = value;
     }
 
-    paths() {
-        return this._paths = this._paths || this._buildPaths();
+    namespaces() {
+        return this._namespaces = this._namespaces || this._buildNamespaces();
+    }
+
+    namespaceAtLevel(level) {
+        if (level === 'root') return this.root();
+        const count = this.namespaces().length - 1;
+        return this.namespaces()[count - level];
     }
 
     root() {
-        return this.paths()[0];
+        return this.namespaces()[0];
+    }
+
+    toVars() {
+        const result = {env: this.value(), envRoot: this.root()};
+        return Object.assign(result, this.namespaces().reduce(
+            (levels, ns, i) => Object.assign(levels, this._createNamespaceLevelVar(i)), {}
+        ));
     }
 
     value() {
         return this._value || '';
     }
 
-    toVars() {
-        return {
-            env: this.value(),
-            envRoot: this.root()
-        }
+    _createNamespaceLevelVar(level) {
+        return {[`envNamespaceLevel${level}`]: this.namespaceAtLevel(level)};
     }
 
-    _buildPaths() {
-        const items = this.value().split(SEPARATOR);
-        return items.reduce((paths, item) => {
-            const prevPath = _.last(paths);
-            const prefix = prevPath ? prevPath + SEPARATOR : '';
-            return paths.concat(prefix.concat(item));
+    _buildNamespaces() {
+        const parts = this.value().split(SEPARATOR);
+        return parts.reduce((namespaces, part) => {
+            const prevNamespace = _.last(namespaces) || '';
+            const separator = prevNamespace !== '' ? SEPARATOR : '';
+            return namespaces.concat(prevNamespace + separator + part);
         }, []);
     }
 }

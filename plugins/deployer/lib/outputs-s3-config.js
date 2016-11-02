@@ -3,20 +3,14 @@
 class OutputsS3Config {
 
     constructor(params) {
-        this._env = params.env;
+        this._envNamespace = params.envNamespace;
         this._settings = params.settings;
     }
 
     bucket() {
         const moduleName = this._settings.moduleName();
-        const defaultPrefix = `${this._env}/${moduleName}`;
-        const outputsBucket = this._settings.outputsBucket();
-        const prefix = this._addSlash(outputsBucket.prefix || defaultPrefix);
-        return Object.assign(outputsBucket, {prefix});
-    }
-
-    _addSlash(prefix) {
-        return prefix && !prefix.endsWith('/') ? `${prefix}/` : prefix;
+        const prefix = `${this._envNamespace}/${moduleName}/`;
+        return Object.assign(this._settings.outputsBucket(), {prefix});
     }
 }
 

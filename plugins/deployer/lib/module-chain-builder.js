@@ -35,9 +35,10 @@ class ModuleChainBuilder {
 
     _createSettingsObj(moduleSettings) {
         return new Settings({
-            moduleSettings: moduleSettings,
+            args: this._context.args,
+            env: this._context.env,
             kumoSettings: this._context.kumoSettings,
-            args: this._context.args
+            moduleSettings: moduleSettings
         });
     }
 

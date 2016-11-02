@@ -13,20 +13,23 @@ class ContextInitializer {
 
     initialize(context, actionParams) {
         return this._defaultContextInitializer.initialize(context, actionParams).then(
-            context => Object.assign({}, context, {
-                moduleDir: path.dirname(context.settingsFile),
-                env: new Env(context.args.env),
-                generateTempFile: tempfile,
-                settings: this._createSettings(context)
-            })
+            context => {
+                const env = new Env(context.args.env);
+                return Object.assign({}, context, {
+                    env: env,
+                    generateTempFile: tempfile,
+                    moduleDir: path.dirname(context.settingsFile),
+                    settings: this._createSettings(context, env)
+                })
+            }
         );
     }
 
-    _createSettings(context) {
+    _createSettings(context, env) {
+        const args = context.args;
         const moduleSettings = context.settings;
         const kumoSettings = context.kumoSettings;
-        const args = context.args;
-        return new Settings({moduleSettings, kumoSettings, args});
+        return new Settings({args, env, kumoSettings, moduleSettings});
     }
 }
 

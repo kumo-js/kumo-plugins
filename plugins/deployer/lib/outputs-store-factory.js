@@ -9,15 +9,15 @@ class OutputsStoreFactory {
         this._awsHelpers = params.awsHelpers;
     }
 
-    createStore(settings, env) {
+    createStore(settings, envNamespace) {
         return new OutputsS3Store({
-            outputsS3Config: this._outputsS3Config(settings, env),
+            outputsS3Config: this._outputsS3Config(settings, envNamespace),
             awsHelpers: this._awsHelpers
         });
     }
 
-    _outputsS3Config(settings, env) {
-        return new OutputsS3Config({settings, env});
+    _outputsS3Config(settings, envNamespace) {
+        return new OutputsS3Config({settings, envNamespace});
     }
 }
 
