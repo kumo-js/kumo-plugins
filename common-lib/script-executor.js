@@ -15,7 +15,8 @@ class ScriptExecutor {
     }
 
     _executeScript(script, options) {
-        options = _.merge({env: process.env}, {env: options.envVars}, options);
+        const env = _.merge(process.env, options.envVars);
+        options = Object.assign(_.omit(options, 'envVars'), {env});
         this._logger.debug(`Running: ${script}`);
 
         return this._runScript(script, options).then(output => {
