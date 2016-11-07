@@ -12,7 +12,7 @@ class ProvisionCfStack {
     }
 
     execute(state) {
-        const templateFile = state.envVars.templateOutputFile;
+        const templateFile = state.taskVars.templateOutputFile;
         return this._fileReader.readJson(templateFile)
             .then(template => JSON.stringify(template))
             .then(template => this._provisionCfStack(template, state.taskDef))

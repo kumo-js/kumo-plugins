@@ -7,7 +7,7 @@ class CollectTaskOutputs {
     }
 
     execute(state) {
-        const outputsFile = state.envVars.taskOutputsFile;
+        const outputsFile = state.taskVars.taskOutputsFile;
         return this._readJson(outputsFile).then(
             outputs => Object.assign({}, state, {outputs: outputs || {}})
         );

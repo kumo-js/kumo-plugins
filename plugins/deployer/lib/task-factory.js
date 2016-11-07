@@ -4,14 +4,14 @@ const runScript = require('command-promise');
 const AwsHelpers = require('../../../common-lib/aws-helpers');
 const DeleteCfStackStep = require('./task-steps/delete-cf-stack');
 const CollectTaskOutputsStep = require('./task-steps/collect-task-outputs');
-const CreateEnvVarsStep = require('./task-steps/create-env-vars');
-const CreateCfEnvVarsStep = require('./task-steps/create-cf-env-vars');
+const CreateTaskVarsStep = require('./task-steps/create-task-vars');
+const CreateCfTaskVarsStep = require('./task-steps/create-cf-task-vars');
 const ExecuteScriptStep = require('./task-steps/execute-script');
 const EnvVarsFormatter = require('../../../common-lib/env-vars-formatter');
 const JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader');
 const JsonSchemaHelper = require('../../../common-lib/json-schema-helper');
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
-const ResolveCfStackParamsStep = require('./task-steps/resolve-cf-stack-params');
+const ResolveTaskAttributesStep = require('./task-steps/resolve-task-attributes');
 const ScriptExecutor = require('../../../common-lib/script-executor');
 const StepsExecutor = require('../../../common-lib/steps-executor');
 const StackNameExpander = require('./stack-name-expander');
@@ -45,41 +45,47 @@ class TaskFactory {
 
     _cfTaskSteps() {
         return [
-            this._createEnvVarsStep(),
-            this._createCfEnvVarsStep(),
-            this._executeScriptStep('stackTemplateScript'),
-            this._resolveCfStackParamsStep(),
+            this._createTaskVarsStep(),
+            this._createCfTaskVarsStep(),
+            this._resolveTaskAttributesStep(),
+            this._executeScriptStep('stackTemplate'),
             this._provisionCfStackStep()
         ];
     }
 
     _customTaskSteps() {
         return [
-            this._createEnvVarsStep(),
-            this._executeScriptStep('runScript'),
+            this._createTaskVarsStep(),
+            this._resolveTaskAttributesStep(),
+            this._executeScriptStep('run'),
             this._collectTaskOutputsStep()
         ];
     }
 
     _undoCfTaskSteps() {
-        return [this._deleteCfStackStep()];
+        return [
+            this._createTaskVarsStep(),
+            this._resolveTaskAttributesStep(),
+            this._deleteCfStackStep()
+        ];
     }
 
     _undoCustomTaskSteps() {
         return [
-            this._createEnvVarsStep(),
-            this._executeScriptStep('undoScript')
+            this._createTaskVarsStep(),
+            this._resolveTaskAttributesStep(),
+            this._executeScriptStep('undo')
         ];
     }
 
-    _createEnvVarsStep() {
+    _createTaskVarsStep() {
         const context = this._context;
-        return new CreateEnvVarsStep({context});
+        return new CreateTaskVarsStep({context});
     }
 
-    _createCfEnvVarsStep() {
+    _createCfTaskVarsStep() {
         const context = this._context;
-        return new CreateCfEnvVarsStep({context});
+        return new CreateCfTaskVarsStep({context});
     }
 
     _collectTaskOutputsStep() {
@@ -96,14 +102,15 @@ class TaskFactory {
 
     _executeScriptStep(scriptKey) {
         const context = this._context;
+        const envVarsFormatter = new EnvVarsFormatter({});
         const scriptExecutor = this._scriptExecutor(context);
-        return new ExecuteScriptStep({context, scriptExecutor, scriptKey});
+        return new ExecuteScriptStep({context, envVarsFormatter, scriptExecutor, scriptKey});
     }
 
-    _resolveCfStackParamsStep() {
+    _resolveTaskAttributesStep() {
         const context = this._context;
         const jsonSchemaHelper = new JsonSchemaHelper();
-        return new ResolveCfStackParamsStep({context, jsonSchemaHelper});
+        return new ResolveTaskAttributesStep({context, jsonSchemaHelper});
     }
 
     _provisionCfStackStep() {
@@ -124,8 +131,7 @@ class TaskFactory {
 
     _scriptExecutor(context) {
         const logger = context.logger;
-        const options = {envVarsFormatter: new EnvVarsFormatter({})};
-        return new ScriptExecutor({logger, runScript, options});
+        return new ScriptExecutor({logger, runScript});
     }
 
     _awsHelpers() {

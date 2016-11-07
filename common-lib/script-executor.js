@@ -6,18 +6,16 @@ class ScriptExecutor {
 
     constructor(params) {
         this._logger = params.logger;
-        this._options = params.options || {};
         this._runScript = params.runScript;
     }
 
     execute(script, options) {
-        const env = this._formatEnvVars(options.env);
-        options = Object.assign({logOutput: true}, options, {env});
+        options = Object.assign({logOutput: true}, options);
         return this._executeScript(script, options);
     }
 
     _executeScript(script, options) {
-        options = _.merge({env: process.env}, options);
+        options = _.merge({env: process.env}, {env: options.envVars}, options);
         this._logger.debug(`Running: ${script}`);
 
         return this._runScript(script, options).then(output => {
@@ -26,11 +24,6 @@ class ScriptExecutor {
             if (logOutput) this._logger.debug(output);
             return output;
         });
-    }
-
-    _formatEnvVars(envVars) {
-        const formatter = this._options.envVarsFormatter;
-        return formatter ? formatter.format(envVars) : envVars;
     }
 }
 

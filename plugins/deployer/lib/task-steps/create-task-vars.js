@@ -2,7 +2,7 @@
 
 const Promise = require('bluebird');
 
-class CreateEnvVars {
+class CreateTaskVars {
 
     constructor(params) {
         this._context = params.context;
@@ -10,15 +10,15 @@ class CreateEnvVars {
 
     execute(state) {
         return Promise.resolve(
-            Object.assign({}, state, {envVars: this._createEnvVars(state)})
+            Object.assign({}, state, {taskVars: this._createTaskVars(state)})
         );
     }
 
-    _createEnvVars(state) {
+    _createTaskVars(state) {
         return Object.assign(
             {
-                deploymentConfig: JSON.stringify(state.deploymentConfig),
-                deploymentOutputs: JSON.stringify(state.deploymentOutputs),
+                deploymentConfig: state.deploymentConfig,
+                deploymentOutputs: state.deploymentOutputs,
                 region: state.taskDef.region,
                 taskOutputsFile: this._context.generateTempFile()
             },
@@ -27,4 +27,4 @@ class CreateEnvVars {
     }
 }
 
-module.exports = CreateEnvVars;
+module.exports = CreateTaskVars;

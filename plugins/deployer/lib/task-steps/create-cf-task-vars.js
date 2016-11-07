@@ -3,7 +3,7 @@
 const _ = require('lodash');
 const Promise = require('bluebird');
 
-class CreateCfEnvVars {
+class CreateCfTaskVars {
 
     constructor(params) {
         this._context = params.context;
@@ -11,11 +11,11 @@ class CreateCfEnvVars {
 
     execute(state) {
         return Promise.resolve(_.merge({}, state, {
-            envVars: {
+            taskVars: {
                 templateOutputFile: this._context.generateTempFile()
             }
         }));
     }
 }
 
-module.exports = CreateCfEnvVars;
+module.exports = CreateCfTaskVars;
