@@ -2,6 +2,7 @@
 
 const aws = require('aws-sdk');
 const CfHelper = require('./cf-helper');
+const IamHelper = require('./iam-helper');
 const KmsHelper = require('./kms-helper');
 const S3Helper = require('./s3-helper');
 
@@ -24,6 +25,13 @@ class AwsHelpers {
             kms: new aws.KMS(options)
         });
     }
+
+    iam(options) {
+        return new IamHelper({
+            iam: new aws.IAM(options)
+        });
+    }
+
 }
 
 module.exports = AwsHelpers;

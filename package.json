@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha plugins/lambda-package-uploader/test --recursive"
+    "test": "mocha plugins/cert-uploader/test --recursive"
   },
   "repository": {
     "type": "git",

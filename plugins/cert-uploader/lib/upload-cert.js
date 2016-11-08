@@ -1,14 +1,16 @@
+
 'use strict';
 
 class UploadCertStep {
 
     constructor(params) {
-        this._iam = params.iam;
-        this._settings = params.settings;
+        this._iamHelper = params.iamHelper;
+        this._stepArgs = params.stepArgs;
     }
 
     execute() {
-        return this._iam.uploadServerCertificate(this._settings);
+        const params = this._stepArgs;
+        return this._iamHelper.uploadServerCertificate(params);
     }
 
 }
