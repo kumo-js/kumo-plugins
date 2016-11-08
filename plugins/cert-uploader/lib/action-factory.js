@@ -2,14 +2,17 @@
 'use strict';
 
 const AwsHelpers = require('../../../common-lib/aws-helpers');
-const UploadCertStep = require('./upload-cert');
+const DataFormatter = require('../../../common-lib/data-formatter');
+const UploadCertAction = require('./upload-cert-action');
 
 class ActionFactory {
 
     createUploadCertAction(context) {
-        return new UploadCertStep({
-            stepArgs: this._getUploadCertStepArgs(context),
-            iamHelper: this._getIamHelper(context)
+        return new UploadCertAction({
+            dataFormatter: new DataFormatter(),
+            iamHelper: this._getIamHelper(context),
+            stdOut: process.stdout,
+            stepArgs: this._getUploadCertStepArgs(context)
         });
     }
 
