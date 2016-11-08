@@ -16,7 +16,9 @@ class ExecuteScript {
         const scriptDef = state.taskDef[this._scriptKey];
         if (!scriptDef) return Promise.resolve(state);
 
-        return this._scriptExecutor.execute(scriptDef.script, {
+        return this._scriptExecutor.execute(
+            scriptDef.script,
+            {
                 cwd: this._context.moduleDir,
                 envVars: this._getEnvVars(scriptDef, state)
             }

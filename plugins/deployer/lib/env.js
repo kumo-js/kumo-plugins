@@ -11,7 +11,8 @@ class Env {
     }
 
     namespaces() {
-        return this._namespaces = this._namespaces || this._buildNamespaces();
+        this._namespaces = this._namespaces || this._buildNamespaces();
+        return this._namespaces;
     }
 
     namespaceAtLevel(level) {

@@ -20,7 +20,7 @@ class ContextInitializer {
                     generateTempFile: tempfile,
                     moduleDir: path.dirname(context.settingsFile),
                     settings: this._createSettings(context, env)
-                })
+                });
             }
         );
     }

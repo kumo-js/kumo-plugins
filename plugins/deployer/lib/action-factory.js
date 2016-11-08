@@ -60,7 +60,12 @@ class ActionFactory {
         const envVarsFormatter = new EnvVarsFormatter({});
         const moduleChainBuilder = this._moduleChainBuilder(context);
         const scriptExecutor = this._scriptExecutor(context);
-        return new CollectDeploymentConfigStep({context, envVarsFormatter, moduleChainBuilder, scriptExecutor});
+        return new CollectDeploymentConfigStep({
+            context,
+            envVarsFormatter,
+            moduleChainBuilder,
+            scriptExecutor
+        });
     }
 
     _expandTaskDefsStep(context) {

@@ -12,8 +12,8 @@ class DataFormatter {
 
     _formatters() {
         return {
-            'yaml': {format: data => yaml.safeDump(data)},
-            'json': {format: data => JSON.stringify(data, null, 2)}
+            yaml: {format: data => yaml.safeDump(data)},
+            json: {format: data => JSON.stringify(data, null, 2)}
         };
     }
 }
