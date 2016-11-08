@@ -7,9 +7,8 @@ class CollectDeploymentConfig {
 
     constructor(params) {
         this._context = params.context;
-        this._envVarsFormatter = params.envVarsFormatter;
+        this._deploymentScriptExecutor = params.deploymentScriptExecutor;
         this._moduleChainBuilder = params.moduleChainBuilder;
-        this._scriptExecutor = params.scriptExecutor;
     }
 
     execute(state) {
@@ -24,16 +23,10 @@ class CollectDeploymentConfig {
     }
 
     _collectConfig(module) {
-        const script = _.get(module.settings.config(), 'script');
-        if (!script) return Promise.resolve({});
-        const envVars = this._getConfigScriptEnvVars();
-        const scriptOptions = {cwd: module.dir, envVars, logOutput: false};
-        return this._scriptExecutor.execute(script, scriptOptions).then(JSON.parse);
-    }
-
-    _getConfigScriptEnvVars() {
-        const envVars = this._context.env.toVars();
-        return this._envVarsFormatter.format(envVars);
+        const configScriptDef = _.get(module.settings, 'config');
+        if (!configScriptDef) return Promise.resolve({});
+        const options = {cwd: module.dir, logOutput: false};
+        return this._deploymentScriptExecutor.execute(configScriptDef, options).then(JSON.parse);
     }
 }
 

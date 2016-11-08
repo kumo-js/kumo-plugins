@@ -1,8 +1,8 @@
 'use strict';
 
+const _ = require('lodash');
 const path = require('path');
 const Promise = require('bluebird');
-const Settings = require('./settings');
 
 class ModuleChainBuilder {
 
@@ -10,6 +10,7 @@ class ModuleChainBuilder {
         this._context = params.context;
         this._dirChainBuilder = params.dirChainBuilder;
         this._fileReader = params.fileReader;
+        this._settingsBuilder = params.settingsBuilder;
     }
 
     build() {
@@ -28,18 +29,15 @@ class ModuleChainBuilder {
         return Promise.all(moduleDirs.map(moduleDir => {
             const settingsFile = path.join(moduleDir, this._settingsFilename());
             return this._fileReader.readJson(settingsFile)
-                .then(settings => this._createSettingsObj(settings))
+                .then(moduleSettings => this._buildSettings(moduleSettings))
                 .then(settings => ({dir: moduleDir, settings}));
         }));
     }
 
-    _createSettingsObj(moduleSettings) {
-        return new Settings({
-            args: this._context.args,
-            env: this._context.env,
-            kumoSettings: this._context.kumoSettings,
-            moduleSettings: moduleSettings
-        });
+    _buildSettings(moduleSettings) {
+        var params = _.pick(this._context, ['args', 'env', 'kumoSettings']);
+        params = Object.assign(params, {moduleSettings});
+        return this._settingsBuilder.build(params);
     }
 
     _currentModuleDir() {

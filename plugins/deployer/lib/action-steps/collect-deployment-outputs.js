@@ -23,7 +23,7 @@ class CollectDeploymentOutputs {
 
     _collectModuleOutputs(module) {
         const settings = module.settings;
-        const moduleName = settings.moduleName();
+        const moduleName = settings.moduleName;
         const envNamespaces = this._context.env.namespaces();
         const promises = envNamespaces.map(
             envNamespace => this._outputsStore(settings, envNamespace).collect()

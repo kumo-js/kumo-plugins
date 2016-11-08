@@ -8,9 +8,9 @@ class OutputsS3Config {
     }
 
     bucket() {
-        const moduleName = this._settings.moduleName();
+        const moduleName = this._settings.moduleName;
         const prefix = `${this._envNamespace}/${moduleName}/`;
-        return Object.assign(this._settings.outputsBucket(), {prefix});
+        return Object.assign(this._settings.outputsBucket, {prefix});
     }
 }
 

@@ -35,7 +35,7 @@ class ExpandTaskDefs {
     }
 
     _taskDefs() {
-        return this._context.settings.tasks();
+        return this._context.settings.tasks;
     }
 }
 

@@ -26,7 +26,7 @@ class CreateOutputsBucket {
     }
 
     _outputsBucket() {
-        return this._context.settings.outputsBucket();
+        return this._context.settings.outputsBucket;
     }
 }
 

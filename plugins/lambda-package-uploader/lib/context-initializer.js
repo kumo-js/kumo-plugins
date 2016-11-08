@@ -1,4 +1,3 @@
-
 'use strict';
 
 const Settings = require('./settings');
@@ -38,13 +37,14 @@ class ContextInitializer {
     _resolveModuleSettings(state) {
         const defaultContext = state.defaultContext;
         const args = defaultContext.args;
-        const referenceDefinitions = {
-            _build_number: args.build_number,
-            _config: JSON.parse(args.config),
-            _env: args.env,
-            _resources: state.resources
+
+        const refData = {
+            buildNumber: args['build-number'],
+            config: JSON.parse(args.config),
+            env: args.env,
+            resources: state.resources
         };
-        return this._jsonSchemaHelper.derefWith(defaultContext.settings, referenceDefinitions)
+        return this._jsonSchemaHelper.derefWith(defaultContext.settings, refData)
             .then(moduleSettings => Object.assign({}, state, {moduleSettings}));
     }
 

@@ -9,16 +9,19 @@ class ContextInitializer {
     }
 
     initialize(context, actionParams) {
-        return this._defaultContextInitializer.initialize(context, actionParams).then(
-            context => Object.assign({}, context, {
-                settings: this._getSettingsOrDefault(context)
-            })
+        return this._initializeDefaults(context, actionParams).then(
+            context => this._initializeSettings(context)
         );
     }
 
-    _getSettingsOrDefault(context) {
+    _initializeDefaults(context, actionParams) {
+        return this._defaultContextInitializer.initialize(context, actionParams);
+    }
+
+    _initializeSettings(context) {
         const defaultSettings = _.get(context.kumoSettings, 'secretKeeper.providers');
-        return Object.assign({}, defaultSettings, context.settings);
+        const settings = Object.assign({}, defaultSettings, context.settings);
+        return Object.assign({}, context, {settings});
     }
 }
 

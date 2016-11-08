@@ -26,7 +26,7 @@ class Env {
     }
 
     toVars() {
-        const result = {env: this.value(), envRoot: this.root()};
+        const result = {env: this.value(), envNamespaceRoot: this.root()};
         return Object.assign(result, this.namespaces().reduce(
             (levels, ns, i) => Object.assign(levels, this._createNamespaceLevelVar(i)), {}
         ));

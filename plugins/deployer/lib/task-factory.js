@@ -3,6 +3,8 @@
 const runScript = require('command-promise');
 const AwsHelpers = require('../../../common-lib/aws-helpers');
 const DeleteCfStackStep = require('./task-steps/delete-cf-stack');
+const DerefTaskAttributesStep = require('./task-steps/deref-task-attributes');
+const DeploymentScriptExecutor = require('./deployment-script-executor');
 const CollectTaskOutputsStep = require('./task-steps/collect-task-outputs');
 const CreateTaskVarsStep = require('./task-steps/create-task-vars');
 const CreateCfTaskVarsStep = require('./task-steps/create-cf-task-vars');
@@ -11,7 +13,6 @@ const EnvVarsFormatter = require('../../../common-lib/env-vars-formatter');
 const JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader');
 const JsonSchemaHelper = require('../../../common-lib/json-schema-helper');
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
-const ResolveTaskAttributesStep = require('./task-steps/resolve-task-attributes');
 const ScriptExecutor = require('../../../common-lib/script-executor');
 const StepsExecutor = require('../../../common-lib/steps-executor');
 const StackNameExpander = require('./stack-name-expander');
@@ -47,7 +48,7 @@ class TaskFactory {
         return [
             this._createTaskVarsStep(),
             this._createCfTaskVarsStep(),
-            this._resolveTaskAttributesStep(),
+            this._derefTaskAttributesStep(),
             this._executeScriptStep('stackTemplate'),
             this._provisionCfStackStep()
         ];
@@ -56,7 +57,7 @@ class TaskFactory {
     _customTaskSteps() {
         return [
             this._createTaskVarsStep(),
-            this._resolveTaskAttributesStep(),
+            this._derefTaskAttributesStep(),
             this._executeScriptStep('run'),
             this._collectTaskOutputsStep()
         ];
@@ -65,7 +66,7 @@ class TaskFactory {
     _undoCfTaskSteps() {
         return [
             this._createTaskVarsStep(),
-            this._resolveTaskAttributesStep(),
+            this._derefTaskAttributesStep(),
             this._deleteCfStackStep()
         ];
     }
@@ -73,7 +74,7 @@ class TaskFactory {
     _undoCustomTaskSteps() {
         return [
             this._createTaskVarsStep(),
-            this._resolveTaskAttributesStep(),
+            this._derefTaskAttributesStep(),
             this._executeScriptStep('undo')
         ];
     }
@@ -100,17 +101,18 @@ class TaskFactory {
         return new DeleteCfStackStep({awsHelpers, context, stackNameExpander});
     }
 
-    _executeScriptStep(scriptKey) {
+    _executeScriptStep(scriptName) {
         const context = this._context;
         const envVarsFormatter = new EnvVarsFormatter({});
-        const scriptExecutor = this._scriptExecutor(context);
-        return new ExecuteScriptStep({context, envVarsFormatter, scriptExecutor, scriptKey});
+        const scriptExecutor = this._scriptExecutor(context.logger);
+        const deploymentScriptExecutor = new DeploymentScriptExecutor({context, envVarsFormatter, scriptExecutor});
+        return new ExecuteScriptStep({context, deploymentScriptExecutor, envVarsFormatter, scriptName});
     }
 
-    _resolveTaskAttributesStep() {
+    _derefTaskAttributesStep() {
         const context = this._context;
         const jsonSchemaHelper = new JsonSchemaHelper();
-        return new ResolveTaskAttributesStep({context, jsonSchemaHelper});
+        return new DerefTaskAttributesStep({context, jsonSchemaHelper});
     }
 
     _provisionCfStackStep() {
@@ -129,8 +131,7 @@ class TaskFactory {
         return new StackNameExpander({context: this._context});
     }
 
-    _scriptExecutor(context) {
-        const logger = context.logger;
+    _scriptExecutor(logger) {
         return new ScriptExecutor({logger, runScript});
     }
 

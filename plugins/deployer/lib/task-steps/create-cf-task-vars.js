@@ -10,11 +10,13 @@ class CreateCfTaskVars {
     }
 
     execute(state) {
-        return Promise.resolve(_.merge({}, state, {
-            taskVars: {
-                templateOutputFile: this._context.generateTempFile()
-            }
-        }));
+        return Promise.resolve(
+            _.merge({}, state, {taskVars: this._createCfTaskVars()})
+        );
+    }
+
+    _createCfTaskVars() {
+        return {templateOutputFile: this._context.generateTempFile()};
     }
 }
 

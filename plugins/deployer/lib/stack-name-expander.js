@@ -7,7 +7,7 @@ class StackNameExpander {
     }
 
     expand(stackName) {
-        const moduleName = this._context.settings.moduleName();
+        const moduleName = this._context.settings.moduleName;
         const env = this._context.env.value();
         const name = `${env}-${moduleName}-${stackName}`;
         return name.replace(/\s/, '-').toLowerCase();

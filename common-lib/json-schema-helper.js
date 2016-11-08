@@ -6,14 +6,16 @@ const deRefJson = Promise.promisify(require('json-schema-deref'));
 
 class JsonSchemaHelper {
 
-    deref(obj) {
-        return deRefJson(obj);
+    deref(schema) {
+        return deRefJson(schema);
     }
 
-    derefWith(schema, obj) {
-        const temporaryProps = Object.keys(obj);
-        return this.deref(Object.assign({}, schema, obj))
-            .then(derefedSchema => _.omit(derefedSchema, temporaryProps));
+    derefWith(schema, refData, options) {
+        options = Object.assign({refDataPrefix: '_'}, options);
+        refData = _.mapKeys(refData || {}, (v, k) => options.refDataPrefix + k);
+        const refDataKeys = Object.keys(refData || {});
+        return this.deref(Object.assign({}, schema, refData))
+            .then(deReferencedSchema => _.omit(deReferencedSchema, refDataKeys));
     }
 
 }

@@ -7,10 +7,10 @@ const CollectDeploymentOutputsStep = require('./action-steps/collect-deployment-
 const CollectDeploymentConfigStep = require('./action-steps/collect-deployment-config');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
 const DirChainBuilder = require('../../../common-lib/dir-chain-builder');
+const DeploymentScriptExecutor = require('./deployment-script-executor');
 const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
 const ExecuteTasksStep = require('./action-steps/execute-tasks');
 const EnvVarsFormatter = require('../../../common-lib/env-vars-formatter');
-const JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
 const ScriptExecutor = require('../../../common-lib/script-executor');
@@ -20,6 +20,11 @@ const TaskService = require('./task-service');
 const UndoTasksStep = require('./action-steps/undo-tasks');
 
 class ActionFactory {
+
+    constructor(params) {
+        this._fileReader = params.fileReader;
+        this._settingsBuilder = params.settingsBuilder;
+    }
 
     createDeployAction(context) {
         return new StepsExecutor({
@@ -58,14 +63,10 @@ class ActionFactory {
 
     _collectDeploymentConfigStep(context) {
         const envVarsFormatter = new EnvVarsFormatter({});
-        const moduleChainBuilder = this._moduleChainBuilder(context);
         const scriptExecutor = this._scriptExecutor(context);
-        return new CollectDeploymentConfigStep({
-            context,
-            envVarsFormatter,
-            moduleChainBuilder,
-            scriptExecutor
-        });
+        const deploymentScriptExecutor = new DeploymentScriptExecutor({context, envVarsFormatter, scriptExecutor});
+        const moduleChainBuilder = this._moduleChainBuilder(context);
+        return new CollectDeploymentConfigStep({context, deploymentScriptExecutor, moduleChainBuilder});
     }
 
     _expandTaskDefsStep(context) {
@@ -88,9 +89,10 @@ class ActionFactory {
     }
 
     _moduleChainBuilder(context) {
-        const fileReader = this._fileReader();
+        const fileReader = this._fileReader;
         const dirChainBuilder = new DirChainBuilder({fileReader});
-        return new ModuleChainBuilder({context, dirChainBuilder, fileReader});
+        const settingsBuilder = this._settingsBuilder;
+        return new ModuleChainBuilder({context, dirChainBuilder, fileReader, settingsBuilder});
     }
 
     _scriptExecutor(context) {
@@ -110,10 +112,6 @@ class ActionFactory {
 
     _awsHelpers() {
         return new AwsHelpers();
-    }
-
-    _fileReader() {
-        return new JsonCompatibleFileReader();
     }
 
     _outputsStoreFactory() {

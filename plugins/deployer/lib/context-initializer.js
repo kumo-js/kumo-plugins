@@ -1,35 +1,42 @@
 'use strict';
 
+const _ = require('lodash');
 const path = require('path');
 const tempfile = require('tempfile2');
 const Env = require('./env');
-const Settings = require('./settings');
 
 class ContextInitializer {
 
     constructor(params) {
         this._defaultContextInitializer = params.defaultContextInitializer;
+        this._settingsBuilder = params.settingsBuilder;
     }
 
     initialize(context, actionParams) {
-        return this._defaultContextInitializer.initialize(context, actionParams).then(
-            context => {
-                const env = new Env(context.args.env);
-                return Object.assign({}, context, {
-                    env: env,
-                    generateTempFile: tempfile,
-                    moduleDir: path.dirname(context.settingsFile),
-                    settings: this._createSettings(context, env)
-                });
-            }
-        );
+        return this._initializeDefaults(context, actionParams)
+            .then(context => this._initializeEnv(context))
+            .then(context => this._initializeSettings(context))
+            .then(context => Object.assign({}, context, {
+                generateTempFile: tempfile,
+                moduleDir: path.dirname(context.settingsFile)
+            }));
     }
 
-    _createSettings(context, env) {
-        const args = context.args;
+    _initializeDefaults(context, actionParams) {
+        return this._defaultContextInitializer.initialize(context, actionParams);
+    }
+
+    _initializeEnv(context) {
+        const env = new Env(context.args.env);
+        return Object.assign({}, context, {env});
+    }
+
+    _initializeSettings(context) {
         const moduleSettings = context.settings;
-        const kumoSettings = context.kumoSettings;
-        return new Settings({args, env, kumoSettings, moduleSettings});
+        const params = Object.assign(_.pick(context, ['args', 'env', 'kumoSettings']), {moduleSettings});
+        return this._settingsBuilder.build(params).then(
+            settings => Object.assign({}, context, {settings})
+        );
     }
 }
 
