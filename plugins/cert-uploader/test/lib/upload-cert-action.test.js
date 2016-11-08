@@ -1,27 +1,23 @@
-const UploadCertStep = require('../../lib/upload-cert-action');
+const UploadCertAction = require('../../lib/upload-cert-action');
 
-describe('UploadCertStep', () => {
+describe('UploadCertAction', () => {
 
     it('uploads a certificate', () => {
-        const uploadCertResult = {
-            ServerCertificateMetadata: {
-                ServerCertificateName: 'SERVER_CERTIFICATE_NAME',
-                Arn: 'ARN'
-            }
-        };
+        const actionResultBuilder = {build: sinon.stub().returns('ACTION_RESULT')};
+        const dataFormatter = {format: sinon.stub().returns(Promise.resolve('FORMATTED_RESULT'))};
         const iamHelper = {
-            uploadServerCertificate: sinon.stub().returns(Promise.resolve(uploadCertResult))
-        };
-        const stepArgs = {
-            CertificateBody: 'CERT_BODY',
-            PrivateKey: 'PRIVATE_KEY',
-            ServerCertificateName: 'CERT_NAME',
-            CertificateChain: 'CERT_CHAIN',
-            Path: 'CERT_PATH'
+            uploadServerCertificate: sinon.stub().returns(Promise.resolve('UPLOAD_CERT_RESULT'))
         };
         const stdOut = {write: sinon.spy()};
-        const dataFormatter = {format: sinon.stub().returns(Promise.resolve('FORMATTED_RESULT'))};
-        const step = new UploadCertStep({dataFormatter, iamHelper, stepArgs, stdOut});
+
+        const actionArgs = {
+            body: 'CERT_BODY',
+            'private-key': 'PRIVATE_KEY',
+            name: 'CERT_NAME',
+            chain: 'CERT_CHAIN',
+            path: 'CERT_PATH'
+        };
+        const step = new UploadCertAction({actionArgs, actionResultBuilder, dataFormatter, iamHelper, stdOut});
 
         return step.execute().then(() => {
             expect(iamHelper.uploadServerCertificate.args).to.eql([[{
@@ -31,10 +27,8 @@ describe('UploadCertStep', () => {
                 CertificateChain: 'CERT_CHAIN',
                 Path: 'CERT_PATH'
             }]]);
-            expect(dataFormatter.format.args).to.eql([[
-                {SERVER_CERTIFICATE_NAME: 'ARN'},
-                'json'
-            ]]);
+            expect(actionResultBuilder.build.args).to.eql([['UPLOAD_CERT_RESULT']]);
+            expect(dataFormatter.format.args).to.eql([['ACTION_RESULT', 'json']]);
             expect(stdOut.write.args).to.eql([['FORMATTED_RESULT']]);
         });
     });

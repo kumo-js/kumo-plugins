@@ -4,9 +4,10 @@
 class UploadCertAction {
 
     constructor(params) {
+        this._actionArgs = params.actionArgs;
+        this._actionResultBuilder = params.actionResultBuilder;
         this._dataFormatter = params.dataFormatter;
         this._iamHelper = params.iamHelper;
-        this._stepArgs = params.stepArgs;
         this._stdOut = params.stdOut;
     }
 
@@ -18,14 +19,26 @@ class UploadCertAction {
     }
 
     _uploadCert(state) {
-        return this._iamHelper.uploadServerCertificate(this._stepArgs)
-            .then(data => Object.assign({}, state, {cert: data.ServerCertificateMetadata}));
+        const params = this._getUploadCertParams(this._actionArgs);
+        return this._iamHelper.uploadServerCertificate(params)
+            .then(uploadResult => Object.assign({}, state, {uploadResult}));
     }
 
     _outputResult(state) {
-        const certArn = {[state.cert.ServerCertificateName]: state.cert.Arn};
-        return this._dataFormatter.format(certArn, 'json')
-            .then(formattedOutput => this._stdOut.write(formattedOutput));
+        const result = this._actionResultBuilder.build(state.uploadResult);
+        return this._dataFormatter.format(result, 'json')
+            .then(formattedOutput => this._stdOut.write(formattedOutput))
+            .then(() => state);
+    }
+
+    _getUploadCertParams(actionArgs) {
+        return {
+            CertificateBody: actionArgs.body,
+            PrivateKey: actionArgs['private-key'],
+            ServerCertificateName: actionArgs.name,
+            CertificateChain: actionArgs.chain,
+            Path: actionArgs.path
+        };
     }
 
 }
