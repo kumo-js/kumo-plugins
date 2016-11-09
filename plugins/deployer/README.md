@@ -1,4 +1,5 @@
 
+
 # Module Deployer
 
 The module deployer plugin is essentially a command line runner that executes a list of tasks in order. 
@@ -58,12 +59,12 @@ There are some built-in references available for use:
 
 #### Script Sections
 
-The flexibility of the deployer is achived through the use of scripts that are executed
+The flexibility of the deployer is achieved through the use of scripts that are executed
 at different stages of the deployment process. Scripts allow the consumer to execute any arbitrary
 command to achieve the desired outcome. They are used in several places including the [config](#config)
 section, [tasks](#tasks) section etc.
 
-All scripts have some built-in env variables available for use (which are equivalent to the built-in [json schema references](#json-schema-references))
+All scripts have some built-in env variables available for use, which are equivalent to the built-in [json schema references](#json-schema-references).
 
 ```bash
 $KUMO_ARGS_[XXX]
@@ -113,7 +114,7 @@ removed if the module is destroyed.
 #### `dependsOn`
 
 A list of dependent modules from which to **collect** [config](#config) and any existing 
-[deployment outputs](#outputsBucket), that will be merged with the current module and made availble for use
+[deployment outputs](#outputsbucket), that will be merged with the current module and made availble for use
 during deployment. E.g. 
 
 ```js
@@ -135,4 +136,3 @@ The collected outputs is made available to **[tasks](#tasks)** via:
 
 
 #### `tasks`
-
