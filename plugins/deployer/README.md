@@ -28,8 +28,8 @@ Arguments are as follows:
             level1: pre-prod--dev
             level2(i.e. root): pre-prod
          
-         These levels can be individually referenced in scripts via ENV vars.
-         See settings file for more details.
+        These levels can be individually referenced in scripts via ENV vars.
+        See settings file for more details.
 ```
 
 
@@ -41,7 +41,6 @@ The following examples assume a `.json` file but you can also use `.yaml` or `.j
 
 Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 There are some built-in references available for use:
-
 
 ```js
 // To reference command line args (in cameCase) supplied to the plugin:
@@ -57,13 +56,30 @@ There are some built-in references available for use:
 {"$ref": "#/_envNamespaceLevel[X]"} // where X is >= 0
 ```
 
+#### Script Sections
+
+The flexibility of the deployer is achived through the use of scripts that are executed
+at different stages of the deployment process. Scripts allow the consumer to execute any arbitrary
+command to achieve the desired outcome. They are used in several places including the [config](#config)
+section, [tasks](#tasks) section etc.
+
+All scripts have some built-in env variables available for use (which are equivalent to the built-in [json schema references](#json-schema-references))
+
+```bash
+$KUMO_ARGS_[XXX]
+$KUMO_ENV
+$KUMO_ENV_NAMESPACE_ROOT
+$KUMO_ENV_NAMESPACE_LEVEL[X]
+```  
+
+
 ### Settings Schema
    
 ```js
 {
   "moduleName": "",
-  "dependsOn": [...],
   "outputsBucket": {},
+  "dependsOn": [...],
   "config": {},
   "tasks": [...]
 }
@@ -78,40 +94,45 @@ Name of the module.
 Configure the S3 bucket used to store the outputs of all deployment [tasks](#tasks). E.g.
 
 ```js
-{
-  "outputsBucket": {
-    "name": "deployment-outputs"
-  }
-}
+"outputsBucket": {"name": "deployment-outputs"}
 ```
 
 The `name` can also be an array of strings to support dynamic items. In this case,
 the different items will be concatenated using the `-` separator. E.g.
 
 ```js
-{
-  "outputsBucket": {
-    "name": ["deployment-outputs", {"$ref": "#/_env"}] 
-  }
-  // will produce 'deployment-outputs-ci' if #/_env is ci
-} 
+"outputsBucket": {
+  "name": ["deployment-outputs", {"$ref": "#/_env"}] 
+}
+// produces 'deployment-outputs-ci' if #/_env is ci 
 ```
 
-The bucket will be created if it doesn't already exist, but will not be 
+The bucket will be created if it doesn't already exist, but currently will not be 
 removed if the module is destroyed.
 
 #### `dependsOn`
 
-A list of modules (in the form of directory paths) of which config and existing that will be traversed to 
-collect config and outputs BEFORE starting the deployment process.
-E.g. `"dependsOn": ['../moduleA', '../moduleB]` 
+A list of dependent modules from which to **collect** [config](#config) and any existing 
+[deployment outputs](#outputsBucket), that will be merged with the current module and made availble for use
+during deployment. E.g. 
 
+```js
+"dependsOn": ["../moduleA", "../moduleB"]
+```
 
+Modules are given as directory paths (that must each contain a `deployment-settings` file).
+Dependencies are deeply traversed left to right.
 
-#### `tasks`
+The collected config is made available to **[tasks](#tasks)** via:
+* `$KUMO_DEPLOYMENT_CONFIG` env variable (in the script section) OR
+* `{"$ref": "#/_deploymentConfig/.."}` json schema reference  
 
+The collected outputs is made available to **[tasks](#tasks)** via:
+* `$KUMO_DEPLOYMENT_OUTPUTS` env variable (in the script section) OR
+* `{"$ref": "#/_deploymentOutputs/.."}` json schema reference 
 
 #### `config`
 
 
-#### Script section
+#### `tasks`
+
