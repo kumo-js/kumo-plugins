@@ -10,25 +10,33 @@ class SettingsBuilder {
 
     build(params) {
         const args = params.args;
+        const env = params.env;
         const kumoSettings = params.kumoSettings;
+        const moduleSettings = params.moduleSettings;
+        const settings = this._mergeSettings(kumoSettings, moduleSettings);
 
-        return this._derefModuleSettings(params).then(
-            moduleSettings => this._setOutputsBucket(moduleSettings, kumoSettings, args)
+        return this._derefSettings(settings, args, env).then(
+            settings => this._setOutputsBucket(settings, args)
         );
     }
 
-    _derefModuleSettings(params) {
-        const refData = Object.assign({args: params.args}, params.env.toVars());
-        return this._jsonSchemaHelper.derefWith(params.moduleSettings, refData)
+    _mergeSettings(kumoSettings, moduleSettings) {
+        const kumoOutputsBucket = _.get(kumoSettings, 'deployer.outputsBucket', {});
+        const moduleOutputsBucket = moduleSettings.outputsBucket;
+        const outputsBucket = Object.assign(kumoOutputsBucket, moduleOutputsBucket);
+        return Object.assign(moduleSettings, {outputsBucket})
     }
 
-    _setOutputsBucket(moduleSettings, kumoSettings, args) {
-        const defaultRegion = args.region;
-        const defaultBucketSettings = _.get(kumoSettings, 'deployer.outputsBucket', {});
-        const mergedBucketSettings = _.merge(defaultBucketSettings, moduleSettings.outputsBucket);
-        const name = this._expandBucketName(mergedBucketSettings.name);
-        const outputsBucket = Object.assign({region: defaultRegion}, mergedBucketSettings, {name});
-        return Object.assign(moduleSettings, {outputsBucket});
+    _derefSettings(settings, args, env) {
+        const refData = Object.assign(env.toVars(), {args});
+        return this._jsonSchemaHelper.derefWith(settings, refData)
+    }
+
+    _setOutputsBucket(settings, args) {
+        const region = args.region;
+        const name = this._expandBucketName(settings.outputsBucket.name);
+        const outputsBucket = Object.assign({}, settings.outputsBucket, {region, name});
+        return Object.assign(settings, {outputsBucket});
     }
 
     _expandBucketName(name) {

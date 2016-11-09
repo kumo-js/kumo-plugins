@@ -26,7 +26,7 @@ Arguments are as follows:
         
             level0: pre-prod--dev--john
             level1: pre-prod--dev
-            level2 (i.e. root): pre-prod
+            level2(i.e. root): pre-prod
          
          These levels can be individually referenced in scripts via ENV vars.
          See settings file for more details.
@@ -35,7 +35,20 @@ Arguments are as follows:
 
 ## `deployment-settings`
 
-The following examples assume `.json` file but you can also use `.yaml` or `.js`
+The following examples assume a `.json` file but you can also use `.yaml` or `.js`
+
+## Json Schema References
+Json schema references (i.e. `{"$ref": ".."}`) are fully supported.
+There are some built-in references available for use:
+
+
+```json
+{"$ref": "#/_args"}
+{"$ref": "#/_env"}
+{"$ref": "#/_envNamespaceRoot"}
+{"$ref": "#/_envNamespaceLevel[X]"}
+   
+```json
 
 ```js
 {
@@ -51,3 +64,6 @@ The following examples assume `.json` file but you can also use `.yaml` or `.js`
 
 Name of the module e.g `"moduleName": "my-module"`
 
+
+
+### script section
