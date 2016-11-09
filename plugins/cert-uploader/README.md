@@ -8,6 +8,7 @@ $ kumo upload-cert --name CERT_NAME --path PATH --body=BODY --private-key=PRIVAT
 ```
 
 Note that you would need to join the option name and value with `=` for `body`, `private-key` and `chain`.
+Also as certs are multiline texts, you would need to quote them.
 
 Arguments are as follows:
 
