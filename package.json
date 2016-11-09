@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "mocha --opts mocha.opts",
-    "coverage": "istanbul cover ./node_modules/.bin/_mocha -- --opts mocha.opts"
+    "coverage": "istanbul cover ./node_modules/.bin/_mocha -x mocha-bootstrap.js -- --opts mocha.opts"
   },
   "repository": {
     "type": "git",
