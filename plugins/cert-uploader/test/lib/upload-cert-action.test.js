@@ -29,7 +29,7 @@ describe('CertUploader UploadCertAction', () => {
             }]]);
             expect(actionResultBuilder.build.args).to.eql([['UPLOAD_CERT_RESULT']]);
             expect(dataFormatter.format.args).to.eql([['ACTION_RESULT', 'json']]);
-            expect(stdOut.write.args).to.eql([['FORMATTED_RESULT']]);
+            expect(stdOut.write.args).to.eql([['FORMATTED_RESULT\n']]);
         });
     });
 

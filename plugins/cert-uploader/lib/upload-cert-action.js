@@ -27,7 +27,7 @@ class UploadCertAction {
     _outputResult(state) {
         const result = this._actionResultBuilder.build(state.uploadResult);
         return this._dataFormatter.format(result, 'json')
-            .then(formattedOutput => this._stdOut.write(formattedOutput))
+            .then(formattedOutput => this._stdOut.write(`${formattedOutput}\n`))
             .then(() => state);
     }
 

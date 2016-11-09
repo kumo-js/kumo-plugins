@@ -1,13 +1,13 @@
 
 # Certificate Uploader
 
-**WIP**
-
 ## Usage
 
 ```sh
-$ kumo upload-cert --name CERT_NAME --path PATH --body BODY --private-key PRIVATE_KEY --chain CHAIN
+$ kumo upload-cert --name CERT_NAME --path PATH --body=BODY --private-key=PRIVATE_KEY --chain=CHAIN
 ```
+
+Note that you would need to join the option name and value with `=` for `body`, `private-key` and `chain`.
 
 Arguments are as follows:
 
@@ -32,6 +32,6 @@ The output of the command:
 
 ```json
 {
-  "<cert-name>": "CERTIFICATE_ARN"
+  "CERT_NAME": "CERTIFICATE_ARN"
 }
 ```
