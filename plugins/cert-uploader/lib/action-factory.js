@@ -19,7 +19,7 @@ class ActionFactory {
     }
 
     _getIamHelper(context) {
-        return new AwsHelpers().iam({region: context.args});
+        return new AwsHelpers().iam({region: context.args.region});
     }
 
 }
