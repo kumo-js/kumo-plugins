@@ -1,3 +1,4 @@
+/* globals sinon */
 
 const chai = require('chai');
 

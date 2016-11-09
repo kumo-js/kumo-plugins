@@ -105,7 +105,7 @@ class TaskFactory {
         const context = this._context;
         const envVarsFormatter = new EnvVarsFormatter({});
         const scriptExecutor = this._scriptExecutor(context.logger);
-        const deploymentScriptExecutor = new DeploymentScriptExecutor({context, envVarsFormatter, scriptExecutor});
+        const deploymentScriptExecutor = new DeploymentScriptExecutor({context, envVarsFormatter, scriptExecutor}); // eslint-disable-line max-len
         return new ExecuteScriptStep({context, deploymentScriptExecutor, envVarsFormatter, scriptName});
     }
 

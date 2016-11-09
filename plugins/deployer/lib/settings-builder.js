@@ -24,12 +24,12 @@ class SettingsBuilder {
         const kumoOutputsBucket = _.get(kumoSettings, 'deployer.outputsBucket', {});
         const moduleOutputsBucket = moduleSettings.outputsBucket;
         const outputsBucket = Object.assign(kumoOutputsBucket, moduleOutputsBucket);
-        return Object.assign(moduleSettings, {outputsBucket})
+        return Object.assign(moduleSettings, {outputsBucket});
     }
 
     _derefSettings(settings, args, env) {
         const refData = Object.assign(env.toVars(), {args});
-        return this._jsonSchemaHelper.derefWith(settings, refData)
+        return this._jsonSchemaHelper.derefWith(settings, refData);
     }
 
     _setOutputsBucket(settings, args) {

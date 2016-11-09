@@ -64,7 +64,7 @@ class ActionFactory {
     _collectDeploymentConfigStep(context) {
         const envVarsFormatter = new EnvVarsFormatter({});
         const scriptExecutor = this._scriptExecutor(context);
-        const deploymentScriptExecutor = new DeploymentScriptExecutor({context, envVarsFormatter, scriptExecutor});
+        const deploymentScriptExecutor = new DeploymentScriptExecutor({context, envVarsFormatter, scriptExecutor}); // eslint-disable-line max-len
         const moduleChainBuilder = this._moduleChainBuilder(context);
         return new CollectDeploymentConfigStep({context, deploymentScriptExecutor, moduleChainBuilder});
     }
