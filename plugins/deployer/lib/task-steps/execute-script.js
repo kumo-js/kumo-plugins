@@ -26,7 +26,7 @@ class ExecuteScript {
     }
 
     _defaultEnvVars(state) {
-        return this._envVarsFormatter.format(state.taskVars);
+        return this._envVarsFormatter.format(state.taskVars || {});
     }
 }
 

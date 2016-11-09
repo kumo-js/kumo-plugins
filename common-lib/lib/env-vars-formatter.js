@@ -10,7 +10,7 @@ class EnvVarsFormatter {
     }
 
     format(envVars) {
-        return _.reduce(envVars || {}, (result, v, k) => {
+        return _.reduce(envVars, (result, v, k) => {
             const parts = [this._options.prefix, inflect.underscore(k).toUpperCase()];
             const newKey = _.compact(parts).join('_');
             return Object.assign(result, {[newKey]: v});
