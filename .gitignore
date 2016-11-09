@@ -2,6 +2,7 @@
 *.log
 **node_modules**
 __*
+/coverage
 
 # Editor files
 /jsconfig.json
