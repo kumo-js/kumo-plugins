@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha plugins/cert-uploader/test --recursive"
+    "test": "mocha --opts mocha.opts"
   },
   "repository": {
     "type": "git",

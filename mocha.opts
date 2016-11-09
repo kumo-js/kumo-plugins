@@ -1,0 +1,4 @@
+--recursive
+--require mocha-bootstrap.js
+plugins/cert-uploader/test
+plugins/lambda-package-uploader/test

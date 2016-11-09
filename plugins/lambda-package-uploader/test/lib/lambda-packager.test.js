@@ -1,7 +1,7 @@
 
 const LambdaPackager = require('../../lib/lambda-packager');
 
-describe('LambdaPackager', () => {
+describe('LambdaPackageUploader LambdaPackager', () => {
 
     it('packages a lambda', () => {
         const packageNameBuilder = {build: sinon.stub().returns('PACKAGE_NAME')};

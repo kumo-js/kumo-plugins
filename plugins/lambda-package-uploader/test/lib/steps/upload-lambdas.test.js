@@ -1,7 +1,7 @@
 
 const UploadLambdasStep = require('../../../lib/steps/upload-lambdas');
 
-describe('UploadLambdasStep', () => {
+describe('LambdaPackageUploader UploadLambdasStep', () => {
 
     it('uploads lambdas', () => {
         const context = {

@@ -1,7 +1,7 @@
 
 const OutputPackageLocationsStep = require('../../../lib/steps/output-package-locations');
 
-describe('OutputPackageLocationsStep', () => {
+describe('LambdaPackageUploader OutputPackageLocationsStep', () => {
 
     it('writes package locations into a JOSN file', () => {
         const context = {

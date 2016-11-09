@@ -1,7 +1,7 @@
 
 const PackageNameBuilder = require('../../lib/package-name-builder');
 
-describe('PackageNameBuilder', () => {
+describe('LambdaPackageUploader PackageNameBuilder', () => {
 
     it('builds a package name', () => {
         const builder = new PackageNameBuilder({

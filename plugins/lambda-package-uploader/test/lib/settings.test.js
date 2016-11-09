@@ -1,7 +1,7 @@
 
 const Settings = require('../../lib/settings');
 
-describe('Settings', () => {
+describe('LambdaPackageUploader Settings', () => {
 
     it('returns packaging configs', () => {
         const settings = new Settings({

@@ -1,7 +1,7 @@
 
 const ActionResultBuilder = require('../../lib/action-result-builder');
 
-describe('ActionResultBuilder', () => {
+describe('CertUploader ActionResultBuilder', () => {
 
     it('builds up action result', () => {
         const actionResultBuilder = new ActionResultBuilder();

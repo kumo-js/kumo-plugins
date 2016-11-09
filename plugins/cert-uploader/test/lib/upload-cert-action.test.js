@@ -1,6 +1,6 @@
 const UploadCertAction = require('../../lib/upload-cert-action');
 
-describe('UploadCertAction', () => {
+describe('CertUploader UploadCertAction', () => {
 
     it('uploads a certificate', () => {
         const actionResultBuilder = {build: sinon.stub().returns('ACTION_RESULT')};
