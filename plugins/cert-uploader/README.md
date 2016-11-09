@@ -32,6 +32,6 @@ The output of the command:
 
 ```json
 {
-  "<cert-name>": "cert-id / arn"
+  "<cert-name>": "CERTIFICATE_ARN"
 }
 ```
