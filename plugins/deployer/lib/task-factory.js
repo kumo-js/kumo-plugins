@@ -1,7 +1,7 @@
 'use strict';
 
 const runScript = require('command-promise');
-const AwsHelpers = require('../../../common-lib/aws-helpers');
+const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
 const DeleteCfStackStep = require('./task-steps/delete-cf-stack');
 const DerefTaskAttributesStep = require('./task-steps/deref-task-attributes');
 const DeploymentScriptExecutor = require('./deployment-script-executor');
@@ -9,12 +9,12 @@ const CollectTaskOutputsStep = require('./task-steps/collect-task-outputs');
 const CreateTaskVarsStep = require('./task-steps/create-task-vars');
 const CreateCfTaskVarsStep = require('./task-steps/create-cf-task-vars');
 const ExecuteScriptStep = require('./task-steps/execute-script');
-const EnvVarsFormatter = require('../../../common-lib/env-vars-formatter');
-const JsonCompatibleFileReader = require('../../../common-lib/json-compatible-file-reader');
-const JsonSchemaHelper = require('../../../common-lib/json-schema-helper');
+const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
+const JsonCompatibleFileReader = require('../../../common-lib/lib/json-compatible-file-reader');
+const JsonSchemaHelper = require('../../../common-lib/lib/json-schema-helper');
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
-const ScriptExecutor = require('../../../common-lib/script-executor');
-const StepsExecutor = require('../../../common-lib/steps-executor');
+const ScriptExecutor = require('../../../common-lib/lib/script-executor');
+const StepsExecutor = require('../../../common-lib/lib/steps-executor');
 const StackNameExpander = require('./stack-name-expander');
 
 class TaskFactory {

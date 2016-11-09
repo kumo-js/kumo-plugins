@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const traverse = require('../../../../common-lib/traverse');
+const traverse = require('../../../../common-lib/lib/traverse');
 
 class DecryptFile {
 

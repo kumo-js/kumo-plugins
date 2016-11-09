@@ -2,7 +2,7 @@
 
 const ActionFactory = require('./lib/action-factory');
 const ContextInitializer = require('./lib/context-initializer');
-const PluginHelper = require('../../common-lib/plugin-helper');
+const PluginHelper = require('../../common-lib/lib/plugin-helper');
 
 const actionFactory = new ActionFactory();
 

@@ -1,20 +1,20 @@
 'use strict';
 
 const runScript = require('command-promise');
-const AwsHelpers = require('../../../common-lib/aws-helpers');
+const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
 const ModuleChainBuilder = require('./module-chain-builder');
 const CollectDeploymentOutputsStep = require('./action-steps/collect-deployment-outputs');
 const CollectDeploymentConfigStep = require('./action-steps/collect-deployment-config');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
-const DirChainBuilder = require('../../../common-lib/dir-chain-builder');
+const DirChainBuilder = require('../../../common-lib/lib/dir-chain-builder');
 const DeploymentScriptExecutor = require('./deployment-script-executor');
 const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
 const ExecuteTasksStep = require('./action-steps/execute-tasks');
-const EnvVarsFormatter = require('../../../common-lib/env-vars-formatter');
+const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
-const ScriptExecutor = require('../../../common-lib/script-executor');
-const StepsExecutor = require('../../../common-lib/steps-executor');
+const ScriptExecutor = require('../../../common-lib/lib/script-executor');
+const StepsExecutor = require('../../../common-lib/lib/steps-executor');
 const TaskFactory = require('./task-factory');
 const TaskService = require('./task-service');
 const UndoTasksStep = require('./action-steps/undo-tasks');

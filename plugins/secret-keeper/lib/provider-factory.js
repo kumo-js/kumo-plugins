@@ -1,6 +1,6 @@
 'use strict';
 
-const AwsHelpers = require('../../../common-lib/aws-helpers');
+const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
 const KmsProvider = require('./providers/kms');
 
 class ProviderFactory {

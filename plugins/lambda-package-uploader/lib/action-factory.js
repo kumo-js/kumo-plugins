@@ -6,8 +6,8 @@ const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const runScript = require('command-promise');
 
-const AwsHelpers = require('../../../common-lib/aws-helpers');
-const StepsExecutor = require('../../../common-lib/steps-executor');
+const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
+const StepsExecutor = require('../../../common-lib/lib/steps-executor');
 const CreateUploadBucketStep = require('./steps/create-upload-bucket');
 const PackageLambdasStep = require('./steps/package-lambdas');
 const LambdaPackager = require('./lambda-packager');
@@ -15,8 +15,8 @@ const UploadLambdasStep = require('./steps/upload-lambdas');
 const OutputPackageLocationsStep = require('./steps/output-package-locations');
 const PackageNameBuilder = require('./package-name-builder');
 const ZipHelper = require('./zip-helper');
-const EnvVarsFormatter = require('../../../common-lib/env-vars-formatter');
-const ScriptExecutor = require('../../../common-lib/script-executor');
+const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
+const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 
 class ActionFactory {
 

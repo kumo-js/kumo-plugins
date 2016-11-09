@@ -2,8 +2,8 @@
 'use strict';
 
 const ActionResultBuilder = require('./action-result-builder');
-const AwsHelpers = require('../../../common-lib/aws-helpers');
-const DataFormatter = require('../../../common-lib/data-formatter');
+const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
+const DataFormatter = require('../../../common-lib/lib/data-formatter');
 const UploadCertAction = require('./upload-cert-action');
 
 class ActionFactory {
