@@ -123,8 +123,6 @@ You can also define common `outputBucket` settings in
 your `kumo.json` file e.g.
 
 ```js
-// kumo.json
-
 "deployer": {
   "outputsBucket": {"name": ...}
 }
@@ -180,17 +178,18 @@ All tasks have access to the following variables either via ENV variables
 
 * **Task region**  
   The resolved task region (taking into account any region overrides)  
-  - via ENV variable: `$KUMO_TASK_REGION`
-  - via json schema ref: `{"$ref": "#/_taskRegion"}` 
+  - ENV variable: `$KUMO_TASK_REGION`
+  - Json schema ref: `{"$ref": "#/_taskRegion"}` 
 
 * **Deployment Config**  
   The collected deployment config for the module (including [dependant modules](#dependson))  
-  - via ENV variable: `$KUMO_DEPLOYMENT_CONFIG` (value is JSON string)
-  - via json schema ref: `{"$ref": "#/_deploymentConfig/.."}`   
+  - ENV variable: `$KUMO_DEPLOYMENT_CONFIG` (value is JSON string)
+  - Json schema ref: `{"$ref": "#/_deploymentConfig/.."}`   
 
 * **Deployment Outputs**  
   The collected deployment outputs for the module (including [dependant modules](#dependson))
-  - via ENV variable: `$KUMO_DEPLOYMENT_OUTPUTS` (value is JSON string)
-  - via json schema ref: `{"$ref": "#/_deploymentOutputs/.."}`
+  - ENV variable: `$KUMO_DEPLOYMENT_OUTPUTS` (value is JSON string)
+  - Json schema ref: `{"$ref": "#/_deploymentOutputs/.."}`
 
 ### `tasks type:cf-stack`
+
