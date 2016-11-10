@@ -28,20 +28,19 @@ Arguments are as follows:
             level1: pre-prod--dev
             level2(i.e. root): pre-prod
          
-        These levels can be individually referenced in scripts via ENV vars.
-        See settings file for more details.
+        These levels can be individually referenced in the deployment-settings file
+        via ENV vars or json schema references.
 ```
 
-
-## `deployment-settings`
+## `deployment-settings` file
 
 The following examples assume a `.json` file but you can also use `.yaml` or `.js`
 
-#### Json Schema References
+### Json Schema References
 
 Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 
-#### Built-in Json Schema References
+#### Built-in Json Schema Reference Variables
 
 ```js
 {"$ref": "#/_args/.."} 
@@ -53,11 +52,11 @@ Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 {"$ref": "#/_envNamespaceRoot"}
 // References the root env namespace e.g. 'pre-prod' if env is 'pre-prod--ci'
  
-{"$ref": "#/_envNamespaceLevel[X]"}
-// References a given env namespace level where X is >= 0
+{"$ref": "#/_envNamespaceLevel<X>"}
+// References a given env namespace level where <X> is >= 0
 ```
 
-#### Script Sections
+### Script Sections
 
 The flexibility of the deployer is achieved through the use of scripts that are executed
 at different stages of the deployment process. Scripts allow the consumer to execute any arbitrary
@@ -67,7 +66,7 @@ command to achieve the desired outcome. They are used in several places includin
 ```js
 {
   "script": "some-script $SOME_ENV_VAR",
-  "envVars": {"SOME_ENV_VAR", "foo bar"}
+  "envVars": {"SOME_ENV_VAR", "foo bar"} // custom env vars for your script (optional) 
 }
 ```
 
@@ -75,11 +74,11 @@ command to achieve the desired outcome. They are used in several places includin
 
 These are similar to the [built-in json schema reference variables](#built-in-json-schema-references).
 
-```bash
-$KUMO_ARGS_[XXX]
+```
 $KUMO_ENV
 $KUMO_ENV_NAMESPACE_ROOT
-$KUMO_ENV_NAMESPACE_LEVEL[X]
+$KUMO_ENV_NAMESPACE_LEVEL<X>  // where <X> is >= 0
+$KUMO_ARGS_<XXX>              // where <XXX> is the arg name
 ```  
 
 ### Settings Schema
@@ -100,7 +99,7 @@ Required. Name of the module.
 
 ### `outputsBucket`
 
-Required. Configure the S3 bucket used to store the outputs of all deployment [tasks](#tasks). E.g.
+Required. The S3 bucket used to store the outputs of all deployment [tasks](#tasks). E.g.
 
 ```js
 "outputsBucket": {"name": "deployment-outputs"}
@@ -113,14 +112,13 @@ the different items will be concatenated using the `-` separator. E.g.
 "outputsBucket": {
   "name": ["deployment-outputs", {"$ref": "#/_env"}] 
 }
-// produces 'deployment-outputs-ci' if #/_env is ci 
+// produces 'deployment-outputs-ci' if '#/_env' is ci 
 ```
 
 The bucket will be created if it doesn't already exist, but currently will not be 
 removed if the module is destroyed. 
 
-You can also define common `outputBucket` settings in
-your `kumo.json` file e.g.
+You can also define common `outputBucket` settings in your `kumo.json` file e.g.
 
 ```js
 "deployer": {
@@ -128,13 +126,13 @@ your `kumo.json` file e.g.
 }
 ``` 
 
-The abopve settings will be merged with the `deployment-settings` file and is useful
-in scenarios where you wish to use the same outputs bucket for multiple modules. 
+The `deployment-settings` file will be merged with the above settings and is useful
+in scenarios where you wish to define outputs bucket once for multiple modules. 
 
 ### `dependsOn`
 
-Optional. A list of dependent modules from which to **collect** [config](#config) and any existing 
-[deployment outputs](#outputsbucket). These will be merged with those of current module 
+Optional. A list of dependent modules from which to collect [config](#config) and any existing 
+[deployment outputs](#outputsbucket). These will be merged with those of the current module 
 and made available as [task variables](#task-variables) for use during deployment. E.g. 
 
 ```js
