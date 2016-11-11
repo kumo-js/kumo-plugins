@@ -8,11 +8,15 @@ describe('CertUploader ActionResultBuilder', () => {
         const uploadCertResult = {
             ServerCertificateMetadata: {
                 ServerCertificateName: 'SERVER_CERTIFICATE_NAME',
+                ServerCertificateId: 'SERVER_CERTIFICATE_ID',
                 Arn: 'ARN'
             }
         };
         expect(actionResultBuilder.build(uploadCertResult)).to.eql({
-            SERVER_CERTIFICATE_NAME: 'ARN'
+            SERVER_CERTIFICATE_NAME: {
+                id: 'SERVER_CERTIFICATE_ID',
+                arn: 'ARN'
+            }
         });
     });
 });

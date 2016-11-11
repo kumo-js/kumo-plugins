@@ -5,7 +5,12 @@ class ActionResultBuilder {
 
     build(uploadCertResult) {
         const certMeta = uploadCertResult.ServerCertificateMetadata;
-        return {[certMeta.ServerCertificateName]: certMeta.Arn};
+        return {
+            [certMeta.ServerCertificateName]: {
+                id: certMeta.ServerCertificateId,
+                arn: certMeta.Arn
+            }
+        };
     }
 
 }

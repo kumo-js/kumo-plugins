@@ -33,19 +33,11 @@ The output of the command:
 
 ```json
 {
-  "CERT_NAME": "CERTIFICATE_ARN"
-}
-```
-
-TODO: Do not try to upload a cert if it's already uploaded and just give the expected output
-
-TODO: Change the output format as follows:
-
-```json
-{
   "CERT_NAME": {
     "id": "CERTIFICATE_ID",
     "arn": "CERTIFICATE_ARN"
   }
 }
 ```
+
+TODO: Do not try to upload a cert if it's already uploaded and just give the expected output
