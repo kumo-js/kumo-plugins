@@ -11,6 +11,15 @@ class IamHelper {
         return this._iam.uploadServerCertificate(params).promise();
     }
 
+    getServerCertificate(name) {
+        const params = {ServerCertificateName: name};
+        return this._iam.getServerCertificate(params).promise()
+            .catch(e => {
+                if (e.message === 'EntityAlreadyExists') return null;
+                throw e;
+            });
+    }
+
 }
 
 module.exports = IamHelper;
