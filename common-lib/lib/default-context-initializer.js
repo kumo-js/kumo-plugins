@@ -11,35 +11,50 @@ class DefaultContextInitializer {
     }
 
     initialize(context, actionParams) {
-        return this._loadSettings(actionParams).then(
-            result => Object.assign({}, context, {
-                cwd: actionParams.kumoContext.cwd,
-                kumoSettings: actionParams.kumoContext.settings,
-                logger: actionParams.logger,
-                args: actionParams.args,
-                settings: result.settings,
-                settingsFile: result.settingsFile,
-                settingsFilename: path.basename(result.settingsFile)
-            })
-        );
+        const state = {context, actionParams};
+        return Promise.resolve(state)
+            .then(state => this._findSettingsFile(state))
+            .then(state => this._loadSettingsIfNecessary(state))
+            .then(state => this._buildNewContext(state))
+            .then(state => state.newContext);
     }
 
-    _loadSettings(actionParams) {
-        return this._findSettingsFile(actionParams).then(settingsFile => {
-            const options = {ignoreNotFound: !this._settingsFileConfig.required};
-            return this._fileReader.readJson(settingsFile, options)
-                .then(settings => settings || {})
-                .then(settings => ({settingsFile, settings}));
-        });
+    _loadSettingsIfNecessary(state) {
+        const settingsFile = state.settingsFile;
+        if (!settingsFile) return Promise.resolve(state);
+
+        const options = {ignoreNotFound: !this._settingsFileConfig.required};
+        return this._fileReader.readJson(settingsFile, options)
+            .then(settings => Object.assign({}, state, {
+                settingsVars: {
+                    settings: settings,
+                    settingsFile: settingsFile,
+                    settingsFilename: path.basename(settingsFile)
+                }
+            }));
     }
 
-    _findSettingsFile(actionParams) {
+    _findSettingsFile(state) {
+        const actionParams = state.actionParams;
         const cwd = actionParams.kumoContext.cwd;
         const settingsFilename = actionParams.args.settingsFilename;
         const defaultSettingsFilename = this._settingsFileConfig.defaultFilename;
         const searchPattern = path.join(cwd, settingsFilename || (defaultSettingsFilename + '*'));
-        return searchFiles(searchPattern).then(files => files[0]);
+        return searchFiles(searchPattern)
+            .then(files => Object.assign({}, state, {settingsFile: files[0]}));
     }
+
+    _buildNewContext(state) {
+        const actionParams = state.actionParams;
+        const newContext = Object.assign({}, state.context, state.settingsVars, {
+            cwd: actionParams.kumoContext.cwd,
+            kumoSettings: actionParams.kumoContext.settings,
+            logger: actionParams.logger,
+            args: actionParams.args
+        });
+        return Object.assign({}, state, {newContext});
+    }
+
 }
 
 module.exports = DefaultContextInitializer;
