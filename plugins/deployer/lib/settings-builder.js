@@ -28,6 +28,7 @@ class SettingsBuilder {
     }
 
     _derefSettings(settings, args, env) {
+        // TODO: camelCase args
         const refData = Object.assign(env.toVars(), {args});
         return this._jsonSchemaHelper.derefWith(settings, refData);
     }

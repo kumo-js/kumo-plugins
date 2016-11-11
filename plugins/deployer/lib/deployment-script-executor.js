@@ -18,9 +18,9 @@ class DeploymentScriptExecutor {
     }
 
     _defaultEnvVars() {
-        // TODO: Format arg keys to camelcase
+        const argsEnvVars = _.mapKeys(this._context.args, (v, k) => `arg-${k}`);
         return this._envVarsFormatter.format(
-            Object.assign(this._context.env.toVars(), this._context.args)
+            Object.assign(this._context.env.toVars(), argsEnvVars)
         );
     }
 
