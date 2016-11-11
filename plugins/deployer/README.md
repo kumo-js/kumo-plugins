@@ -78,7 +78,7 @@ These are similar to the [built-in json schema reference variables](#built-in-js
 $KUMO_ENV
 $KUMO_ENV_NAMESPACE_ROOT
 $KUMO_ENV_NAMESPACE_LEVEL<X>  // where <X> is >= 0
-$KUMO_ARGS_<XXX>              // where <XXX> is the arg name
+$KUMO_ARG_<XXX>              // where <XXX> is the arg name
 ```  
 
 ### Settings Schema
