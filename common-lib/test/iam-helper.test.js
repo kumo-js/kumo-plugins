@@ -37,9 +37,10 @@ describe('IamHelper', () => {
         });
 
         it('returns null if there is no certificate matches to the given name', () => {
+            const noSuchEntityError = Object.assign(new Error('ERROR'), {code: 'NoSuchEntity'});
             const iam = {
                 getServerCertificate: sinon.stub().returns({
-                    promise: () => Promise.reject(new Error('EntityAlreadyExists'))
+                    promise: () => Promise.reject(noSuchEntityError)
                 })
             };
             const iamHelper = new IamHelper({iam});

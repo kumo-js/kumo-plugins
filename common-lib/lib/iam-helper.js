@@ -15,7 +15,7 @@ class IamHelper {
         const params = {ServerCertificateName: name};
         return this._iam.getServerCertificate(params).promise()
             .catch(e => {
-                if (e.message === 'EntityAlreadyExists') return null;
+                if (e.code === 'NoSuchEntity') return null;
                 throw e;
             });
     }

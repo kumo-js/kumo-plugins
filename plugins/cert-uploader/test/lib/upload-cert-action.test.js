@@ -2,11 +2,31 @@ const UploadCertAction = require('../../lib/upload-cert-action');
 
 describe('CertUploader UploadCertAction', () => {
 
-    it('uploads a certificate', () => {
-        const actionResultBuilder = {build: sinon.stub().returns('ACTION_RESULT')};
-        const dataFormatter = {format: sinon.stub().returns(Promise.resolve('FORMATTED_RESULT'))};
+    it('fetches the existing certificate information if it is available', () => {
+        const certInfoBuilder = {build: sinon.stub().returns('CERT_INFO')};
+        const dataFormatter = {format: sinon.stub().returns(Promise.resolve('CERT_INFO_STRING'))};
         const iamHelper = {
-            uploadServerCertificate: sinon.stub().returns(Promise.resolve('UPLOAD_CERT_RESULT'))
+            getServerCertificate: sinon.stub().returns(Promise.resolve({ServerCertificate: 'CERT'}))
+        };
+        const stdOut = {write: sinon.spy()};
+
+        const actionArgs = {name: 'CERT_NAME'};
+        const action = new UploadCertAction({actionArgs, certInfoBuilder, dataFormatter, iamHelper, stdOut});
+
+        return action.execute().then(() => {
+            expect(iamHelper.getServerCertificate.args).to.eql([['CERT_NAME']]);
+            expect(certInfoBuilder.build.args).to.eql([['CERT']]);
+            expect(dataFormatter.format.args).to.eql([['CERT_INFO', 'json']]);
+            expect(stdOut.write.args).to.eql([['CERT_INFO_STRING\n']]);
+        });
+    });
+
+    it('uploads a certificate', () => {
+        const certInfoBuilder = {build: sinon.stub().returns('CERT_INFO')};
+        const dataFormatter = {format: sinon.stub().returns(Promise.resolve('CERT_INFO_STRING'))};
+        const iamHelper = {
+            getServerCertificate: () => Promise.resolve(null),
+            uploadServerCertificate: sinon.stub().returns(Promise.resolve('UPLOAD_CERT_INFO'))
         };
         const stdOut = {write: sinon.spy()};
 
@@ -17,9 +37,9 @@ describe('CertUploader UploadCertAction', () => {
             chain: 'CERT_CHAIN',
             path: 'CERT_PATH'
         };
-        const step = new UploadCertAction({actionArgs, actionResultBuilder, dataFormatter, iamHelper, stdOut});
+        const action = new UploadCertAction({actionArgs, certInfoBuilder, dataFormatter, iamHelper, stdOut});
 
-        return step.execute().then(() => {
+        return action.execute().then(() => {
             expect(iamHelper.uploadServerCertificate.args).to.eql([[{
                 CertificateBody: 'CERT_BODY',
                 PrivateKey: 'PRIVATE_KEY',
@@ -27,9 +47,9 @@ describe('CertUploader UploadCertAction', () => {
                 CertificateChain: 'CERT_CHAIN',
                 Path: 'CERT_PATH'
             }]]);
-            expect(actionResultBuilder.build.args).to.eql([['UPLOAD_CERT_RESULT']]);
-            expect(dataFormatter.format.args).to.eql([['ACTION_RESULT', 'json']]);
-            expect(stdOut.write.args).to.eql([['FORMATTED_RESULT\n']]);
+            expect(certInfoBuilder.build.args).to.eql([['UPLOAD_CERT_INFO']]);
+            expect(dataFormatter.format.args).to.eql([['CERT_INFO', 'json']]);
+            expect(stdOut.write.args).to.eql([['CERT_INFO_STRING\n']]);
         });
     });
 

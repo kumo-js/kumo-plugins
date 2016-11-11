@@ -1,10 +1,10 @@
 
 'use strict';
 
-class ActionResultBuilder {
+class CertInfoBuilder {
 
-    build(uploadCertResult) {
-        const certMeta = uploadCertResult.ServerCertificateMetadata;
+    build(certificate) {
+        const certMeta = certificate.ServerCertificateMetadata;
         return {
             [certMeta.ServerCertificateName]: {
                 id: certMeta.ServerCertificateId,
@@ -15,4 +15,4 @@ class ActionResultBuilder {
 
 }
 
-module.exports = ActionResultBuilder;
+module.exports = CertInfoBuilder;

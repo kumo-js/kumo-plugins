@@ -5,7 +5,7 @@ class UploadCertAction {
 
     constructor(params) {
         this._actionArgs = params.actionArgs;
-        this._actionResultBuilder = params.actionResultBuilder;
+        this._certInfoBuilder = params.certInfoBuilder;
         this._dataFormatter = params.dataFormatter;
         this._iamHelper = params.iamHelper;
         this._stdOut = params.stdOut;
@@ -14,18 +14,28 @@ class UploadCertAction {
     execute() {
         const state = {};
         return Promise.resolve(state)
-            .then(state => this._uploadCert(state))
-            .then(state => this._outputResult(state));
+            .then(state => this._fetchCert(state))
+            .then(state => this._uploadCertIfNotFetched(state))
+            .then(state => this._outputCertMeta(state));
     }
 
-    _uploadCert(state) {
+    _fetchCert(state) {
+        return this._iamHelper.getServerCertificate(this._actionArgs.name)
+            .then(result => Object.assign({}, state, {
+                cert: result && result.ServerCertificate
+            }));
+    }
+
+    _uploadCertIfNotFetched(state) {
+        if (state.cert) return Promise.resolve(state);
+
         const params = this._getUploadCertParams(this._actionArgs);
         return this._iamHelper.uploadServerCertificate(params)
-            .then(uploadResult => Object.assign({}, state, {uploadResult}));
+            .then(cert => Object.assign({}, state, {cert}));
     }
 
-    _outputResult(state) {
-        const result = this._actionResultBuilder.build(state.uploadResult);
+    _outputCertMeta(state) {
+        const result = this._certInfoBuilder.build(state.cert);
         return this._dataFormatter.format(result, 'json')
             .then(formattedOutput => this._stdOut.write(`${formattedOutput}\n`))
             .then(() => state);

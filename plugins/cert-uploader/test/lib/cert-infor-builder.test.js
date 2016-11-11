@@ -1,18 +1,18 @@
 
-const ActionResultBuilder = require('../../lib/action-result-builder');
+const CertInfoBuilder = require('../../lib/cert-info-builder');
 
-describe('CertUploader ActionResultBuilder', () => {
+describe('CertUploader CertInfoBuilder', () => {
 
     it('builds up action result', () => {
-        const actionResultBuilder = new ActionResultBuilder();
-        const uploadCertResult = {
+        const certInfoBuilder = new CertInfoBuilder();
+        const cert = {
             ServerCertificateMetadata: {
                 ServerCertificateName: 'SERVER_CERTIFICATE_NAME',
                 ServerCertificateId: 'SERVER_CERTIFICATE_ID',
                 Arn: 'ARN'
             }
         };
-        expect(actionResultBuilder.build(uploadCertResult)).to.eql({
+        expect(certInfoBuilder.build(cert)).to.eql({
             SERVER_CERTIFICATE_NAME: {
                 id: 'SERVER_CERTIFICATE_ID',
                 arn: 'ARN'

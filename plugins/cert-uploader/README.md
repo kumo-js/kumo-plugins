@@ -1,6 +1,10 @@
 
 # Certificate Uploader
 
+Certificate Uploader uploads a given SSL certificate. If there is already a certificate
+whose name is same with the given name, the command returns the information of the
+certificate instead of uploading new one.
+
 ## Usage
 
 ```sh
@@ -39,5 +43,3 @@ The output of the command:
   }
 }
 ```
-
-TODO: Do not try to upload a cert if it's already uploaded and just give the expected output
