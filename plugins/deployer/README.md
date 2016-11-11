@@ -144,7 +144,7 @@ Dependencies are deeply traversed left to right.
 
 ### `config`
 
-Optional. A [script section](#script-sections) for obtaining the environment specific configuration for the
+Optional. A [script](#script-sections) for obtaining the environment specific configuration for the
 deployment. The script must output the config as a JSON string to standard out. 
 
 ### `tasks`
@@ -156,10 +156,10 @@ has the following common attributes:
 ```js
 {
   "id": "", 
-  // Unique id for the task in this module. Required.
+  // Required. Unique id for the task in this module.
 
   "type": "custom|cf-task", 
-  // The type of task. Required, defaults to custom.
+  // Required. The type of task, defaults to custom.
 
   "regionOverrides": {
     "region-arg": "region-override"
@@ -242,10 +242,7 @@ additional attributes:
 ```js
 {
   "stackName": "",
-  "stackTemplate": {
-    "script": "",
-    "envVars": {}
-  },
+  "stackTemplate": {..},
   "stackParams": {
     "<name>": "<value>"
   }
@@ -265,7 +262,7 @@ moduleName: "module1"
 The expanded stack name would be `pre-prod--ci-module1-buckets` (using `-` as the separator)
 
 #### `stackTemplate`
-Required. A [script section](#script-sections) that generates the template (json or yaml) 
+Required. A [script](#script-sections) that generates the template (json or yaml) 
 used to create the stack. Your script must generate/copy the template to the location specified by
 the `$KUMO_TEMPLATE_OUTPUT_FILE` env variable.
 
@@ -295,7 +292,6 @@ deployment config and outputs if you wish e.g.
 } 
 ```
 
-
 #### Task Outputs
 
 Upon completion of this task the outputs of the stack are automatically extracted 
@@ -303,4 +299,23 @@ and merged with the deployment outputs.
 
 ### `tasks type: custom`
 
+This type of task is used to execute any custom **idempotent** script and has the following 
+additional attributes:
 
+```js
+{
+  "run": {..},
+  "undo": {..}
+}
+```
+
+#### `run`
+
+Required. The [script](#script-sections) to run which **must be idempotent**. Any outputs 
+of this task that are required by the deployment process must be saved to the
+the location specified by the `$KUMO_TASK_OUTPUTS_FILE` env variable. Outputs must be 
+json compatible (i.e. json or yaml). 
+
+#### `undo`
+
+Optional. The undo [script](#script-sections) which **must be idempotent**.
