@@ -65,7 +65,7 @@ command to achieve the desired outcome. They are used in several places includin
 
 ```js
 {
-  "script": "some-script $SOME_ENV_VAR",
+  "script": "shell-script $SOME_ENV_VAR",
   "envVars": {"SOME_ENV_VAR", "foo bar"} // custom env vars for your script (optional) 
 }
 ```
@@ -144,11 +144,12 @@ Dependencies are deeply traversed left to right.
 
 ### `config`
 
-// TODO
+Optional. A [script section](#script-sections) for obtaining the environment specific configuration for the
+deployment. The script must output the config as a JSON string to standard out. 
 
 ### `tasks`
 
-Defines a list of operations to perform during deployment. Tasks are executed sequentially
+Required. Defines a list of operations to perform during deployment. Tasks are executed sequentially
 during deployment, and in reverse order during teardown. Each task (irrespective of `type`)
 has the following common attributes:
 
@@ -174,20 +175,132 @@ has the following common attributes:
 All tasks have access to the following variables either via ENV variables 
 (in [script sections](#script-sections)) or via json schema references:
 
-* **Task region**  
+* #### Task region
+
   The resolved task region (taking into account any region overrides)  
   - ENV variable: `$KUMO_TASK_REGION`
   - Json schema ref: `{"$ref": "#/_taskRegion"}` 
 
-* **Deployment Config**  
-  The collected deployment config for the module (including [dependant modules](#dependson))  
+* #### Deployment Config
+
+  The merged deployment config of the module and any [dependant modules](#dependson)  
   - ENV variable: `$KUMO_DEPLOYMENT_CONFIG` (value is JSON string)
   - Json schema ref: `{"$ref": "#/_deploymentConfig/.."}`   
 
-* **Deployment Outputs**  
-  The collected deployment outputs for the module (including [dependant modules](#dependson))
-  - ENV variable: `$KUMO_DEPLOYMENT_OUTPUTS` (value is JSON string)
-  - Json schema ref: `{"$ref": "#/_deploymentOutputs/.."}`
+* #### Deployment Outputs
 
-### `tasks type:cf-stack`
+  The merged [task outputs](#task-outputs) of the module and any [dependant modules](#dependson) 
+
+  - ENV variable: `$KUMO_DEPLOYMENT_OUTPUTS` (value is JSON string)
+  - Json schema ref: `{"$ref": "#/_deploymentOutputs/<moduleName>/.."}`
+
+#### Task Outputs
+
+Each task can output variables in json compatible format. After each task executes, its outputs (if any) 
+are uploaded to the [outputsBucket](#outputsbucket), are merged with the overall deployment outputs and 
+made available to subsequent tasks. 
+
+E.g. assuming we are deploying a module called `module2` which is dependent on `module1`, 
+the following visualises the state of deployment outputs through the deployment process:
+
+  ```js
+  // Before any tasks are executed, deployment outputs contains any exisiting 
+  // outputs fetched from the outputsBucket:
+  {
+    "module1": {..}
+  }
+
+  // Assuming module2 consists of two tasks, when the first task executes it 
+  // has access to all outputs. On completion, it outputs {"abc": 123} which 
+  // is merged with all outputs:
+  {
+    "module1": {..},
+    "module2": {
+      "abc": 123
+    }
+  }
+
+  // When the second task executes, it also has access to all outputs 
+  // (including the first task). On completion, it outputs {"def": 456} which
+  // is again merged with all outputs: 
+  {
+    "module1": {..},
+    "module2": {
+      "abc": 123,
+      "def": 456
+    }
+  }
+  ```
+
+Please refer to details of each task type below to know how it produces its outputs.
+
+### `tasks type: cf-stack`
+
+This type of task is used to provision a cloud formation stack and has the following 
+additional attributes:
+
+```js
+{
+  "stackName": "",
+  "stackTemplate": {
+    "script": "",
+    "envVars": {}
+  },
+  "stackParams": {
+    "<name>": "<value>"
+  }
+}
+```
+
+#### `stackName`  
+Required. The `stackName` is used in conjunction with the `moduleName` and given `--env` arg 
+to generate the full expanded name for the stack. E.g. assuming the following:
+
+```
+stackName: "buckets"
+moduleName: "module1"
+--env pre-prod--ci
+```   
+
+The expanded stack name would be `pre-prod--ci-module1-buckets` (using `-` as the separator)
+
+#### `stackTemplate`
+Required. A [script section](#script-sections) that generates the template (json or yaml) 
+used to create the stack. Your script must generate/copy the template to the location specified by
+the `$KUMO_TEMPLATE_OUTPUT_FILE` env variable.
+
+#### `stackParams`
+Optional. If the template contains parameters, you can specify the key/value pairs here. 
+Remember you can take full advantage of json schema references to extract values from 
+deployment config and outputs if you wish e.g.
+
+```js
+// template contents
+
+"Parameters": {
+  "DomainName": {..},
+  "IamCertificateId": {..}
+}
+...
+```
+
+```js
+// task attributes
+{
+  ...
+  "stackParams": {
+    "DomainName": {"$ref": "#/_deploymentConfig/domainName"},
+    "IamCertificateId": {"$ref": "#/_deploymentOutputs/module1/iamCertificateId"}
+  }
+} 
+```
+
+
+#### Task Outputs
+
+Upon completion of this task the outputs of the stack are automatically extracted 
+and merged with the deployment outputs.
+
+### `tasks type: custom`
+
 
