@@ -41,7 +41,11 @@ class DefaultContextInitializer {
         const defaultSettingsFilename = this._settingsFileConfig.defaultFilename;
         const searchPattern = path.join(cwd, settingsFilename || (defaultSettingsFilename + '*'));
         return searchFiles(searchPattern)
-            .then(files => Object.assign({}, state, {settingsFile: files[0]}));
+            .then(files => {
+                if (files[0]) return files[0];
+                if (this._settingsFileConfig.required) throw new Error('Settings file not found');
+            })
+            .then(settingsFile => Object.assign({}, state, {settingsFile}));
     }
 
     _buildNewContext(state) {
