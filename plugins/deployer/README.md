@@ -44,7 +44,7 @@ Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 
 ```js
 {"$ref": "#/_args/.."} 
-// References command line args (in cameCase) supplied to the plugin
+// References command line args supplied to the plugin
 
 {"$ref": "#/_env"}
 // References the full env namespace
@@ -78,7 +78,7 @@ These are similar to the [built-in json schema reference variables](#built-in-js
 $KUMO_ENV
 $KUMO_ENV_NAMESPACE_ROOT
 $KUMO_ENV_NAMESPACE_LEVEL<X>  // where <X> is >= 0
-$KUMO_ARG_<XXX>              // where <XXX> is the arg name
+$KUMO_ARG_<XXX>  // where <XXX> is the arg name
 ```  
 
 ### Settings Schema
@@ -145,7 +145,8 @@ Dependencies are deeply traversed left to right.
 ### `config`
 
 Optional. A [script](#script-sections) for obtaining the environment specific configuration for the
-deployment. The script must output the config as a JSON string to standard out. 
+deployment which will be made available as [task variables](#task-variables). The script must 
+output the config as a JSON string to standard out. 
 
 ### `tasks`
 
@@ -162,7 +163,7 @@ has the following common attributes:
   // Required. The type of task, defaults to custom.
 
   "regionOverrides": {
-    "region-arg": "region-override"
+    "<region-arg>": "<region-override>"
   }
   // Optional region overrides for this task. If provided overrides 
   // the given command line region arg with the override region during
@@ -189,7 +190,8 @@ All tasks have access to the following variables either via ENV variables
 
 * #### Deployment Outputs
 
-  The merged [task outputs](#task-outputs) of the module and any [dependant modules](#dependson) 
+  The merged [task outputs](#task-outputs) of the module and any [dependant modules](#dependson).
+  Outputs are grouped by module name.
 
   - ENV variable: `$KUMO_DEPLOYMENT_OUTPUTS` (value is JSON string)
   - Json schema ref: `{"$ref": "#/_deploymentOutputs/<moduleName>/.."}`
@@ -197,21 +199,21 @@ All tasks have access to the following variables either via ENV variables
 #### Task Outputs
 
 Each task can output variables in json compatible format. After each task executes, its outputs (if any) 
-are uploaded to the [outputsBucket](#outputsbucket), are merged with the overall deployment outputs and 
+are uploaded to the [outputsBucket](#outputsbucket), then merged with the overall deployment outputs and 
 made available to subsequent tasks. 
 
 E.g. assuming we are deploying a module called `module2` which is dependent on `module1`, 
 the following visualises the state of deployment outputs through the deployment process:
 
   ```js
-  // Before any tasks are executed, deployment outputs contains any exisiting 
-  // outputs fetched from the outputsBucket:
+  // Before any tasks are executed, deployment outputs contains any exisiting outputs 
+  // for the current module and any dependent modules, fetched from the outputsBucket:
   {
     "module1": {..}
   }
 
   // Assuming module2 consists of two tasks, when the first task executes it 
-  // has access to all outputs. On completion, it outputs {"abc": 123} which 
+  // has access to the current outputs. On completion, it outputs {"abc": 123} which 
   // is merged with all outputs:
   {
     "module1": {..},
@@ -220,9 +222,9 @@ the following visualises the state of deployment outputs through the deployment 
     }
   }
 
-  // When the second task executes, it also has access to all outputs 
-  // (including the first task). On completion, it outputs {"def": 456} which
-  // is again merged with all outputs: 
+  // When the second task executes, it has access to the current outputs 
+  // (including those from the first task). On completion, it outputs {"def": 456} 
+  // which is again merged with all outputs: 
   {
     "module1": {..},
     "module2": {
@@ -250,7 +252,7 @@ additional attributes:
 ```
 
 #### `stackName`  
-Required. The `stackName` is used in conjunction with the `moduleName` and given `--env` arg 
+Required. The `stackName` is used in conjunction with the `moduleName` and the `--env` arg 
 to generate the full expanded name for the stack. E.g. assuming the following:
 
 ```
@@ -262,8 +264,8 @@ moduleName: "module1"
 The expanded stack name would be `pre-prod--ci-module1-buckets` (using `-` as the separator)
 
 #### `stackTemplate`
-Required. A [script](#script-sections) that generates the template (json or yaml) 
-used to create the stack. Your script must generate/copy the template to the location specified by
+Required. A [script](#script-sections) that generates the json compatible template used to 
+create the stack. Your script must generate/copy the template to the location specified by
 the `$KUMO_TEMPLATE_OUTPUT_FILE` env variable.
 
 #### `stackParams`
@@ -299,7 +301,7 @@ and merged with the deployment outputs.
 
 ### `tasks type: custom`
 
-This type of task is used to execute any custom **idempotent** script and has the following 
+This type of task is used to execute any custom script and has the following 
 additional attributes:
 
 ```js
