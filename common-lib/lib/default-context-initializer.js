@@ -25,13 +25,7 @@ class DefaultContextInitializer {
 
         const options = {ignoreNotFound: !this._settingsFileConfig.required};
         return this._fileReader.readJson(settingsFile, options)
-            .then(settings => Object.assign({}, state, {
-                settingsVars: {
-                    settings: settings,
-                    settingsFile: settingsFile,
-                    settingsFilename: path.basename(settingsFile)
-                }
-            }));
+            .then(settings => Object.assign({}, state, {settings}));
     }
 
     _findSettingsFile(state) {
@@ -50,13 +44,24 @@ class DefaultContextInitializer {
 
     _buildNewContext(state) {
         const actionParams = state.actionParams;
-        const newContext = Object.assign({}, state.context, state.settingsVars, {
+        const settingsVars = this._getSettingsVars(state);
+        const newContext = Object.assign({}, state.context, settingsVars, {
             cwd: actionParams.kumoContext.cwd,
             kumoSettings: actionParams.kumoContext.settings,
             logger: actionParams.logger,
             args: actionParams.args
         });
         return Object.assign({}, state, {newContext});
+    }
+
+    _getSettingsVars(state) {
+        const settingsFile = state.settingsFile;
+        if (!settingsFile) return null;
+        return {
+            settings: state.settings,
+            settingsFile: settingsFile,
+            settingsFilename: path.basename(settingsFile)
+        };
     }
 
 }
