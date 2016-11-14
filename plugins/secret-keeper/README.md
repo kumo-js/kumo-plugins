@@ -28,25 +28,25 @@ All results are always printed to standard out.
 
 ### Encryption
 
-**Encrypt value**    
+Encrypt value  
 `kumo encrypt --value --profile`
 
-**Encrypt json compatible file**  
+Encrypt json compatible file  
 `kumo encrypt --file --profile`
 
-**Encrypt and store value in json compatible file**  
+Encrypt and store value in json compatible file  
 `kumo securely-store --value --file --item --profile`
 
 
 ### Decryption
 
-**Decrypt value**    
+Decrypt value  
 `kumo decrypt --value --profile`
 
-**Decrypt json compatible file**  
+Decrypt json compatible file  
 `kumo decrypt --file --profile`
 
-**Decrypt item in json compatible file**  
+Decrypt item in json compatible file  
 `kumo decrypt --file --item--profile`
 
 
