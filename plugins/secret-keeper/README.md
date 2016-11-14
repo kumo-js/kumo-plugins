@@ -28,27 +28,27 @@ All results are always printed to standard out.
 
 ### Encryption
 
-Encrypt value  
-`kumo encrypt --value --profile`
+* encrypt value  
+  `kumo encrypt --value "plain text" --profile kms`
+  
 
-Encrypt json compatible file  
-`kumo encrypt --file --profile`
+* encrypt json compatible file  
+  `kumo encrypt --file values.json --profile kms`
 
-Encrypt and store value in json compatible file  
-`kumo securely-store --value --file --item --profile`
+* encrypt and store value in json compatible file  
+  `kumo securely-store --value "plain text" --file secrets.json --item "key.path" --profile kms`
 
 
 ### Decryption
 
-Decrypt value  
-`kumo decrypt --value --profile`
+* decrypt value  
+  `kumo decrypt --value "secret::.." --profile kms`
 
-Decrypt json compatible file  
-`kumo decrypt --file --profile`
+* decrypt json compatible file  
+  `kumo decrypt --file secrets.json --profile kms`
 
-Decrypt item in json compatible file  
-`kumo decrypt --file --item--profile`
-
+* decrypt item in json compatible file  
+  `kumo decrypt --file secrets.json --item "key.path" --profile kms`
 
 ## Argument reference 
 
@@ -99,7 +99,8 @@ See [providers](#providers) for more details:
 
 **via command line args** `--provider kms --keyId --region`
 
-**via settings file** 
+**via settings file**
+
 ```js
 {
   "provider": "kms", 
