@@ -29,6 +29,7 @@ Arguments are as follows:
         Path of an output file. Default to package-locations.json
 ```
 
+**TODO: Change `--config` to accept a file path to load a config from, instead of a string **
 
 ## Setting file
 
