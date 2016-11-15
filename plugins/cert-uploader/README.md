@@ -43,3 +43,15 @@ The output of the command:
   }
 }
 ```
+
+TODO: Group the output under given `resourceName`
+
+```json
+{
+  "RESOURCE_NAME": {
+    "id": "CERTIFICATE_ID",
+    "arn": "CERTIFICATE_ARN",
+    "name": "CERT_NAME"
+  }
+}
+```
