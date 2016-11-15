@@ -8,7 +8,7 @@ certificate instead of uploading new one.
 ## Usage
 
 ```sh
-$ kumo upload-cert --name CERT_NAME --path PATH --body=BODY --private-key=PRIVATE_KEY --chain=CHAIN
+$ kumo upload-cert --resource-name RESOURCE_NAME --name CERT_NAME --path PATH --body=BODY --private-key=PRIVATE_KEY --chain=CHAIN
 ```
 
 Note that you would need to join the option name and value with `=` for `body`, `private-key` and `chain`.
@@ -31,20 +31,12 @@ Arguments are as follows:
 
 --chain CHAIN
         The contents of the certificate chain
+
+--resource-name RESOURCE_NAME
+        Name to group the certificate information output
 ```
 
 The output of the command:
-
-```json
-{
-  "CERT_NAME": {
-    "id": "CERTIFICATE_ID",
-    "arn": "CERTIFICATE_ARN"
-  }
-}
-```
-
-TODO: Group the output under given `resourceName`
 
 ```json
 {

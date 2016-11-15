@@ -35,7 +35,8 @@ class UploadCertAction {
     }
 
     _outputCertMeta(state) {
-        const result = this._certInfoBuilder.build(state.cert);
+        const resourceName = this._actionArgs['resource-name'];
+        const result = this._certInfoBuilder.build(resourceName, state.cert);
         return this._dataFormatter.format(result, 'json')
             .then(formattedOutput => this._stdOut.write(`${formattedOutput}\n`))
             .then(() => state);
