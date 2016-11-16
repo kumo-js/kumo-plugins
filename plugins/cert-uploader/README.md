@@ -37,10 +37,8 @@ The output of the command:
 
 ```json
 {
-  "CERT_NAME": {
-    "id": "CERTIFICATE_ID",
-    "arn": "CERTIFICATE_ARN",
-    "name": "CERT_NAME"
-  }
+  "id": "CERTIFICATE_ID",
+  "arn": "CERTIFICATE_ARN",
+  "name": "CERT_NAME"
 }
 ```
