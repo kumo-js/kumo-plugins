@@ -13,10 +13,9 @@ describe('CertUploader CertInfoBuilder', () => {
             }
         };
         expect(certInfoBuilder.build(cert)).to.eql({
-            SERVER_CERTIFICATE_NAME: {
-                id: 'SERVER_CERTIFICATE_ID',
-                arn: 'ARN'
-            }
+            id: 'SERVER_CERTIFICATE_ID',
+            arn: 'ARN',
+            name: 'SERVER_CERTIFICATE_NAME'
         });
     });
 });
