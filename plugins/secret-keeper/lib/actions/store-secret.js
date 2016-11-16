@@ -25,7 +25,7 @@ class StoreSecret {
     _storeValue(value) {
         const file = this._args.file;
         const item = this._args.item;
-        return this._fileReader.readJson(file, {ignoreNotFound: true})
+        return this._fileReader.readAsObject(file, {ignoreNotFound: true})
             .then(data => _.set(data || {}, item, value))
             .then(result => this._resultFormatter.format(result, this._args))
             .then(result => this._fs.writeFileAsync(file, result));

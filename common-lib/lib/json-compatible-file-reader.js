@@ -7,7 +7,7 @@ const yaml = require('js-yaml');
 
 class JsonCompatibleFileReader {
 
-    readJson(file, options) {
+    readAsObject(file, options) {
         options = options || {};
         const ext = path.extname(file);
         const read = this._readers()[ext];

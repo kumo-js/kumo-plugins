@@ -29,6 +29,8 @@ class CfHelper {
         );
     }
 
+    // TODO: Delete stack first if in ROLLBACK_COMPLETE or ROLLBACK_FAILED state
+
     provisionStack(params) {
         return this.searchStack(params.StackName)
             .then(stack => stack ? this._updateStack : this._createStack)

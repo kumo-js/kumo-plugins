@@ -26,7 +26,7 @@ class EncryptFile {
     }
 
     _readInputFile() {
-        return this._fileReader.readJson(this._args.file);
+        return this._fileReader.readAsObject(this._args.file);
     }
 }
 

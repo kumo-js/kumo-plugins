@@ -164,10 +164,13 @@ has the following common attributes:
 
   "regionOverrides": {
     "<region-arg>": "<region-override>"
-  }
+  },
   // Optional region overrides for this task. If provided overrides 
   // the given command line region arg with the override region during
-  // task execution.    
+  // task execution.
+      
+  "outputsName": ""
+  // Optional, the name under which all task outputs are grouped.
 }
 ```
 

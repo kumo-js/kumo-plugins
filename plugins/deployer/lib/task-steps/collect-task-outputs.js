@@ -7,14 +7,16 @@ class CollectTaskOutputs {
     }
 
     execute(state) {
+        const outputsName = state.taskDef.outputsName;
         const outputsFile = state.taskVars.taskOutputsFile;
-        return this._readJson(outputsFile).then(
-            outputs => Object.assign({}, state, {outputs: outputs || {}})
-        );
+
+        return this._readAsObject(outputsFile)
+            .then(outputs => outputsName ? {[outputsName]: outputs} : outputs)
+            .then(outputs => Object.assign({}, state, {outputs: outputs || {}}));
     }
 
-    _readJson(file) {
-        return this._fileReader.readJson(file, {ignoreNotFound: true});
+    _readAsObject(file) {
+        return this._fileReader.readAsObject(file, {ignoreNotFound: true});
     }
 }
 

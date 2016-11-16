@@ -28,7 +28,7 @@ class ModuleChainBuilder {
     _loadModules(moduleDirs) {
         return Promise.all(moduleDirs.map(moduleDir => {
             const settingsFile = path.join(moduleDir, this._settingsFilename());
-            return this._fileReader.readJson(settingsFile)
+            return this._fileReader.readAsObject(settingsFile)
                 .then(moduleSettings => this._buildSettings(moduleSettings))
                 .then(settings => ({dir: moduleDir, settings}));
         }));

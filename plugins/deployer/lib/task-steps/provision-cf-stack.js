@@ -1,22 +1,26 @@
 'use strict';
 
 const _ = require('lodash');
+const Promise = require('bluebird');
 
 class ProvisionCfStack {
 
     constructor(params) {
         this._awsHelpers = params.awsHelpers;
         this._fileReader = params.fileReader;
+        this._fs = Promise.promisifyAll(params.fs);
         this._logger = params.context.logger;
         this._stackNameExpander = params.stackNameExpander;
     }
 
     execute(state) {
+        const taskOutputsFile = state.taskVars.taskOutputsFile;
         const templateFile = state.taskVars.templateOutputFile;
-        return this._fileReader.readJson(templateFile)
+        return this._fileReader.readAsObject(templateFile)
             .then(template => JSON.stringify(template))
             .then(template => this._provisionCfStack(template, state.taskDef))
-            .then(outputs => Object.assign({}, state, {outputs: outputs}));
+            .then(outputs => this._fs.writeFileAsync(taskOutputsFile, JSON.stringify(outputs)))
+            .then(() => state);
     }
 
     _provisionCfStack(template, taskDef) {

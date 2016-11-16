@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const runScript = require('command-promise');
 const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
 const DeleteCfStackStep = require('./task-steps/delete-cf-stack');
@@ -50,7 +51,8 @@ class TaskFactory {
             this._createCfTaskVarsStep(),
             this._derefTaskAttributesStep(),
             this._executeScriptStep('stackTemplate'),
-            this._provisionCfStackStep()
+            this._provisionCfStackStep(),
+            this._collectTaskOutputsStep()
         ];
     }
 
@@ -105,7 +107,8 @@ class TaskFactory {
         const context = this._context;
         const envVarsFormatter = new EnvVarsFormatter({});
         const scriptExecutor = this._scriptExecutor(context.logger);
-        const deploymentScriptExecutor = new DeploymentScriptExecutor({context, envVarsFormatter, scriptExecutor}); // eslint-disable-line max-len
+        const deploymentScriptExecutorParams = {context, envVarsFormatter, scriptExecutor};
+        const deploymentScriptExecutor = new DeploymentScriptExecutor(deploymentScriptExecutorParams);
         return new ExecuteScriptStep({context, deploymentScriptExecutor, envVarsFormatter, scriptName});
     }
 
@@ -120,7 +123,7 @@ class TaskFactory {
         const context = this._context;
         const fileReader = this._fileReader();
         const stackNameExpander = this._stackNameExpander();
-        return new ProvisionCfStackStep({awsHelpers, context, fileReader, stackNameExpander});
+        return new ProvisionCfStackStep({awsHelpers, context, fileReader, fs, stackNameExpander});
     }
 
     _fileReader() {

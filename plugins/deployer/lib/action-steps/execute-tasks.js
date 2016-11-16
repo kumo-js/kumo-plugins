@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const Promise = require('bluebird');
 
 class ExecuteTasks {
@@ -27,7 +28,7 @@ class ExecuteTasks {
     _executeTask(params) {
         const moduleName = this._context.settings.moduleName;
         return this._taskService.executeTask(params).then(taskOutputs =>
-            Object.assign({}, params.deploymentOutputs, {[moduleName]: taskOutputs})
+            _.merge({}, params.deploymentOutputs, {[moduleName]: taskOutputs})
         );
     }
 }

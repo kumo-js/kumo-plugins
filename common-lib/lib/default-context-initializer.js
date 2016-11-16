@@ -24,7 +24,7 @@ class DefaultContextInitializer {
         if (!settingsFile) return Promise.resolve(state);
 
         const options = {ignoreNotFound: !this._settingsFileConfig.required};
-        return this._fileReader.readJson(settingsFile, options)
+        return this._fileReader.readAsObject(settingsFile, options)
             .then(settings => Object.assign({}, state, {settings}));
     }
 

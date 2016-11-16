@@ -30,7 +30,7 @@ class ContextInitializer {
     }
 
     _loadResources(state) {
-        return this._fileReader.readJson(state.defaultContext.args.resources)
+        return this._fileReader.readAsObject(state.defaultContext.args.resources)
             .then(resources => Object.assign({}, state, {resources}));
     }
 

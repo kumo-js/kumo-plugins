@@ -36,7 +36,7 @@ class DirChainBuilder {
     }
 
     _readSettings(settingsFilename) {
-        return this._fileReader.readJson(settingsFilename);
+        return this._fileReader.readAsObject(settingsFilename);
     }
 
     _defaultOptions() {
