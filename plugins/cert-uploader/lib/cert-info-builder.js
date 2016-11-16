@@ -3,13 +3,12 @@
 
 class CertInfoBuilder {
 
-    build(resourceName, certificate) {
+    build(certificate) {
         const certMeta = certificate.ServerCertificateMetadata;
         return {
-            [resourceName]: {
+            [certMeta.ServerCertificateName]: {
                 id: certMeta.ServerCertificateId,
-                arn: certMeta.Arn,
-                name: certMeta.ServerCertificateName
+                arn: certMeta.Arn
             }
         };
     }

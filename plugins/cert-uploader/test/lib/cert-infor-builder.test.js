@@ -12,11 +12,10 @@ describe('CertUploader CertInfoBuilder', () => {
                 Arn: 'ARN'
             }
         };
-        expect(certInfoBuilder.build('RESOURCE_NAME', cert)).to.eql({
-            RESOURCE_NAME: {
+        expect(certInfoBuilder.build(cert)).to.eql({
+            SERVER_CERTIFICATE_NAME: {
                 id: 'SERVER_CERTIFICATE_ID',
-                arn: 'ARN',
-                name: 'SERVER_CERTIFICATE_NAME'
+                arn: 'ARN'
             }
         });
     });

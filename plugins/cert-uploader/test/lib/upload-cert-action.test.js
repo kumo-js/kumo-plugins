@@ -10,15 +10,12 @@ describe('CertUploader UploadCertAction', () => {
         };
         const stdOut = {write: sinon.spy()};
 
-        const actionArgs = {
-            name: 'CERT_NAME',
-            'resource-name': 'RESOURCE_NAME'
-        };
+        const actionArgs = {name: 'CERT_NAME'};
         const action = new UploadCertAction({actionArgs, certInfoBuilder, dataFormatter, iamHelper, stdOut});
 
         return action.execute().then(() => {
             expect(iamHelper.getServerCertificate.args).to.eql([['CERT_NAME']]);
-            expect(certInfoBuilder.build.args).to.eql([['RESOURCE_NAME', 'CERT']]);
+            expect(certInfoBuilder.build.args).to.eql([['CERT']]);
             expect(dataFormatter.format.args).to.eql([['CERT_INFO', 'json']]);
             expect(stdOut.write.args).to.eql([['CERT_INFO_STRING\n']]);
         });
@@ -38,8 +35,7 @@ describe('CertUploader UploadCertAction', () => {
             'private-key': 'PRIVATE_KEY',
             name: 'CERT_NAME',
             chain: 'CERT_CHAIN',
-            path: 'CERT_PATH',
-            'resource-name': 'RESOURCE_NAME'
+            path: 'CERT_PATH'
         };
         const action = new UploadCertAction({actionArgs, certInfoBuilder, dataFormatter, iamHelper, stdOut});
 
@@ -51,7 +47,7 @@ describe('CertUploader UploadCertAction', () => {
                 CertificateChain: 'CERT_CHAIN',
                 Path: 'CERT_PATH'
             }]]);
-            expect(certInfoBuilder.build.args).to.eql([['RESOURCE_NAME', 'UPLOAD_CERT_INFO']]);
+            expect(certInfoBuilder.build.args).to.eql([['UPLOAD_CERT_INFO']]);
             expect(dataFormatter.format.args).to.eql([['CERT_INFO', 'json']]);
             expect(stdOut.write.args).to.eql([['CERT_INFO_STRING\n']]);
         });
