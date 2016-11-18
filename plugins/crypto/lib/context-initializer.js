@@ -19,7 +19,7 @@ class ContextInitializer {
     }
 
     _initializeSettings(context) {
-        const defaultSettings = _.get(context.kumoSettings, 'secretKeeper.providers');
+        const defaultSettings = _.get(context.kumoSettings, 'crypto.profiles');
         const settings = Object.assign({}, defaultSettings, context.settings);
         return Object.assign({}, context, {settings});
     }

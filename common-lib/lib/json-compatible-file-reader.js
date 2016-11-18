@@ -3,39 +3,43 @@
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const path = require('path');
-const yaml = require('js-yaml');
+const JsonCompatibleDataParser = require('./json-compatible-data-parser');
 
 class JsonCompatibleFileReader {
 
+    constructor(params) {
+        params = params || {};
+        this._jsonCompatibleDataParser =
+            params.jsonCompatibleDataParser || new JsonCompatibleDataParser();
+    }
+
     readAsObject(file, options) {
         options = options || {};
-        const ext = path.extname(file);
-        const read = this._readers()[ext];
-        if (!read) throw new Error(`Don't know how to read: ${file}`);
-        return read(file).catch(err => this._handleReadErr(err, options));
+        const extName = this._fileExt(file);
+        const isJsFile = extName === '.js';
+        const handler = isJsFile ? this._parseJsFile : this._parseDataFile;
+        return handler.call(this, file).catch(err => this._handleReadErr(err, options));
     }
 
-    _readers() {
-        return {
-            '.js': file => Promise.resolve(this._requireFile(file)),
-            '.yaml': file => this._readFile(file).then(yaml.safeLoad),
-            '.json': file => this._parseJsonFile(file),
-            '': file => this._parseJsonFile(file)
-        };
-    }
-
-    _requireFile(file) {
+    _parseJsFile(file) {
         const isAbsolute = path.isAbsolute(file);
         const absolutePath = isAbsolute ? file : path.join(process.cwd(), file);
-        return require(absolutePath);
+        return Promise.resolve(require(absolutePath));
     }
 
-    _parseJsonFile(file) {
-        return this._readFile(file).then(JSON.parse);
+    _parseDataFile(file) {
+        const format = this._fileExt(file).slice(1);
+        return this._readFile(file).then(data =>
+            this._jsonCompatibleDataParser.parse(data, format)
+        );
     }
 
     _readFile(file) {
         return fs.readFileAsync(file).then(data => data.toString());
+    }
+
+    _fileExt(file) {
+        return path.extname(file);
     }
 
     _handleReadErr(err, options) {

@@ -13,7 +13,8 @@ class DataFormatter {
     _formatters() {
         return {
             yaml: {format: data => yaml.safeDump(data)},
-            json: {format: data => JSON.stringify(data, null, 2)}
+            json: {format: data => JSON.stringify(data, null, 2)},
+            text: {format: data => data.toString()}
         };
     }
 }

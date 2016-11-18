@@ -8,7 +8,7 @@ const PluginHelper = require('../../common-lib/lib/plugin-helper');
 
 const actionFactory = new ActionFactory();
 const fileReader = new JsonCompatibleFileReader();
-const settingsFileConfig = {defaultFilename: 'secret-profiles', required: false};
+const settingsFileConfig = {defaultFilename: 'crypto-profiles', required: false};
 const defaultContextInitializer = new DefaultContextInitializer({fileReader, settingsFileConfig});
 const contextInitializer = new ContextInitializer({defaultContextInitializer});
 
@@ -22,10 +22,6 @@ module.exports = new PluginHelper({
         {
             name: 'decrypt',
             createAction: context => actionFactory.createDecryptAction(context)
-        },
-        {
-            name: 'securely-store',
-            createAction: context => actionFactory.createStoreSecretAction(context)
         }
     ]
 });
