@@ -1,87 +1,81 @@
-### OUTDATED! New docs coming soon....
+# Crypto
 
-# Secret Keeper
-
-The secret keeper plugin allows encryption and decryption of values and/or files using
-built in providers. Currently the only supported provider is aws kms.
+The crypto plugin allows encryption and decryption of data from the standard input
+stream using built in providers. Currently the only supported provider is aws kms.
 
 ## Usage
 
-// TODO: Refactor to accept all input from standard in.
-
-Each command requires [provider](#providers) specific args for encryption / decryption. These can 
-either be supplied as command line args or saved to a [settings file](#settings-file)
-with a named profile and referenced via the `--profile` arg. 
+Each encryption / decryption command takes input data from the standard input stream 
+and hence supports piping for maximum flexibility. In addition, each command requires 
+[provider](#providers) specific args for encryption / decryption. These can either be 
+supplied as command line args or saved to a [settings file](#settings-file) with a 
+named profile and referenced via the `--profile` arg. 
 
 E.g. supply provider specifc args individually
 ```sh
-kumo encrypt --value "secret" --provider kms --keyId .. --region ..
+echo "secret" | kumo encrypt --provider kms --keyId .. --region ..
 ```
 
 Or, create profile in [settings file](#settings-file) and reference via profile
 ```sh 
-kumo encrypt --value "secret" --profile "my-profile" 
+echo "secret" | kumo encrypt --profile "my-profile" 
 # The profile 'my-profile' must define the provider and any 
-# specific attributes e.g. keyId, region etc  
+# provider specific attributes e.g. in this case keyId and region  
 ```
 
-All results are always printed to standard out.
+Currently all results are printed to the standard output stream and can be piped
+to file if required.
 
 ### Encryption
 
 * encrypt value  
-  `kumo encrypt --value "plain text" --profile kms`
+  `echo "secret" | kumo encrypt --profile kms`
   
+* encrypt entire json file  
+  `cat config.json | kumo encrypt --profile kms --inputFormat json`
 
-* encrypt json compatible file  
-  `kumo encrypt --file values.json --profile kms`
-
-* encrypt and store value in json compatible file  
-  `kumo securely-store --value "plain text" --file secrets.json --item "key.path" --profile kms`
-
+* encrypt a section in a json file  
+  `cat config.json | kumo encrypt --profile kms --inputFormat json --keyPath "key.path"`
 
 ### Decryption
 
 * decrypt value  
-  `kumo decrypt --value "secret::.." --profile kms`
+  `echo "encrypted::..." | kumo decrypt --profile kms`
 
-* decrypt json compatible file  
-  `kumo decrypt --file secrets.json --profile kms`
+* decrypt entire json file  
+  `cat config.json | kumo decrypt --profile kms --inputFormat json`
 
-* decrypt item in json compatible file  
-  `kumo decrypt --file secrets.json --item "key.path" --profile kms`
+* decrypt a given section in a json file  
+  `cat config.json | kumo decrypt --profile kms --inputFormat json --keyPath "key.path"`
 
 ## Argument reference 
 
 ```
---value value
-    The value to encrypt / decrypt.
-
---file path
-    Path to the file to encrypt / decrypt. This can be any json compatible 
-    file (.js, .json, .yaml). For .js a plain object must be exported and 
-    you must also specify --outputFormat.
-
---item keyPath
-    Used in conjunction with the --file arg. Specifies the key path within 
-    the file to encrypt / decrypt. E.g. if the file contains 
-    {"parent": {"child": "abc"}}, you can specify 'parent.child' for --item.
-
 --profile name
-    The name of the profile (in the settings file) that defines the provider 
-    to use to encrypt / decrypt.
+    Optional. The name of the profile (in the settings file) that defines the provider 
+    to use to encrypt / decrypt. Any args given at command line will override the
+    values in the profile.
 
---outputFormat (json|yaml)
-    The output format to use. Not strictly required unless the given --file 
-    ends with *.js (as the plugin cannot determine the output format).  
+--inputFormat (text|json|yaml)
+    Optional. The format of the input data. By default it is text.
+
+--outputFormat (text|json|yaml)
+    Optional. The output format to use. By default this is the 
+    same as --inputFormat.
+
+--keyPath keyPath
+    Optional. Specifies the key path (i.e. section) within the input data 
+    to encrypt / decrypt. This works if the input data is json or yaml.
+    E.g. if the input data contains {"parent": {"child": "abc"}}, you can 
+    specify 'parent.child' to encrypt / decrypt 'abc'.
 
 ```
 
 ## Settings file
 
-Profiles for encryption / decryption can be stored in a file named 
-`secret-profiles.(json|yaml|js)`. For now, this must exist in the same 
-location as the command being executed and has the following structure:
+Profiles for encryption / decryption can either be stored in the `kumo.json` 
+file under the `crypto.profiles` section, or in a separate file named 
+`crypto-profiles.(json|yaml|js)` and has the following structure:
 
 ```js
 {
@@ -92,7 +86,10 @@ location as the command being executed and has the following structure:
 }
 ```
 
-See [providers](#providers) for more details:
+See [providers](#providers) for more details.
+
+Note: If storing in a separate `crypto-profiles` file, this must exist in the same 
+location as the command being executed.
 
 ## Providers
 
