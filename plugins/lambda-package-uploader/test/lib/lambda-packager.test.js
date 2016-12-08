@@ -25,7 +25,7 @@ describe('LambdaPackageUploader LambdaPackager', () => {
                 'PACKAGE_SCRIPT',
                 {
                     cwd: undefined,
-                    env: {PACKAGE_OUTPUT_FILE: 'PACKAGE_NAME'},
+                    envVars: {KUMO_PACKAGE_OUTPUT_FILE: 'PACKAGE_NAME'},
                     logOutput: false
                 }
             ]);

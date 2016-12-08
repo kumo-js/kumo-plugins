@@ -40,10 +40,14 @@ class LambdaPackager {
     }
 
     _package(state) {
-        const packagingConfig = state.packagingConfig;
-        const envVars = {PACKAGE_OUTPUT_FILE: state.packagePath};
-        const scriptOptions = {cwd: module.dir, env: envVars, logOutput: false};    // XXX: Do not use module.dir
-        return this._scriptExecutor.execute(packagingConfig['package-script'], scriptOptions)
+        const scriptOptions = {
+            cwd: module.dir,    // XXX: Do not use module.dir
+            envVars: {
+                KUMO_PACKAGE_OUTPUT_FILE: state.packagePath
+            },
+            logOutput: false
+        };
+        return this._scriptExecutor.execute(state.packagingConfig['package-script'], scriptOptions)
             .then(() => state);
     }
 
