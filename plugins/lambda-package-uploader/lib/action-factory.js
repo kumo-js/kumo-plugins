@@ -68,7 +68,7 @@ class ActionFactory {
         const args = settings.args;
         return new PackageNameBuilder({
             env: args.env,
-            buildNumber: args.build_number
+            buildNumber: args['build-number']
         });
     }
 
