@@ -7,13 +7,13 @@ Go to a directory where you have `lambda-packages.json` and execute `upload-lamb
 `lambda-packages.json` is a file to specify how to create a lambda package and where to upload.
 
 ```sh
-$ kumo upload-lambda --build_number 99999 --env ENV_NAME --config CONFIG --resources RESOURCES --output OUTPUT
+$ kumo upload-lambda --build-number 99999 --env ENV_NAME --config CONFIG --resources RESOURCES --output OUTPUT
 ```
 
 Arguments are as follows:
 
 ```
---build_number build_number
+--build-number buildNumber
         Build number
 
 --env environment
