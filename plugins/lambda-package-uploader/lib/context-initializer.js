@@ -1,13 +1,12 @@
 'use strict';
 
-const Settings = require('./settings');
-
 class ContextInitializer {
 
     constructor(params) {
         this._defaultContextInitializer = params.defaultContextInitializer;
         this._fileReader = params.fileReader;
         this._jsonSchemaHelper = params.jsonSchemaHelper;
+        this._wrapSettings = params.wrapSettings;
     }
 
     initialize(context, actionParams) {
@@ -46,13 +45,6 @@ class ContextInitializer {
         };
         return this._jsonSchemaHelper.derefWith(defaultContext.settings, refData)
             .then(moduleSettings => Object.assign({}, state, {moduleSettings}));
-    }
-
-    _wrapSettings(context, moduleSettings) {
-        return new Settings({
-            moduleSettings,
-            args: context.args
-        });
     }
 
 }

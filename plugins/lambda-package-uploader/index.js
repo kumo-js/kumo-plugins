@@ -6,13 +6,17 @@ const JsonSchemaHelper = require('../../common-lib/lib/json-schema-helper');
 const DefaultContextInitializer = require('../../common-lib/lib/default-context-initializer');
 const ContextInitializer = require('./lib/context-initializer');
 const PluginHelper = require('../../common-lib/lib/plugin-helper');
+const Settings = require('./lib/settings');
 
 const actionFactory = new ActionFactory();
 const fileReader = new JsonCompatibleFileReader();
-const jsonSchemaHelper = new JsonSchemaHelper();
 const settingsFileConfig = {defaultFilename: 'lambda-packages', required: true};
-const defaultContextInitializer = new DefaultContextInitializer({fileReader, settingsFileConfig});
-const contextInitializer = new ContextInitializer({defaultContextInitializer, fileReader, jsonSchemaHelper});
+const contextInitializer = new ContextInitializer({
+    defaultContextInitializer: new DefaultContextInitializer({fileReader, settingsFileConfig}),
+    fileReader,
+    jsonSchemaHelper: new JsonSchemaHelper(),
+    wrapSettings: (context, moduleSettings) => new Settings({moduleSettings, args: context.args})
+});
 
 module.exports = new PluginHelper({
     contextInitializer: contextInitializer,
