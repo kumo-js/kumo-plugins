@@ -18,20 +18,27 @@ class ModuleSettingsResolver {
     }
 
     _loadResources(state) {
-        return this._fileReader.readAsObject(state.args.resources)
+        const resourceFilePath = state.args.resources;
+        if (!resourceFilePath) return state;
+        return this._fileReader.readAsObject(resourceFilePath)
             .then(resources => Object.assign({}, state, {resources}));
     }
 
     _resolveModuleSettings(state) {
-        const args = state.args;
-        const refData = {
-            buildNumber: args['build-number'],
-            config: JSON.parse(args.config),
-            env: args.env,
-            resources: state.resources
-        };
+        const refData = this._getRefData(state.args, state.resources);
         return this._jsonSchemaHelper.derefWith(state.settings, refData)
             .then(moduleSettings => Object.assign({}, state, {moduleSettings}));
+    }
+
+    _getRefData(args, resources) {
+        return Object.assign(
+            {
+                buildNumber: args['build-number'],
+                config: JSON.parse(args.config),
+                env: args.env
+            },
+            resources && {resources}
+        );
     }
 
 }

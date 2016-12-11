@@ -14,19 +14,19 @@ Arguments are as follows:
 
 ```
 --build-number buildNumber
-        Build number
+        Required. Build number
 
 --env environment
-        Environment name (id?)
+        Required. Environment name (id?)
 
 --config config
-        JSON string, containing environment specific config values
+        Required. JSON string, containing environment specific config values
 
 --resources resources
-        Path to a JSON file that contains resources
+        Optional. Path to a JSON file that contains resources
 
 --output output
-        Path of an output file. Default to package-locations.json
+        Required. Path of an output file. Default to package-locations.json
 ```
 
 **TODO: Change `--config` to accept a file path to load a config from, instead of a string **

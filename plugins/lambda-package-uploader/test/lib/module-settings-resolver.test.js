@@ -39,4 +39,29 @@ describe('LambdaPackageUploader ModuleSettingsResolver', () => {
         });
     });
 
+    it('does not try to load resources if the file is not specified', () => {
+        const wrapSettings = () => 'WRAPPED_SETTINGS';
+        const fileReader = {readAsObject: sinon.spy()};
+        const jsonSchemaHelper = {derefWith: sinon.stub().returns(Promise.resolve('RESOLVED_SETTINGS'))};
+        const resolver = new ModuleSettingsResolver({fileReader, jsonSchemaHelper, wrapSettings});
+
+        const args = {
+            'build-number': 'BUILD_NUMBER',
+            config: '{"CONFIG_KEY":".."}',
+            env: 'ENV'
+        };
+        return resolver.resolve('SETTINGS', args).then(moduleSettings => {
+            expect(moduleSettings).to.eql('WRAPPED_SETTINGS');
+            expect(fileReader.readAsObject.callCount).to.eql(0);
+            expect(jsonSchemaHelper.derefWith.args).to.eql([[
+                'SETTINGS',
+                {
+                    buildNumber: 'BUILD_NUMBER',
+                    config: {CONFIG_KEY: '..'},
+                    env: 'ENV'
+                }
+            ]]);
+        });
+    });
+
 });
