@@ -1,14 +1,10 @@
 'use strict';
 
-const ModuleSettingsResolver = require('./module-settings-resolver');
-
 class ContextInitializer {
 
     constructor(params) {
         this._defaultContextInitializer = params.defaultContextInitializer;
-        this._fileReader = params.fileReader;
-        this._jsonSchemaHelper = params.jsonSchemaHelper;
-        this._wrapSettings = params.wrapSettings;
+        this._moduleSettingsResolver = params.moduleSettingsResolver;
     }
 
     initialize(context, actionParams) {
@@ -25,12 +21,7 @@ class ContextInitializer {
     }
 
     _resolveModuleSettings(state) {
-        const resolver = new ModuleSettingsResolver({
-            fileReader: this._fileReader,
-            jsonSchemaHelper: this._jsonSchemaHelper,
-            wrapSettings: this._wrapSettings
-        });
-        return resolver.resolve(state.defaultContext.settings, state.defaultContext.args)
+        return this._moduleSettingsResolver.resolve(state.defaultContext.settings, state.defaultContext.args)
             .then(moduleSettings => Object.assign({}, state, {moduleSettings}));
     }
 
