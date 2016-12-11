@@ -16,12 +16,7 @@ class ContextInitializer {
         return Promise.resolve(state)
             .then(state => this._loadDefaultContext(state))
             .then(state => this._resolveModuleSettings(state))
-            .then(state => {
-                const defaultContext = state.defaultContext;
-                return Object.assign({}, defaultContext, {
-                    settings: this._wrapSettings(defaultContext, state.moduleSettings)
-                });
-            });
+            .then(state => Object.assign({}, state.defaultContext, {settings: state.moduleSettings}));
     }
 
     _loadDefaultContext(state) {
@@ -32,7 +27,8 @@ class ContextInitializer {
     _resolveModuleSettings(state) {
         const resolver = new ModuleSettingsResolver({
             fileReader: this._fileReader,
-            jsonSchemaHelper: this._jsonSchemaHelper
+            jsonSchemaHelper: this._jsonSchemaHelper,
+            wrapSettings: this._wrapSettings
         });
         return resolver.resolve(state.defaultContext.settings, state.defaultContext.args)
             .then(moduleSettings => Object.assign({}, state, {moduleSettings}));

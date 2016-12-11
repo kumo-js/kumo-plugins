@@ -31,13 +31,10 @@ describe('LambdaPackageUploader ContextInitializer', () => {
             });
             expect(wrapSettings.args).to.eql([[
                 {
-                    args: {
-                        'build-number': 'BUILD_NUMBER',
-                        config: '{"CONFIG_KEY":".."}',
-                        env: 'ENV',
-                        resources: 'RESOURCES'
-                    },
-                    settings: 'SETTINGS'
+                    'build-number': 'BUILD_NUMBER',
+                    config: '{"CONFIG_KEY":".."}',
+                    env: 'ENV',
+                    resources: 'RESOURCES'
                 },
                 'MODULE_SETTINGS'
             ]]);

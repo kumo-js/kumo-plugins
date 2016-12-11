@@ -6,6 +6,7 @@ class ModuleSettingsResolver {
     constructor(params) {
         this._jsonSchemaHelper = params.jsonSchemaHelper;
         this._fileReader = params.fileReader;
+        this._wrapSettings = params.wrapSettings;
     }
 
     resolve(settings, args) {
@@ -13,7 +14,7 @@ class ModuleSettingsResolver {
         return Promise.resolve(state)
             .then(state => this._loadResources(state))
             .then(state => this._resolveModuleSettings(state))
-            .then(state => state.moduleSettings);
+            .then(state => this._wrapSettings(state.args, state.moduleSettings));
     }
 
     _loadResources(state) {

@@ -15,7 +15,7 @@ const contextInitializer = new ContextInitializer({
     defaultContextInitializer: new DefaultContextInitializer({fileReader, settingsFileConfig}),
     fileReader,
     jsonSchemaHelper: new JsonSchemaHelper(),
-    wrapSettings: (context, moduleSettings) => new Settings({moduleSettings, args: context.args})
+    wrapSettings: (args, moduleSettings) => new Settings({moduleSettings, args})
 });
 
 module.exports = new PluginHelper({
