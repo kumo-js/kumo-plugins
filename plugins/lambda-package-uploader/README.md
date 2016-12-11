@@ -49,7 +49,7 @@ Arguments are as follows:
     {
       "name": "my-lambda-function",   // <lambda-name>
 
-      // $KUMO_PACKAGE_OUTPUT_FILE has the format: <temp-dir-path>/<env>-<lambda-name>-<build_number>.zip
+      // $KUMO_PACKAGE_OUTPUT_FILE has the format: <temp-dir-path>/<env>-<lambda-name>-<build-number>.zip
       // packaging-command has to save a zipped lambda as $KUMO_PACKAGE_OUTPUT_FILE
       "package-script": "sample-packaging-command /path/to/lambda --output $KUMO_PACKAGE_OUTPUT_FILE",
 
@@ -66,13 +66,13 @@ Arguments are as follows:
 ```
 
 By using the json scheme reference, you can access the values given as the command line arguments.
-They are accessible via `#/_env`, `#/_build_number`, `#/_config`, `#/_resources`.
+They are accessible via `#/_env`, `#/_buildNumber`, `#/_config`, `#/_resources`.
 
 After the successful execution of the `kumo upload-lambda` command, you should get a json file containing
 the locations of uploaded lambdas. The path of the json file is what you have specified with `--output` option.
 
 ```json
 {
-  "<lambda-name>": "s3://kumo-bucket/packages/<env>-<lambda-name>-<build_number>.zip"
+  "<lambda-name>": "s3://kumo-bucket/packages/<env>-<lambda-name>-<build-number>.zip"
 }
 ```
