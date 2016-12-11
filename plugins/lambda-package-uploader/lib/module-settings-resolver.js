@@ -31,13 +31,15 @@ class ModuleSettingsResolver {
     }
 
     _getRefData(args, resources) {
+        const config = args.config && {config: JSON.parse(args.config)};
+        const resourceObj = resources && {resources};
         return Object.assign(
             {
                 buildNumber: args['build-number'],
-                config: JSON.parse(args.config),
                 env: args.env
             },
-            resources && {resources}
+            config,
+            resourceObj
         );
     }
 

@@ -64,4 +64,28 @@ describe('LambdaPackageUploader ModuleSettingsResolver', () => {
         });
     });
 
+    it('treats `config` argument as optional', () => {
+        const wrapSettings = () => 'WRAPPED_SETTINGS';
+        const fileReader = {readAsObject: () => Promise.resolve('LOADED_RESOURCES')};
+        const jsonSchemaHelper = {derefWith: sinon.stub().returns(Promise.resolve('RESOLVED_SETTINGS'))};
+        const resolver = new ModuleSettingsResolver({fileReader, jsonSchemaHelper, wrapSettings});
+
+        const args = {
+            'build-number': 'BUILD_NUMBER',
+            env: 'ENV',
+            resources: 'RESOURCES'
+        };
+        return resolver.resolve('SETTINGS', args).then(moduleSettings => {
+            expect(moduleSettings).to.eql('WRAPPED_SETTINGS');
+            expect(jsonSchemaHelper.derefWith.args).to.eql([[
+                'SETTINGS',
+                {
+                    buildNumber: 'BUILD_NUMBER',
+                    env: 'ENV',
+                    resources: 'LOADED_RESOURCES'
+                }
+            ]]);
+        });
+    });
+
 });

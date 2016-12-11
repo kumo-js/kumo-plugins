@@ -20,7 +20,7 @@ Arguments are as follows:
         Required. Environment name (id?)
 
 --config config
-        Required. JSON string, containing environment specific config values
+        Optional. JSON string, containing environment specific config values
 
 --resources resources
         Optional. Path to a JSON file that contains resources
