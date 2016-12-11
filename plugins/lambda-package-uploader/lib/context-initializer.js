@@ -1,5 +1,7 @@
 'use strict';
 
+const ModuleSettingsResolver = require('./module-settings-resolver');
+
 class ContextInitializer {
 
     constructor(params) {
@@ -13,7 +15,6 @@ class ContextInitializer {
         const state = {context, actionParams};
         return Promise.resolve(state)
             .then(state => this._loadDefaultContext(state))
-            .then(state => this._loadResources(state))
             .then(state => this._resolveModuleSettings(state))
             .then(state => {
                 const defaultContext = state.defaultContext;
@@ -28,22 +29,12 @@ class ContextInitializer {
             .then(defaultContext => Object.assign({}, state, {defaultContext}));
     }
 
-    _loadResources(state) {
-        return this._fileReader.readAsObject(state.defaultContext.args.resources)
-            .then(resources => Object.assign({}, state, {resources}));
-    }
-
     _resolveModuleSettings(state) {
-        const defaultContext = state.defaultContext;
-        const args = defaultContext.args;
-
-        const refData = {
-            buildNumber: args['build-number'],
-            config: JSON.parse(args.config),
-            env: args.env,
-            resources: state.resources
-        };
-        return this._jsonSchemaHelper.derefWith(defaultContext.settings, refData)
+        const resolver = new ModuleSettingsResolver({
+            fileReader: this._fileReader,
+            jsonSchemaHelper: this._jsonSchemaHelper
+        });
+        return resolver.resolve(state.defaultContext.settings, state.defaultContext.args)
             .then(moduleSettings => Object.assign({}, state, {moduleSettings}));
     }
 
