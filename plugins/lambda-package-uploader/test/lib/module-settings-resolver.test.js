@@ -6,7 +6,7 @@ describe('LambdaPackageUploader ModuleSettingsResolver', () => {
     it('fully resolves module settings', () => {
         const wrapSettings = sinon.stub().returns('WRAPPED_SETTINGS');
         const fileReader = {readAsObject: sinon.stub().returns(Promise.resolve('LOADED_RESOURCES'))};
-        const jsonSchemaHelper = {derefWith: sinon.stub().returns(Promise.resolve('MODULE_SETTINGS'))};
+        const jsonSchemaHelper = {derefWith: sinon.stub().returns(Promise.resolve('RESOLVED_SETTINGS'))};
         const resolver = new ModuleSettingsResolver({fileReader, jsonSchemaHelper, wrapSettings});
 
         const args = {
@@ -34,7 +34,7 @@ describe('LambdaPackageUploader ModuleSettingsResolver', () => {
                     env: 'ENV',
                     resources: 'RESOURCES'
                 },
-                'MODULE_SETTINGS'
+                'RESOLVED_SETTINGS'
             ]]);
         });
     });
