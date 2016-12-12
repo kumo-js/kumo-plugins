@@ -1,6 +1,6 @@
 {
   "name": "kumo-plugins",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -34,7 +34,7 @@
     "sinon": "^1.17.6"
   },
   "dependencies": {
-    "aws-sdk": "^2.4.7",
+    "aws-sdk": "^2.7.13",
     "bluebird": "^3.4.1",
     "chdir-promise": "^0.2.1",
     "command-promise": "^2.0.0",
