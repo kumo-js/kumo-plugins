@@ -4,14 +4,13 @@ const LambdaPackager = require('../../lib/lambda-packager');
 describe('LambdaPackageUploader LambdaPackager', () => {
 
     it('packages a lambda', () => {
+        const fs = {readFileAsync: sinon.stub().returns(Promise.resolve('ZIP_DATA'))};
         const packageNameBuilder = {build: sinon.stub().returns('PACKAGE_NAME')};
         const scriptExecutor = {execute: sinon.stub().returns(Promise.resolve())};
-        const zipHelper = {addDataToZip: sinon.stub().returns(Promise.resolve('ZIP_DATA'))};
-        const packager = new LambdaPackager({packageNameBuilder, scriptExecutor, zipHelper});
+        const packager = new LambdaPackager({fs, packageNameBuilder, scriptExecutor});
 
         const params = {
             name: 'LAMBDA_NAME',
-            envFile: 'ENV_VARS',
             'package-script': 'PACKAGE_SCRIPT'
         };
         return packager.package(params).then(pkg => {
@@ -29,11 +28,7 @@ describe('LambdaPackageUploader LambdaPackager', () => {
                     logOutput: false
                 }
             ]);
-            expect(zipHelper.addDataToZip.args[0][0]).to.eql({
-                data: '"ENV_VARS"',
-                pathInZip: 'env.json',
-                zipPath: 'PACKAGE_NAME'
-            });
+            expect(fs.readFileAsync.args[0]).to.eql(['PACKAGE_NAME']);
         });
     });
 

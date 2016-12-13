@@ -29,7 +29,7 @@ Arguments are as follows:
         Required. Path of an output file. Default to package-locations.json
 ```
 
-**TODO: Change `--config` to accept a file path to load a config from, instead of a string **
+**TODO: Change `--config` to accept a file path to load a config from, instead of a string**
 
 ## Setting file
 
@@ -52,14 +52,6 @@ Arguments are as follows:
       // $KUMO_PACKAGE_OUTPUT_FILE has the format: <temp-dir-path>/<env>-<lambda-name>-<build-number>.zip
       // packaging-command has to save a zipped lambda as $KUMO_PACKAGE_OUTPUT_FILE
       "package-script": "sample-packaging-command /path/to/lambda --output $KUMO_PACKAGE_OUTPUT_FILE",
-
-      // The value of `envFile` will be written into env.json and injected into the root level
-      // of the zipped lambda. This will be performed in-memory and won't be written into a file
-      "envFile": {
-        "abc": {
-          "$ref": "#/_config/lambdas/updates/memory"
-        }
-      }
     }
   ]
 }

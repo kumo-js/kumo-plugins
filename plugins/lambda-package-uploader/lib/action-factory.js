@@ -1,7 +1,6 @@
 
 'use strict';
 
-const JSZip = require('jszip');
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const runScript = require('command-promise');
@@ -14,7 +13,6 @@ const LambdaPackager = require('./lambda-packager');
 const UploadLambdasStep = require('./steps/upload-lambdas');
 const OutputPackageLocationsStep = require('./steps/output-package-locations');
 const PackageNameBuilder = require('./package-name-builder');
-const ZipHelper = require('./zip-helper');
 const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 
@@ -58,9 +56,9 @@ class ActionFactory {
 
     _createLambdaPackager(context) {
         return new LambdaPackager({
+            fs,
             packageNameBuilder: this._createPackageNameBuilder(context.settings),
-            scriptExecutor: this._createScriptExecutor(context.logger),
-            zipHelper: this._createZipHelper()
+            scriptExecutor: this._createScriptExecutor(context.logger)
         });
     }
 
@@ -75,13 +73,6 @@ class ActionFactory {
     _createScriptExecutor(logger) {
         const options = {envVarsFormatter: new EnvVarsFormatter({})};
         return new ScriptExecutor({logger, runScript, options});
-    }
-
-    _createZipHelper() {
-        return new ZipHelper({
-            createJSZip: () => new JSZip(),
-            fs
-        });
     }
 
     _getAwsHelpers() {
