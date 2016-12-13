@@ -1,7 +1,7 @@
 
 const IamHelper = require('../lib/iam-helper');
 
-describe('IamHelper', () => {
+describe('CommonLib IamHelper', () => {
 
     describe('#uploadServerCertificate', () => {
 
