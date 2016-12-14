@@ -1,16 +1,13 @@
 
 'use strict';
 
-const path = require('path');
-
-const LOCAL_PACKAGE_OUTPUT_DIR = '.';   // How should it be passed?
-
 class LambdaPackager {
 
     constructor(params) {
         this._fs = params.fs;
         this._packageNameBuilder = params.packageNameBuilder;
         this._scriptExecutor = params.scriptExecutor;
+        this._generateTempFilePath = params.generateTempFilePath;
     }
 
     package(packagingConfig) {
@@ -34,7 +31,7 @@ class LambdaPackager {
 
     _buildPackageFilePath(state) {
         return Object.assign({}, state, {
-            packagePath: path.join(LOCAL_PACKAGE_OUTPUT_DIR, state.packageName)
+            packagePath: this._generateTempFilePath({ext: '.zip'})
         });
     }
 

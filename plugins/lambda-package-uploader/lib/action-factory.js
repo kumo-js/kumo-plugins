@@ -4,6 +4,7 @@
 const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const runScript = require('command-promise');
+const tempfile = require('tempfile2');
 
 const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
@@ -58,7 +59,8 @@ class ActionFactory {
         return new LambdaPackager({
             fs,
             packageNameBuilder: this._createPackageNameBuilder(context.settings),
-            scriptExecutor: this._createScriptExecutor(context.logger)
+            scriptExecutor: this._createScriptExecutor(context.logger),
+            generateTempFilePath: tempfile
         });
     }
 
