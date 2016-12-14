@@ -16,13 +16,16 @@ class OutputPackageLocationsStep {
 
     _getPackagesAsMap(packageList) {
         return packageList.reduce(
-            (memo, pkg) => Object.assign(memo, {[pkg.lambdaName]: this._getS3Path(pkg.packageName)}),
+            (memo, pkg) => Object.assign(memo, {[pkg.lambdaName]: this._getPackageLocation(pkg.packageName)}),
             {}
         );
     }
 
-    _getS3Path(packageName) {
-        return `s3://${this._bucketName}/${packageName}`;
+    _getPackageLocation(packageName) {
+        return {
+            s3Bucket: this._bucketName,
+            s3Key: packageName
+        };
     }
 
     _getOutputString(packages) {

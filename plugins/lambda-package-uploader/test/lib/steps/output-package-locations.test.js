@@ -23,8 +23,8 @@ describe('LambdaPackageUploader OutputPackageLocationsStep', () => {
             expect(newState).to.eql(state);
             expect(fs.writeFileAsync.args[0][0]).to.eql('OUTPUT_FILE');
             expect(JSON.parse(fs.writeFileAsync.args[0][1])).to.eql({
-                LAMBDA_NAME_1: 's3://BUCKET_NAME/PACKAGE_NAME_1',
-                LAMBDA_NAME_2: 's3://BUCKET_NAME/PACKAGE_NAME_2'
+                LAMBDA_NAME_1: {s3Bucket: 'BUCKET_NAME', s3Key: 'PACKAGE_NAME_1'},
+                LAMBDA_NAME_2: {s3Bucket: 'BUCKET_NAME', s3Key: 'PACKAGE_NAME_2'}
             });
         });
     });

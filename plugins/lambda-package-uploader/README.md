@@ -59,10 +59,13 @@ By using the json scheme reference, you can access the values given as the comma
 They are accessible via `#/_env`, `#/_buildNumber`, `#/_config`, `#/_resources`.
 
 After the successful execution of the `kumo upload-lambda` command, you should get a json file containing
-the locations of uploaded lambdas. The path of the json file is what you have specified with `--output` option.
+the locations of uploaded lambdas in S3. The path of the json file is what you have specified with `--output` option.
 
 ```json
 {
-  "<lambda-name>": "s3://kumo-bucket/packages/<env>-<lambda-name>-<build-number>.zip"
+  "<lambda-name>": {
+    "s3Bucket": "<packages-bucket>",
+    "s3Key": "<env>-<lambda-name>-<build-number>.zip"
+  }
 }
 ```
