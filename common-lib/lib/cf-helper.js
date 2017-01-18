@@ -67,7 +67,7 @@ class CfHelper {
     }
 
     _waitForCompletion(stackName, desiredState, options) {
-        options = Object.assign({interval: 5000, retries: 500}, options);
+        options = Object.assign({interval: 5000, retries: 1000}, options);
         return this.searchStack(stackName).then(stack => {
             const status = (stack || {}).StackStatus || '';
             if (status === desiredState) return;
