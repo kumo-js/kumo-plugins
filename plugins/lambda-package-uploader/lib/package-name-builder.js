@@ -5,11 +5,10 @@ class PackageNameBuilder {
 
     constructor(params) {
         this._buildNumber = params.buildNumber;
-        this._env = params.env;
     }
 
     build(lambdaName) {
-        return `${this._env}-${lambdaName}-${this._buildNumber}.zip`;
+        return `${lambdaName}-${this._buildNumber}.zip`;
     }
 
 }
