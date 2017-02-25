@@ -1,8 +1,6 @@
 
 # Lambda Package Uploader
 
-**WIP: Removal of `env`, `config` and `resources` arguments are in progress**
-
 ## Usage
 
 Go to a directory where you have `lambda-packages.json` and execute `upload-lambda` command.

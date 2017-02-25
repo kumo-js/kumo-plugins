@@ -13,7 +13,6 @@ const actionFactory = new ActionFactory();
 const fileReader = new JsonCompatibleFileReader();
 const settingsFileConfig = {defaultFilename: 'lambda-packages', required: true};
 const moduleSettingsResolver = new ModuleSettingsResolver({
-    fileReader,
     jsonSchemaHelper: new JsonSchemaHelper(),
     wrapSettings: (args, moduleSettings) => new Settings({moduleSettings, args})
 });

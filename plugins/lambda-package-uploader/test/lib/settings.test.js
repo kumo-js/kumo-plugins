@@ -17,12 +17,14 @@ describe('LambdaPackageUploader Settings', () => {
 
     it('returns uploadBucket', () => {
         const settings = new Settings({
-            args: {region: 'REGION'},
-            moduleSettings: {uploadBucket: {BUCKET: '..'}}
+            args: {
+                region: 'REGION',
+                'upload-bucket': 'UPLOAD_BUCKET'
+            }
         });
         expect(settings.uploadBucket).to.eql({
             region: 'REGION',
-            BUCKET: '..'
+            name: 'UPLOAD_BUCKET'
         });
     });
 

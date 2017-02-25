@@ -9,10 +9,10 @@ class Settings {
     }
 
     get uploadBucket() {
-        return Object.assign(
-            {region: this._args.region},
-            this._moduleSettings.uploadBucket
-        );
+        return {
+            region: this._args.region,
+            name: this._args['upload-bucket']
+        };
     }
 
     get args() {
