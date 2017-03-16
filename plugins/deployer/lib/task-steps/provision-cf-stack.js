@@ -27,9 +27,13 @@ class ProvisionCfStack {
         const stackName = this._stackNameExpander.expand(taskDef.stackName);
         const stackParams = this._buildCfStackParams(taskDef);
         const cfHelper = this._awsHelpers.cf({region: taskDef.region});
-        const params = {StackName: stackName, Parameters: stackParams, TemplateBody: template};
         this._logger.info(`Provisioning stack ${stackName}`);
-        return cfHelper.provisionStack(params).then(() => cfHelper.extractOutputs(stackName));
+        return cfHelper.provisionStack({
+            StackName: stackName,
+            Parameters: stackParams,
+            TemplateBody: template,
+            Capabilities: ['CAPABILITY_IAM']
+        }).then(() => cfHelper.extractOutputs(stackName));
     }
 
     _buildCfStackParams(taskDef) {
