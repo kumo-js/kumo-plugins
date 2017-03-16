@@ -15,29 +15,25 @@ class Env {
         return this._namespaces;
     }
 
-    namespaceAtLevel(level) {
-        if (level === 'root') return this.root();
-        const count = this.namespaces().length - 1;
-        return this.namespaces()[count - level];
-    }
-
-    root() {
-        return this.namespaces()[0];
-    }
-
     toVars() {
-        const result = {env: this.value(), envNamespaceRoot: this.root()};
-        return Object.assign(result, this.namespaces().reduce(
+        const namespaces = this.namespaces();
+        const result = {env: this.value(), envNamespaceRoot: namespaces[0]};
+        return Object.assign(result, namespaces.reduce(
             (levels, ns, i) => Object.assign(levels, this._createNamespaceLevelVar(i)), {}
         ));
     }
 
     value() {
-        return this._value || '';
+        return this._value;
     }
 
     _createNamespaceLevelVar(level) {
-        return {[`envNamespaceLevel${level}`]: this.namespaceAtLevel(level)};
+        return {[`envNamespaceLevel${level}`]: this._namespaceAtLevel(level)};
+    }
+
+    _namespaceAtLevel(level) {
+        const count = this.namespaces().length - 1;
+        return this.namespaces()[count - level];
     }
 
     _buildNamespaces() {

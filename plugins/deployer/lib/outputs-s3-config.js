@@ -1,5 +1,7 @@
 'use strict';
 
+const _ = require('lodash');
+
 class OutputsS3Config {
 
     constructor(params) {
@@ -8,9 +10,13 @@ class OutputsS3Config {
     }
 
     bucket() {
-        const moduleName = this._settings.moduleName;
-        const prefix = `${this._envNamespace}/${moduleName}/`;
+        const prefix = this._bucketPrefix();
         return Object.assign(this._settings.outputsBucket, {prefix});
+    }
+
+    _bucketPrefix() {
+        const parts = _.compact([this._envNamespace, this._settings.moduleName]);
+        return parts.concat(['']).join('/');
     }
 }
 

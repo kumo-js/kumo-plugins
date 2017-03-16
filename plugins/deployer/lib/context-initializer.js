@@ -4,6 +4,7 @@ const _ = require('lodash');
 const path = require('path');
 const tempfile = require('tempfile2');
 const Env = require('./env');
+const NullEnv = require('./null-env');
 
 class ContextInitializer {
 
@@ -27,7 +28,7 @@ class ContextInitializer {
     }
 
     _initializeEnv(context) {
-        const env = new Env(context.args.env);
+        const env = context.args.env ? new Env(context.args.env) : new NullEnv();
         return Object.assign({}, context, {env});
     }
 

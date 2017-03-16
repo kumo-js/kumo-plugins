@@ -1,5 +1,9 @@
 'use strict';
 
+const _ = require('lodash');
+
+const SEPARATOR = '-';
+
 class StackNameExpander {
 
     constructor(params) {
@@ -9,8 +13,8 @@ class StackNameExpander {
     expand(stackName) {
         const moduleName = this._context.settings.moduleName;
         const env = this._context.env.value();
-        const name = `${env}-${moduleName}-${stackName}`;
-        return name.replace(/\s/, '-').toLowerCase();
+        const fullName = _.compact([env, moduleName, stackName]).join(SEPARATOR);
+        return fullName.replace(/\s/, SEPARATOR).toLowerCase();
     }
 }
 

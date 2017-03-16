@@ -1,14 +1,14 @@
 
 # Module Deployer
 
-The module deployer plugin is essentially a command line runner that executes a list of tasks in order. 
+The module deployer plugin is essentially a command line runner that executes a list of tasks in order.
 It records the output of each task in an s3 bucket and makes those outputs available to subsequent tasks.
-It also supports undoing all tasks in reverse order. 
+It also supports undoing all tasks in reverse order.
 
 ## Usage
 
 Go to any directory containing a `deployment-settings.(yam|json|js)` file and execute one of the following:
-  
+
 * **To Deploy** `kumo deploy-module --region --env`
 * **To Destroy** `kumo destroy-module --region --env`
 
@@ -19,15 +19,15 @@ Arguments are as follows:
         Required. The default aws region.
 
 --env environment
-        Required. The deployment environment namespace.
+        Optional. The deployment environment namespace.
         Namespace levels should be specified using the -- separator so they
         can be recognised and parsed by the plugin. E.g. the plugin recognises
         the environment 'pre-prod--dev--john' as having has three levels:
-        
+
             level0: pre-prod--dev--john
             level1: pre-prod--dev
             level2(i.e. root): pre-prod
-         
+
         These levels can be individually referenced in the deployment-settings file
         via ENV vars or json schema references.
 ```
@@ -43,7 +43,7 @@ Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 #### Built-in Json Schema Reference Variables
 
 ```js
-{"$ref": "#/_args/.."} 
+{"$ref": "#/_args/.."}
 // References command line args supplied to the plugin
 
 {"$ref": "#/_env"}
@@ -51,7 +51,7 @@ Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 
 {"$ref": "#/_envNamespaceRoot"}
 // References the root env namespace e.g. 'pre-prod' if env is 'pre-prod--ci'
- 
+
 {"$ref": "#/_envNamespaceLevel<X>"}
 // References a given env namespace level where <X> is >= 0
 ```
@@ -60,13 +60,13 @@ Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 
 The flexibility of the deployer is achieved through the use of scripts that are executed
 at different stages of the deployment process. Scripts allow the consumer to execute any arbitrary
-command to achieve the desired outcome. They are used in several places including sections such as 
+command to achieve the desired outcome. They are used in several places including sections such as
 [`config`](#config), [`tasks`](#tasks) etc, and have the following structure:
 
 ```js
 {
   "script": "shell-script $SOME_ENV_VAR",
-  "envVars": {"SOME_ENV_VAR", "foo bar"} // custom env vars for your script (optional) 
+  "envVars": {"SOME_ENV_VAR", "foo bar"} // custom env vars for your script (optional)
 }
 ```
 
@@ -79,10 +79,10 @@ $KUMO_ENV
 $KUMO_ENV_NAMESPACE_ROOT
 $KUMO_ENV_NAMESPACE_LEVEL<X>  // where <X> is >= 0
 $KUMO_ARG_<XXX>  // where <XXX> is the arg name
-```  
+```
 
 ### Settings Schema
-   
+
 ```js
 {
   "moduleName": "",
@@ -110,13 +110,13 @@ the different items will be concatenated using the `-` separator. E.g.
 
 ```js
 "outputsBucket": {
-  "name": ["deployment-outputs", {"$ref": "#/_env"}] 
+  "name": ["deployment-outputs", {"$ref": "#/_env"}]
 }
-// produces 'deployment-outputs-ci' if '#/_env' is ci 
+// produces 'deployment-outputs-ci' if '#/_env' is ci
 ```
 
-The bucket will be created if it doesn't already exist, but currently will not be 
-removed if the module is destroyed. 
+The bucket will be created if it doesn't already exist, but currently will not be
+removed if the module is destroyed.
 
 You can also define common `outputBucket` settings in your `kumo.json` file e.g.
 
@@ -124,16 +124,16 @@ You can also define common `outputBucket` settings in your `kumo.json` file e.g.
 "deployer": {
   "outputsBucket": {"name": ...}
 }
-``` 
+```
 
 The `deployment-settings` file will be merged with the above settings and is useful
-in scenarios where you wish to define outputs bucket once for multiple modules. 
+in scenarios where you wish to define outputs bucket once for multiple modules.
 
 ### `dependsOn`
 
-Optional. A list of dependent modules from which to collect [config](#config) and any existing 
-[deployment outputs](#outputsbucket). These will be merged with those of the current module 
-and made available as [task variables](#task-variables) for use during deployment. E.g. 
+Optional. A list of dependent modules from which to collect [config](#config) and any existing
+[deployment outputs](#outputsbucket). These will be merged with those of the current module
+and made available as [task variables](#task-variables) for use during deployment. E.g.
 
 ```js
 "dependsOn": ["../moduleA", "../moduleB"]
@@ -145,8 +145,8 @@ Dependencies are deeply traversed left to right.
 ### `config`
 
 Optional. A [script](#script-sections) for obtaining the environment specific configuration for the
-deployment which will be made available as [task variables](#task-variables). The script must 
-output the config as a JSON string to standard out. 
+deployment which will be made available as [task variables](#task-variables). The script must
+output the config as a JSON string to standard out.
 
 ### `tasks`
 
@@ -156,19 +156,19 @@ has the following common attributes:
 
 ```js
 {
-  "id": "", 
+  "id": "",
   // Required. Unique id for the task in this module.
 
-  "type": "custom|cf-task", 
+  "type": "custom|cf-task",
   // Required. The type of task, defaults to custom.
 
   "regionOverrides": {
     "<region-arg>": "<region-override>"
   },
-  // Optional region overrides for this task. If provided overrides 
+  // Optional region overrides for this task. If provided overrides
   // the given command line region arg with the override region during
   // task execution.
-      
+
   "outputsName": ""
   // Optional, the name under which all task outputs are grouped.
 }
@@ -176,20 +176,20 @@ has the following common attributes:
 
 #### Task Variables
 
-All tasks have access to the following variables either via ENV variables 
+All tasks have access to the following variables either via ENV variables
 (in [script sections](#script-sections)) or via json schema references:
 
 * #### Task region
 
-  The resolved task region (taking into account any region overrides)  
+  The resolved task region (taking into account any region overrides)
   - ENV variable: `$KUMO_TASK_REGION`
-  - Json schema ref: `{"$ref": "#/_taskRegion"}` 
+  - Json schema ref: `{"$ref": "#/_taskRegion"}`
 
 * #### Deployment Config
 
-  The merged deployment config of the module and any [dependant modules](#dependson)  
+  The merged deployment config of the module and any [dependant modules](#dependson)
   - ENV variable: `$KUMO_DEPLOYMENT_CONFIG` (value is JSON string)
-  - Json schema ref: `{"$ref": "#/_deploymentConfig/.."}`   
+  - Json schema ref: `{"$ref": "#/_deploymentConfig/.."}`
 
 * #### Deployment Outputs
 
@@ -201,22 +201,22 @@ All tasks have access to the following variables either via ENV variables
 
 #### Task Outputs
 
-Each task can output variables in json compatible format. After each task executes, its outputs (if any) 
-are uploaded to the [outputsBucket](#outputsbucket), then merged with the overall deployment outputs and 
-made available to subsequent tasks. 
+Each task can output variables in json compatible format. After each task executes, its outputs (if any)
+are uploaded to the [outputsBucket](#outputsbucket), then merged with the overall deployment outputs and
+made available to subsequent tasks.
 
-E.g. assuming we are deploying a module called `module2` which is dependent on `module1`, 
+E.g. assuming we are deploying a module called `module2` which is dependent on `module1`,
 the following visualises the state of deployment outputs through the deployment process:
 
   ```js
-  // Before any tasks are executed, deployment outputs contains any exisiting outputs 
+  // Before any tasks are executed, deployment outputs contains any exisiting outputs
   // for the current module and any dependent modules, fetched from the outputsBucket:
   {
     "module1": {..}
   }
 
-  // Assuming module2 consists of two tasks, when the first task executes it 
-  // has access to the current outputs. On completion, it outputs {"abc": 123} which 
+  // Assuming module2 consists of two tasks, when the first task executes it
+  // has access to the current outputs. On completion, it outputs {"abc": 123} which
   // is merged with all outputs:
   {
     "module1": {..},
@@ -225,9 +225,9 @@ the following visualises the state of deployment outputs through the deployment 
     }
   }
 
-  // When the second task executes, it has access to the current outputs 
-  // (including those from the first task). On completion, it outputs {"def": 456} 
-  // which is again merged with all outputs: 
+  // When the second task executes, it has access to the current outputs
+  // (including those from the first task). On completion, it outputs {"def": 456}
+  // which is again merged with all outputs:
   {
     "module1": {..},
     "module2": {
@@ -241,7 +241,7 @@ Please refer to details of each task type below to know how it produces its outp
 
 ### `tasks type: cf-stack`
 
-This type of task is used to provision a cloud formation stack and has the following 
+This type of task is used to provision a cloud formation stack and has the following
 additional attributes:
 
 ```js
@@ -254,26 +254,26 @@ additional attributes:
 }
 ```
 
-#### `stackName`  
-Required. The `stackName` is used in conjunction with the `moduleName` and the `--env` arg 
+#### `stackName`
+Required. The `stackName` is used in conjunction with the `moduleName` and the `--env` arg
 to generate the full expanded name for the stack. E.g. assuming the following:
 
 ```
 stackName: "buckets"
 moduleName: "module1"
 --env pre-prod--ci
-```   
+```
 
 The expanded stack name would be `pre-prod--ci-module1-buckets` (using `-` as the separator)
 
 #### `stackTemplate`
-Required. A [script](#script-sections) that generates the json compatible template used to 
+Required. A [script](#script-sections) that generates the json compatible template used to
 create the stack. Your script must generate/copy the template to the location specified by
 the `$KUMO_TEMPLATE_OUTPUT_FILE` env variable.
 
 #### `stackParams`
-Optional. If the template contains parameters, you can specify the key/value pairs here. 
-Remember you can take full advantage of json schema references to extract values from 
+Optional. If the template contains parameters, you can specify the key/value pairs here.
+Remember you can take full advantage of json schema references to extract values from
 deployment config and outputs if you wish e.g.
 
 ```js
@@ -294,17 +294,17 @@ deployment config and outputs if you wish e.g.
     "DomainName": {"$ref": "#/_deploymentConfig/domainName"},
     "IamCertificateId": {"$ref": "#/_deploymentOutputs/module1/iamCertificateId"}
   }
-} 
+}
 ```
 
 #### Task Outputs
 
-Upon completion of this task the outputs of the stack are automatically extracted 
+Upon completion of this task the outputs of the stack are automatically extracted
 and merged with the deployment outputs.
 
 ### `tasks type: custom`
 
-This type of task is used to execute any custom script and has the following 
+This type of task is used to execute any custom script and has the following
 additional attributes:
 
 ```js
@@ -316,10 +316,10 @@ additional attributes:
 
 #### `run`
 
-Required. The [script](#script-sections) to run which **must be idempotent**. Any outputs 
+Required. The [script](#script-sections) to run which **must be idempotent**. Any outputs
 of this task that are required by the deployment process must be saved to the
-the location specified by the `$KUMO_TASK_OUTPUTS_FILE` env variable. Outputs must be 
-json compatible (i.e. json or yaml). 
+the location specified by the `$KUMO_TASK_OUTPUTS_FILE` env variable. Outputs must be
+json compatible (i.e. json or yaml).
 
 #### `undo`
 
