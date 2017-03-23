@@ -7,7 +7,7 @@ describe('LambdaPackageUploader Settings', () => {
         const settings = new Settings({
             moduleSettings: {packages: 'PACKAGES'}
         });
-        expect(settings.packages).to.eql('PACKAGES // Making this test fail');
+        expect(settings.packages).to.eql('PACKAGES');
     });
 
     it('returns args', () => {
