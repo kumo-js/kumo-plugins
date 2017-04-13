@@ -2,4 +2,4 @@
 --require mocha-bootstrap.js
 common-lib/test
 plugins/cert-uploader/test
-plugins/lambda-package-uploader/test
+plugins/package-uploader/test

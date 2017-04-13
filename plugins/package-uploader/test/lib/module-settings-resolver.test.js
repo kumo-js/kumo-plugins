@@ -1,7 +1,7 @@
 
 const ModuleSettingsResolver = require('../../lib/module-settings-resolver');
 
-describe('LambdaPackageUploader ModuleSettingsResolver', () => {
+describe('PackageUploader ModuleSettingsResolver', () => {
 
     it('fully resolves module settings', () => {
         const wrapSettings = sinon.stub().returns('WRAPPED_SETTINGS');

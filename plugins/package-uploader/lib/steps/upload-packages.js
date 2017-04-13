@@ -1,7 +1,7 @@
 
 'use strict';
 
-class UploadLambdasStep {
+class UploadPackagesStep {
 
     constructor(params) {
         this._context = params.context;
@@ -17,7 +17,7 @@ class UploadLambdasStep {
         return Promise.all(packages.map(pkg =>
             this._s3Helper.putObject({
                 Bucket: this._uploadBucket.name,
-                Key: pkg.packageName,
+                Key: pkg.finalPackageName,
                 Body: pkg.packageData
             })
         ));
@@ -33,4 +33,4 @@ class UploadLambdasStep {
 
 }
 
-module.exports = UploadLambdasStep;
+module.exports = UploadPackagesStep;

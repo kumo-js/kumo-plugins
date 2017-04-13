@@ -1,7 +1,7 @@
 
 const ContextInitializer = require('../../lib/context-initializer');
 
-describe('LambdaPackageUploader ContextInitializer', () => {
+describe('PackageUploader ContextInitializer', () => {
 
     it('initialises a context', () => {
         const defaultContextInitializer = {

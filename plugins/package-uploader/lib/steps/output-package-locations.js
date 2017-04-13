@@ -16,7 +16,7 @@ class OutputPackageLocationsStep {
 
     _getPackagesAsMap(packageList) {
         return packageList.reduce(
-            (memo, pkg) => Object.assign(memo, {[pkg.lambdaName]: this._getPackageLocation(pkg.packageName)}),
+            (memo, pkg) => Object.assign(memo, {[pkg.originalPackageName]: this._getPackageLocation(pkg.finalPackageName)}),
             {}
         );
     }

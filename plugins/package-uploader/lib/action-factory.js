@@ -9,9 +9,9 @@ const tempfile = require('tempfile2');
 const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
 const CreateUploadBucketStep = require('./steps/create-upload-bucket');
-const PackageLambdasStep = require('./steps/package-lambdas');
-const LambdaPackager = require('./lambda-packager');
-const UploadLambdasStep = require('./steps/upload-lambdas');
+const PackageStep = require('./steps/package');
+const Packager = require('./packager');
+const UploadPackagesStep = require('./steps/upload-packages');
 const OutputPackageLocationsStep = require('./steps/output-package-locations');
 const PackageNameBuilder = require('./package-name-builder');
 const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
@@ -19,12 +19,12 @@ const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 
 class ActionFactory {
 
-    createUploadLambdaAction(context) {
+    createUploadPackageAction(context) {
         return new StepsExecutor({
             steps: [
                 this._createUploadBucketStep(context),
-                this._createPackageLambdasStep(context),
-                this._createUploadLambdasStep(context),
+                this._createPackageStep(context),
+                this._createUploadPackagesStep(context),
                 this._createOutputPackageLocationsStep(context)
             ]
         });
@@ -37,15 +37,15 @@ class ActionFactory {
         });
     }
 
-    _createPackageLambdasStep(context) {
-        return new PackageLambdasStep({
+    _createPackageStep(context) {
+        return new PackageStep({
             context,
-            lambdaPackager: this._createLambdaPackager(context)
+            packager: this._createPackager(context)
         });
     }
 
-    _createUploadLambdasStep(context) {
-        return new UploadLambdasStep({
+    _createUploadPackagesStep(context) {
+        return new UploadPackagesStep({
             awsHelpers: this._getAwsHelpers(),
             context
         });
@@ -55,8 +55,8 @@ class ActionFactory {
         return new OutputPackageLocationsStep({context, fs});
     }
 
-    _createLambdaPackager(context) {
-        return new LambdaPackager({
+    _createPackager(context) {
+        return new Packager({
             fs,
             packageNameBuilder: this._createPackageNameBuilder(context.settings),
             scriptExecutor: this._createScriptExecutor(context.logger),

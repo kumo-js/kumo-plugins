@@ -7,8 +7,8 @@ class PackageNameBuilder {
         this._buildNumber = params.buildNumber;
     }
 
-    build(lambdaName) {
-        return `${lambdaName}-${this._buildNumber}.zip`;
+    build(originalPackageName) {
+        return `${originalPackageName}-${this._buildNumber}.zip`;
     }
 
 }

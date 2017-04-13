@@ -11,7 +11,7 @@ const Settings = require('./lib/settings');
 
 const actionFactory = new ActionFactory();
 const fileReader = new JsonCompatibleFileReader();
-const settingsFileConfig = {defaultFilename: 'lambda-packages', required: true};
+const settingsFileConfig = {defaultFilename: 'package-settings', required: true};
 const moduleSettingsResolver = new ModuleSettingsResolver({
     jsonSchemaHelper: new JsonSchemaHelper(),
     wrapSettings: (args, moduleSettings) => new Settings({moduleSettings, args})
@@ -25,8 +25,8 @@ module.exports = new PluginHelper({
     contextInitializer: contextInitializer,
     actionDefs: [
         {
-            name: 'upload-lambda',
-            createAction: context => actionFactory.createUploadLambdaAction(context)
+            name: 'upload-package',
+            createAction: context => actionFactory.createUploadPackageAction(context)
         }
     ]
 });

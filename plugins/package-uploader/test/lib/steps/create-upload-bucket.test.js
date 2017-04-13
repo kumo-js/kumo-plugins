@@ -1,7 +1,7 @@
 
 const CreateUploadBucketStep = require('../../../lib/steps/create-upload-bucket');
 
-describe('LambdaPackageUploader CreateUploadBucketStep', () => {
+describe('PackageUploader CreateUploadBucketStep', () => {
 
     it('does nothing if an upload bucket already exists', () => {
         const s3Helper = {

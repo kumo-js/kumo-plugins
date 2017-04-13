@@ -1,7 +1,7 @@
 
 const OutputPackageLocationsStep = require('../../../lib/steps/output-package-locations');
 
-describe('LambdaPackageUploader OutputPackageLocationsStep', () => {
+describe('PackageUploader OutputPackageLocationsStep', () => {
 
     it('writes package locations into a JOSN file', () => {
         const context = {
@@ -15,16 +15,16 @@ describe('LambdaPackageUploader OutputPackageLocationsStep', () => {
 
         const state = {
             packages: [
-                {lambdaName: 'LAMBDA_NAME_1', packageName: 'PACKAGE_NAME_1'},
-                {lambdaName: 'LAMBDA_NAME_2', packageName: 'PACKAGE_NAME_2'}
+                {originalPackageName: 'ORG_PACKAGE_NAME_1', finalPackageName: 'FINAL_PACKAGE_NAME_1'},
+                {originalPackageName: 'ORG_PACKAGE_NAME_2', finalPackageName: 'FINAL_PACKAGE_NAME_2'}
             ]
         };
         return step.execute(state).then(newState => {
             expect(newState).to.eql(state);
             expect(fs.writeFileAsync.args[0][0]).to.eql('OUTPUT_FILE');
             expect(JSON.parse(fs.writeFileAsync.args[0][1])).to.eql({
-                LAMBDA_NAME_1: {s3Bucket: 'BUCKET_NAME', s3Key: 'PACKAGE_NAME_1'},
-                LAMBDA_NAME_2: {s3Bucket: 'BUCKET_NAME', s3Key: 'PACKAGE_NAME_2'}
+                ORG_PACKAGE_NAME_1: {s3Bucket: 'BUCKET_NAME', s3Key: 'FINAL_PACKAGE_NAME_1'},
+                ORG_PACKAGE_NAME_2: {s3Bucket: 'BUCKET_NAME', s3Key: 'FINAL_PACKAGE_NAME_2'}
             });
         });
     });

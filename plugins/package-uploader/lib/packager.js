@@ -1,7 +1,7 @@
 
 'use strict';
 
-class LambdaPackager {
+class Packager {
 
     constructor(params) {
         this._fs = params.fs;
@@ -15,10 +15,10 @@ class LambdaPackager {
             .then(state => this._buildPackageFileName(state))
             .then(state => this._buildPackageFilePath(state))
             .then(state => this._package(state))
-            .then(state => this._loadPackgeFile(state))
+            .then(state => this._loadPackageFile(state))
             .then(state => ({
-                lambdaName: state.packagingConfig.name,
-                packageName: state.packageName,
+                originalPackageName: state.packagingConfig.name,
+                finalPackageName: state.packageName,
                 packageData: state.zipData
             }));
     }
@@ -47,11 +47,11 @@ class LambdaPackager {
             .then(() => state);
     }
 
-    _loadPackgeFile(state) {
+    _loadPackageFile(state) {
         return this._fs.readFileAsync(state.packagePath)
             .then(zipData => Object.assign({}, state, {zipData}));
     }
 
 }
 
-module.exports = LambdaPackager;
+module.exports = Packager;

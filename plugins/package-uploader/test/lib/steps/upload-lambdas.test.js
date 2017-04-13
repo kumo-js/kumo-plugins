@@ -1,9 +1,9 @@
 
-const UploadLambdasStep = require('../../../lib/steps/upload-lambdas');
+const UploadPackagesStep = require('../../../lib/steps/upload-packages');
 
-describe('LambdaPackageUploader UploadLambdasStep', () => {
+describe('PackageUploader UploadPackagesStep', () => {
 
-    it('uploads lambdas', () => {
+    it('uploads packages', () => {
         const context = {
             settings: {
                 uploadBucket: {
@@ -14,7 +14,7 @@ describe('LambdaPackageUploader UploadLambdasStep', () => {
         };
         const s3Helper = {putObject: sinon.stub().returns(Promise.resolve())};
         const awsHelpers = {s3: sinon.stub().returns(s3Helper)};
-        const step = new UploadLambdasStep({context, awsHelpers});
+        const step = new UploadPackagesStep({context, awsHelpers});
 
         const state = {
             packages: [
