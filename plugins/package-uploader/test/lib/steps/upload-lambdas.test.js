@@ -18,8 +18,8 @@ describe('PackageUploader UploadPackagesStep', () => {
 
         const state = {
             packages: [
-                {packageName: 'PACKAGE_1', packageData: 'PACKAGE_DATA_1'},
-                {packageName: 'PACKAGE_2', packageData: 'PACKAGE_DATA_2'}
+                {finalPackageName: 'PACKAGE_1', packageData: 'PACKAGE_DATA_1'},
+                {finalPackageName: 'PACKAGE_2', packageData: 'PACKAGE_DATA_2'}
             ]
         };
         return step.execute(state).then(newState => {
