@@ -66,15 +66,18 @@ class ActionFactory {
     }
 
     _collectDeploymentConfigStep(context) {
+        const objectResolver = this._objectResolver();
         const envVarsFormatter = new EnvVarsFormatter({});
         const scriptExecutor = this._scriptExecutor(context);
-        const deploymentScriptExecutor = new DeploymentScriptExecutor({context, envVarsFormatter, scriptExecutor}); // eslint-disable-line max-len
-        return new CollectDeploymentConfigStep({context, deploymentScriptExecutor});
+        const deploymentScriptExecutor = new DeploymentScriptExecutor(
+            {context, envVarsFormatter, scriptExecutor}
+        );
+        return new CollectDeploymentConfigStep({context, deploymentScriptExecutor, objectResolver});
     }
 
     _collectDataSourceDataStep(context) {
         const dataSourceFactory = new DataSourceFactory();
-        const objectResolver = new ObjectResolver();
+        const objectResolver = this._objectResolver();
         return new CollectDataSourceDataStep({context, dataSourceFactory, objectResolver});
     }
 
@@ -126,6 +129,10 @@ class ActionFactory {
     _outputsStoreFactory() {
         const awsHelpers = this._awsHelpers();
         return new OutputsStoreFactory({awsHelpers});
+    }
+
+    _objectResolver() {
+        return new ObjectResolver();
     }
 }
 
