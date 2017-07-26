@@ -4,11 +4,11 @@ class DerefTaskAttributes {
 
     constructor(params) {
         this._context = params.context;
-        this._jsonSchemaHelper = params.jsonSchemaHelper;
+        this._objectResolver = params.objectResolver;
     }
 
     execute(state) {
-        return this._jsonSchemaHelper.derefWith(state.taskDef, state.taskVars).then(
+        return this._objectResolver.resolve(state.taskDef, state.taskVars).then(
             taskDef => Object.assign({}, state, {taskDef})
         );
     }

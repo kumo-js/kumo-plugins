@@ -12,7 +12,7 @@ const CreateCfTaskVarsStep = require('./task-steps/create-cf-task-vars');
 const ExecuteScriptStep = require('./task-steps/execute-script');
 const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
 const JsonCompatibleFileReader = require('../../../common-lib/lib/json-compatible-file-reader');
-const JsonSchemaHelper = require('../../../common-lib/lib/json-schema-helper');
+const ObjectResolver = require('../../../common-lib/lib/object-resolver');
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
@@ -114,8 +114,8 @@ class TaskFactory {
 
     _derefTaskAttributesStep() {
         const context = this._context;
-        const jsonSchemaHelper = new JsonSchemaHelper();
-        return new DerefTaskAttributesStep({context, jsonSchemaHelper});
+        const objectResolver = new ObjectResolver();
+        return new DerefTaskAttributesStep({context, objectResolver});
     }
 
     _provisionCfStackStep() {
