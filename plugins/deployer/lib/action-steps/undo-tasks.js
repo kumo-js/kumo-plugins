@@ -3,7 +3,7 @@
 class UndoTasks {
 
     constructor(params) {
-        this._taskService = params.taskService;
+        this._taskServiceFactory = params.taskServiceFactory;
     }
 
     execute(state) {
@@ -13,11 +13,18 @@ class UndoTasks {
     _undoTasks(state) {
         const deploymentConfig = state.deploymentConfig;
         const deploymentOutputs = state.deploymentOutputs;
+        const taskService = this._createTaskService(state);
 
         return state.taskDefs.reverse().reduce((promise, taskDef) => {
             const params = {taskDef, deploymentConfig, deploymentOutputs};
-            return promise.then(() => this._taskService.undoTask(params));
+            return promise.then(() => taskService.undoTask(params));
         }, Promise.resolve());
+    }
+
+    _createTaskService(state) {
+        return this._taskServiceFactory.createService({
+            outputsStore: state.outputsStore
+        });
     }
 }
 

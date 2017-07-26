@@ -1,23 +1,34 @@
 'use strict';
 
-const OutputsS3Config = require('./outputs-s3-config');
-const OutputsS3Store = require('./outputs-s3-store');
+const _ = require('lodash');
+const AWSHelpers = require('../../../common-lib/lib/aws-helpers');
+const S3OutputsStore = require('./output-stores/s3-outputs-store');
+const NullOutputsStore = require('./output-stores/null-outputs-store');
 
 class OutputsStoreFactory {
 
-    constructor(params) {
-        this._awsHelpers = params.awsHelpers;
+    createStore(outputsStoreDef) {
+        const type = _.get(outputsStoreDef, 'type');
+        if (!type) return this._createNullOutputsStore();
+        const createFn = this._outputsStoreCreators()[type];
+        if (!createFn) throw new Error(`Unsupported outputs store type ${type}`);
+        return createFn.call(this, outputsStoreDef);
     }
 
-    createStore(settings, envNamespace) {
-        return new OutputsS3Store({
-            outputsS3Config: this._outputsS3Config(settings, envNamespace),
-            awsHelpers: this._awsHelpers
-        });
+    _outputsStoreCreators() {
+        return {
+            's3-bucket': this._createS3OutputsStore
+        };
     }
 
-    _outputsS3Config(settings, envNamespace) {
-        return new OutputsS3Config({settings, envNamespace});
+    _createS3OutputsStore(outputsDef) {
+        const awsHelpers = new AWSHelpers();
+        const params = _.omit(outputsDef, ['type']);
+        return new S3OutputsStore(Object.assign(params, {awsHelpers}));
+    }
+
+    _createNullOutputsStore() {
+        return new NullOutputsStore();
     }
 }
 

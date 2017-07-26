@@ -6,9 +6,8 @@ const Promise = require('bluebird');
 class TaskService {
 
     constructor(params) {
-        this._context = params.context;
-        this._logger = this._context.logger;
-        this._outputsStoreFactory = params.outputsStoreFactory;
+        this._logger = params.logger;
+        this._outputsStore = params.outputsStore;
         this._taskFactory = params.taskFactory;
     }
 
@@ -19,7 +18,7 @@ class TaskService {
         return Promise.resolve()
             .then(() => this._taskFactory.createTask(params).execute())
             .then(taskResult => _.get(taskResult, 'outputs', {}))
-            .then(outputs => this._saveOutputs(taskId, outputs));
+            .then(outputs => this._outputsStore.save(taskId, outputs).then(() => outputs));
     }
 
     undoTask(params) {
@@ -28,18 +27,7 @@ class TaskService {
 
         return Promise.resolve()
             .then(() => this._taskFactory.createUndoTask(params).execute())
-            .then(() => this._outputsStore().remove(taskId));
-    }
-
-    _saveOutputs(taskId, outputs) {
-        return this._outputsStore().save(taskId, outputs).then(() => outputs);
-    }
-
-    _outputsStore() {
-        return this._outputsStoreFactory.createStore(
-            this._context.settings,
-            this._context.env.value()
-        );
+            .then(() => this._outputsStore.remove(taskId));
     }
 }
 

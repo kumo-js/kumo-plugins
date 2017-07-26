@@ -29,9 +29,9 @@ class CollectDataSourceData {
     }
 
     _fetchDataFromDataSource(dataSourceDef, name, state) {
-        const params = {deploymentConfig: state.deploymentConfig};
-        return this._objectResolver.resolve(dataSourceDef, params)
-            .then(dataSourceDef => this._dataSourceFactory.createDataSource(dataSourceDef, params))
+        const refData = {deploymentConfig: state.deploymentConfig};
+        return this._objectResolver.resolve(dataSourceDef, refData)
+            .then(dataSourceDef => this._dataSourceFactory.createDataSource(dataSourceDef))
             .then(dataSource => dataSource.fetchData().then(data => ({[name]: data})));
     }
 

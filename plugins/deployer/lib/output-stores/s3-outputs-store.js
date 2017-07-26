@@ -2,23 +2,31 @@
 
 const _ = require('lodash');
 
-class OutputsS3Store {
+class S3OutputsStore {
 
     constructor(params) {
+        this._bucket = params.bucket;
+        this._prefix = params.prefix || '';
+        this._region = params.region;
         this._awsHelpers = params.awsHelpers;
-        this._config = params.outputsS3Config;
+    }
+
+    initialise() {
+        return this._s3Helper().bucketExists(this._bucket).then(
+            exists => !exists ? this._s3Helper().createBucket({Bucket: this._bucket}) : null
+        );
     }
 
     collect() {
         return this._s3Helper().mergeContents([{
-            Bucket: this._bucket().name,
-            Prefix: this._bucket().prefix
+            Bucket: this._bucket,
+            Prefix: this._prefix
         }]);
     }
 
     save(id, outputs) {
         return this._s3Helper().putObject({
-            Bucket: this._bucket().name,
+            Bucket: this._bucket,
             Key: this._getKey(id),
             Body: JSON.stringify(outputs)
         });
@@ -26,7 +34,7 @@ class OutputsS3Store {
 
     remove(id) {
         return this._s3Helper().deleteObject({
-            Bucket: this._bucket().name,
+            Bucket: this._bucket,
             Key: this._getKey(id)
         });
     }
@@ -40,8 +48,8 @@ class OutputsS3Store {
 
     _listItems() {
         return this._s3Helper().listObjects({
-            Bucket: this._bucket().name,
-            Prefix: this._bucket().prefix
+            Bucket: this._bucket,
+            Prefix: this._prefix
         });
     }
 
@@ -49,7 +57,7 @@ class OutputsS3Store {
         return keys.length === 0 ?
             Promise.resolve() :
             this._s3Helper().deleteObjects({
-                Bucket: this._bucket().name,
+                Bucket: this._bucket,
                 Delete: {Objects: keys.map(k => ({Key: k}))}
             });
     }
@@ -60,16 +68,12 @@ class OutputsS3Store {
     }
 
     _getKey(id) {
-        return this._bucket().prefix + id;
+        return `${this._prefix}/${id}`;
     }
 
     _s3Helper() {
-        return this._awsHelpers.s3({region: this._bucket().region});
-    }
-
-    _bucket() {
-        return this._config.bucket();
+        return this._awsHelpers.s3({region: this._region});
     }
 }
 
-module.exports = OutputsS3Store;
+module.exports = S3OutputsStore;

@@ -14,34 +14,20 @@ class SettingsBuilder {
         const kumoSettings = params.kumoSettings;
         const moduleSettings = params.moduleSettings;
         const settings = this._mergeSettings(kumoSettings, moduleSettings);
-
-        return this._derefSettings(settings, args, env).then(
-            settings => this._setOutputsBucket(settings, args)
-        );
+        return this._derefSettings(settings, args, env);
     }
 
     _mergeSettings(kumoSettings, moduleSettings) {
-        const kumoOutputsBucket = _.get(kumoSettings, 'deployer.outputsBucket', {});
-        const moduleOutputsBucket = moduleSettings.outputsBucket;
-        const outputsBucket = Object.assign(kumoOutputsBucket, moduleOutputsBucket);
-        return Object.assign(moduleSettings, {outputsBucket});
+        const kumoOutputsStore = _.get(kumoSettings, 'deployer.outputsStore', {});
+        const moduleOutputsStore = moduleSettings.outputsStore;
+        const outputsStore = Object.assign(kumoOutputsStore, moduleOutputsStore);
+        return Object.assign(moduleSettings, {outputsStore});
     }
 
     _derefSettings(settings, args, env) {
         // TODO: camelCase args
         const refData = Object.assign(env.toVars(), {args});
         return this._jsonSchemaHelper.derefWith(settings, refData);
-    }
-
-    _setOutputsBucket(settings, args) {
-        const region = args.region;
-        const name = this._expandBucketName(settings.outputsBucket.name);
-        const outputsBucket = Object.assign({}, settings.outputsBucket, {region, name});
-        return Object.assign(settings, {outputsBucket});
-    }
-
-    _expandBucketName(name) {
-        return _.isArray(name) ? name.join('-') : name;
     }
 }
 
