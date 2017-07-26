@@ -7,7 +7,7 @@ class CollectDataSourceData {
     constructor(params) {
         this._context = params.context;
         this._dataSourceFactory = params.dataSourceFactory;
-        this._jsonSchemaHelper = params.jsonSchemaHelper;
+        this._objectResolver = params.objectResolver;
     }
 
     execute(state) {
@@ -30,7 +30,7 @@ class CollectDataSourceData {
 
     _fetchDataFromDataSource(dataSourceDef, name, state) {
         const params = {deploymentConfig: state.deploymentConfig};
-        return this._jsonSchemaHelper.derefWith(dataSourceDef, params)
+        return this._objectResolver.resolve(dataSourceDef, params)
             .then(dataSourceDef => this._dataSourceFactory.createDataSource(dataSourceDef, params))
             .then(dataSource => dataSource.fetchData().then(data => ({[name]: data})));
     }

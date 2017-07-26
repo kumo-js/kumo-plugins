@@ -13,7 +13,7 @@ const DeploymentScriptExecutor = require('./deployment-script-executor');
 const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
 const ExecuteTasksStep = require('./action-steps/execute-tasks');
 const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
-const JsonSchemaHelper = require('../../../common-lib/lib/json-schema-helper');
+const ObjectResolver = require('../../../common-lib/lib/object-resolver');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
@@ -74,8 +74,8 @@ class ActionFactory {
 
     _collectDataSourceDataStep(context) {
         const dataSourceFactory = new DataSourceFactory();
-        const jsonSchemaHelper = new JsonSchemaHelper();
-        return new CollectDataSourceDataStep({context, dataSourceFactory, jsonSchemaHelper});
+        const objectResolver = new ObjectResolver();
+        return new CollectDataSourceDataStep({context, dataSourceFactory, objectResolver});
     }
 
     _expandTaskDefsStep(context) {

@@ -6,11 +6,11 @@ const S3DataSource = require('./data-sources/s3-data-source');
 
 class DataSourceFactory {
 
-    createDataSource(dataSource, state) {
-        const type = dataSource.type;
+    createDataSource(dataSourceDef, state) {
+        const type = dataSourceDef.type;
         const createFn = this._dataSourceCreators()[type];
         if (!createFn) throw new Error(`Unsupported data source type ${type}`);
-        return createFn.call(this, dataSource, state);
+        return createFn.call(this, dataSourceDef, state);
     }
 
     _dataSourceCreators() {
@@ -19,9 +19,9 @@ class DataSourceFactory {
         };
     }
 
-    _createS3DataSourceProvider(dataSource, _state) {
+    _createS3DataSourceProvider(dataSourceDef, _state) {
         const awsHelpers = new AWSHelpers();
-        const params = _.pick(dataSource, ['bucket', 'key', 'region']);
+        const params = _.pick(dataSourceDef, ['bucket', 'key', 'region']);
         return new S3DataSource(Object.assign(params, {awsHelpers}));
     }
 }
