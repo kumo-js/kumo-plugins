@@ -19,6 +19,7 @@ class CreateTaskVars {
         return {
             deploymentConfig: state.deploymentConfig,
             deploymentOutputs: state.deploymentOutputs,
+            dataSourceData: state.dataSourceData,
             taskOutputsFile: this._context.generateTempFile(),
             taskRegion: state.taskDef.region
         };

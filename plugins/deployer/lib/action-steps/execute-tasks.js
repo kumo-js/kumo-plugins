@@ -18,10 +18,12 @@ class ExecuteTasks {
 
     _executeTasks(state) {
         const deploymentConfig = state.deploymentConfig;
+        const dataSourceData = state.dataSourceData;
+
         return state.taskDefs.reduce((promise, taskDef) => {
-            return promise.then(deploymentOutputs =>
-                this._executeTask({taskDef, deploymentConfig, deploymentOutputs})
-            );
+            return promise.then(deploymentOutputs => this._executeTask(
+                {taskDef, deploymentConfig, deploymentOutputs, dataSourceData}
+            ));
         }, Promise.resolve(state.deploymentOutputs));
     }
 

@@ -21,6 +21,12 @@ class S3Helper {
         return this._s3.createBucket(params).promise();
     }
 
+    getObject(params) {
+        return this._s3.getObject(params).promise().then(
+            obj => obj.Body.toString()
+        );
+    }
+
     putObject(params) {
         return this._s3.putObject(params).promise();
     }
@@ -47,15 +53,13 @@ class S3Helper {
     _listObjectsInBuckets(buckets) {
         return Promise.all(buckets.map(bucket =>
             this._s3.listObjects(bucket).promise().then(response =>
-                response.Contents.map(obj => Object.assign({Bucket: bucket.Bucket, Key: obj.Key}))
+                response.Contents.map(obj => ({Bucket: bucket.Bucket, Key: obj.Key}))
             )
         )).then(items => _.flatten(items));
     }
 
     _fetch(items) {
-        return Promise.all(items.map(item =>
-            this._s3.getObject(item).promise().then(obj => obj.Body.toString())
-        ));
+        return Promise.all(items.map(item => this.getObject(item)));
     }
 
     _merge(contents) {

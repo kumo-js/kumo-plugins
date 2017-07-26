@@ -5,12 +5,15 @@ const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
 const ModuleChainBuilder = require('./module-chain-builder');
 const CollectDeploymentOutputsStep = require('./action-steps/collect-deployment-outputs');
 const CollectDeploymentConfigStep = require('./action-steps/collect-deployment-config');
+const CollectDataSourceDataStep = require('./action-steps/collect-data-source-data');
 const CreateOutputsBucketStep = require('./action-steps/create-outputs-bucket');
+const DataSourceFactory = require('./data-source-factory');
 const DirChainBuilder = require('../../../common-lib/lib/dir-chain-builder');
 const DeploymentScriptExecutor = require('./deployment-script-executor');
 const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
 const ExecuteTasksStep = require('./action-steps/execute-tasks');
 const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
+const JsonSchemaHelper = require('../../../common-lib/lib/json-schema-helper');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
@@ -30,8 +33,9 @@ class ActionFactory {
         return new StepsExecutor({
             steps: [
                 this._createOutputsBucketStep(context),
-                this._collectDeploymentOutputsStep(context),
                 this._collectDeploymentConfigStep(context),
+                this._collectDeploymentOutputsStep(context),
+                this._collectDataSourceDataStep(context),
                 this._expandTaskDefsStep(context),
                 this._executeTasksStep(context),
                 this._sanitizeOutputsStep(context)
@@ -66,6 +70,12 @@ class ActionFactory {
         const scriptExecutor = this._scriptExecutor(context);
         const deploymentScriptExecutor = new DeploymentScriptExecutor({context, envVarsFormatter, scriptExecutor}); // eslint-disable-line max-len
         return new CollectDeploymentConfigStep({context, deploymentScriptExecutor});
+    }
+
+    _collectDataSourceDataStep(context) {
+        const dataSourceFactory = new DataSourceFactory();
+        const jsonSchemaHelper = new JsonSchemaHelper();
+        return new CollectDataSourceDataStep({context, dataSourceFactory, jsonSchemaHelper});
     }
 
     _expandTaskDefsStep(context) {
