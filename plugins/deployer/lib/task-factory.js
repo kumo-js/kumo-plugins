@@ -14,7 +14,6 @@ const JsonCompatibleFileReader = require('../../../common-lib/lib/json-compatibl
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
-const StackNameExpander = require('./stack-name-expander');
 
 class TaskFactory {
 
@@ -93,8 +92,7 @@ class TaskFactory {
     _deleteCfStackStep() {
         const awsHelpers = this._awsHelpers();
         const context = this._context;
-        const stackNameExpander = this._stackNameExpander();
-        return new DeleteCfStackStep({awsHelpers, context, stackNameExpander});
+        return new DeleteCfStackStep({awsHelpers, context});
     }
 
     _executeScriptStep(scriptName) {
@@ -110,16 +108,11 @@ class TaskFactory {
         const awsHelpers = this._awsHelpers();
         const context = this._context;
         const fileReader = this._fileReader();
-        const stackNameExpander = this._stackNameExpander();
-        return new ProvisionCfStackStep({awsHelpers, context, fileReader, fs, stackNameExpander});
+        return new ProvisionCfStackStep({awsHelpers, context, fileReader, fs});
     }
 
     _fileReader() {
         return new JsonCompatibleFileReader();
-    }
-
-    _stackNameExpander() {
-        return new StackNameExpander({context: this._context});
     }
 
     _scriptExecutor(logger) {

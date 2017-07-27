@@ -10,7 +10,6 @@ class ProvisionCfStack {
         this._fileReader = params.fileReader;
         this._fs = Promise.promisifyAll(params.fs);
         this._logger = params.context.logger;
-        this._stackNameExpander = params.stackNameExpander;
     }
 
     execute(state) {
@@ -24,7 +23,7 @@ class ProvisionCfStack {
     }
 
     _provisionCfStack(template, taskDef) {
-        const stackName = this._stackNameExpander.expand(taskDef.stackName);
+        const stackName = taskDef.stackName;
         const stackParams = this._buildCfStackParams(taskDef);
         const cfHelper = this._awsHelpers.cf({region: taskDef.region});
         this._logger.info(`Provisioning stack ${stackName}`);
