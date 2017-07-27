@@ -49,6 +49,7 @@ class PluginSettings {
         const items = _.get(settings, keyPath);
         const wrapItem = params => ({asParams: () => params});
 
+        if (!items) return [];
         if (_.isArray(items)) return _.map(items, i => wrapItem([i]));
         if (_.isObject(items)) return _.map(items, (v, k) => wrapItem([v, k]));
         throw new Error(`KeyPath "${keyPath}" must be an array/object`);
