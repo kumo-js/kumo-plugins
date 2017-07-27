@@ -22,19 +22,19 @@ class PluginSettings {
     }
 
     reduce(keyPath, callback, initial) {
-        return this._reduce(keyPath, callback, initial, this._forwardIterate());
+        return this._reduce(keyPath, callback, initial, this._forwardIterateFn());
     }
 
     reduceRight(keyPath, callback, initial) {
-        return this._reduce(keyPath, callback, initial, this._reverseIterate());
+        return this._reduce(keyPath, callback, initial, this._reverseIterateFn());
     }
 
-    _reduce(keyPath, callback, initial, iterate) {
+    _reduce(keyPath, callback, initial, iterateFn) {
         const getItems = settings => this._getAsCollection(settings, keyPath);
         const count = getItems(this._settings).length;
         let promise = Promise.resolve(initial);
 
-        iterate(count, index => {
+        iterateFn(count, index => {
             promise = promise.then(result => {
                 return this._resolveSettings()
                     .then(settings => getItems(settings)[index])
@@ -47,26 +47,20 @@ class PluginSettings {
 
     _getAsCollection(settings, keyPath) {
         const items = _.get(settings, keyPath);
-        if (_.isArray(items)) {
-            return items.map(item => ({
-                asParams: () => [item]
-            }));
-        }
-        if (_.isObject(items)) {
-            return _.map(items, (value, key) => ({
-                asParams: () => [value, key]
-            }));
-        }
+        const wrapItem = params => ({asParams: () => params});
+
+        if (_.isArray(items)) return _.map(items, i => wrapItem([i]));
+        if (_.isObject(items)) return _.map(items, (v, k) => wrapItem([v, k]));
         throw new Error(`KeyPath "${keyPath}" must be an array/object`);
     }
 
-    _forwardIterate() {
+    _forwardIterateFn() {
         return (count, processIndex) => {
             for (let i = 0; i < count; i += 1) processIndex(i);
         };
     }
 
-    _reverseIterate() {
+    _reverseIterateFn() {
         return (count, processIndex) => {
             for (let i = (count - 1); i >= 0; i -= 1) processIndex(i);
         };
