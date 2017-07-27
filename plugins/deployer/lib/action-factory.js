@@ -7,15 +7,14 @@ const CollectDeploymentConfigStep = require('./action-steps/collect-deployment-c
 const CollectDataSourceDataStep = require('./action-steps/collect-data-source-data');
 const DataSourceFactory = require('./data-source-factory');
 const DeploymentScriptExecutor = require('./deployment-script-executor');
-const ExpandTaskDefsStep = require('./action-steps/expand-task-defs');
 const ExecuteTasksStep = require('./action-steps/execute-tasks');
 const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
 const InitialiseOutputsStoreStep = require('./action-steps/initialise-outputs-store');
-const ObjectResolver = require('../../../common-lib/lib/object-resolver');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
+const TaskDefExpander = require('./task-def-expander');
 const TaskFactory = require('./task-factory');
 const UndoTasksStep = require('./action-steps/undo-tasks');
 
@@ -23,7 +22,6 @@ class ActionFactory {
 
     constructor(params) {
         this._fileReader = params.fileReader;
-        this._settingsBuilder = params.settingsBuilder;
     }
 
     createDeployAction(context) {
@@ -31,9 +29,8 @@ class ActionFactory {
             steps: [
                 this._collectDeploymentConfigStep(context),
                 this._initialiseOutputsStoreStep(context),
-                this._collectDeploymentOutputsStep(),
+                this._collectDeploymentOutputsStep(context),
                 this._collectDataSourceDataStep(context),
-                this._expandTaskDefsStep(context),
                 this._executeTasksStep(context),
                 this._sanitizeOutputsStep(context)
             ]
@@ -45,54 +42,46 @@ class ActionFactory {
             steps: [
                 this._collectDeploymentConfigStep(context),
                 this._initialiseOutputsStoreStep(context),
-                this._collectDeploymentOutputsStep(),
+                this._collectDeploymentOutputsStep(context),
                 this._collectDataSourceDataStep(context),
-                this._expandTaskDefsStep(context),
                 this._undoTasksStep(context)
             ]
         });
     }
 
     _initialiseOutputsStoreStep(context) {
-        const objectResolver = this._objectResolver();
         const outputsStoreFactory = new OutputsStoreFactory();
-        return new InitialiseOutputsStoreStep({context, objectResolver, outputsStoreFactory});
+        return new InitialiseOutputsStoreStep({context, outputsStoreFactory});
     }
 
-    _collectDeploymentOutputsStep() {
-        return new CollectDeploymentOutputsStep();
+    _collectDeploymentOutputsStep(context) {
+        return new CollectDeploymentOutputsStep({context});
     }
 
     _collectDeploymentConfigStep(context) {
-        const objectResolver = this._objectResolver();
         const envVarsFormatter = new EnvVarsFormatter({});
         const scriptExecutor = this._scriptExecutor(context);
-        const deploymentScriptExecutor = new DeploymentScriptExecutor(
-            {context, envVarsFormatter, scriptExecutor}
-        );
-        return new CollectDeploymentConfigStep({context, deploymentScriptExecutor, objectResolver});
+        const deploymentScriptExecutor = new DeploymentScriptExecutor({
+            context, envVarsFormatter, scriptExecutor
+        });
+        return new CollectDeploymentConfigStep({context, deploymentScriptExecutor});
     }
 
     _collectDataSourceDataStep(context) {
         const dataSourceFactory = new DataSourceFactory();
-        const objectResolver = this._objectResolver();
-        return new CollectDataSourceDataStep({context, dataSourceFactory, objectResolver});
-    }
-
-    _expandTaskDefsStep(context) {
-        return new ExpandTaskDefsStep({context});
+        return new CollectDataSourceDataStep({context, dataSourceFactory});
     }
 
     _executeTasksStep(context) {
-        const logger = context.logger;
+        const taskDefExpander = this._taskDefExpander(context);
         const taskFactory = this._taskFactory(context);
-        return new ExecuteTasksStep({logger, taskFactory});
+        return new ExecuteTasksStep({context, taskDefExpander, taskFactory});
     }
 
     _undoTasksStep(context) {
-        const logger = context.logger;
+        const taskDefExpander = this._taskDefExpander(context);
         const taskFactory = this._taskFactory(context);
-        return new UndoTasksStep({logger, taskFactory});
+        return new UndoTasksStep({context, taskDefExpander, taskFactory});
     }
 
     _sanitizeOutputsStep() {
@@ -104,16 +93,16 @@ class ActionFactory {
         return new ScriptExecutor({logger, runScript});
     }
 
+    _taskDefExpander(context) {
+        return new TaskDefExpander({context});
+    }
+
     _taskFactory(context) {
         return new TaskFactory({context});
     }
 
     _awsHelpers() {
         return new AwsHelpers();
-    }
-
-    _objectResolver() {
-        return new ObjectResolver();
     }
 }
 

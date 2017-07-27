@@ -2,19 +2,13 @@
 
 const _ = require('lodash');
 
-class ExpandTaskDefs {
+class TaskDefExpander {
 
     constructor(params) {
         this._context = params.context;
     }
 
-    execute(state) {
-        return Promise.resolve()
-            .then(() => this._taskDefs().map(taskDef => this._expandTaskDef(taskDef)))
-            .then(taskDefs => Object.assign({}, state, {taskDefs: taskDefs}));
-    }
-
-    _expandTaskDef(taskDef) {
+    expand(taskDef) {
         taskDef = this._assignTaskType(taskDef);
         taskDef = this._assignRegion(taskDef);
         return taskDef;
@@ -33,10 +27,6 @@ class ExpandTaskDefs {
     _region() {
         return this._context.args.region;
     }
-
-    _taskDefs() {
-        return this._context.settings.tasks;
-    }
 }
 
-module.exports = ExpandTaskDefs;
+module.exports = TaskDefExpander;

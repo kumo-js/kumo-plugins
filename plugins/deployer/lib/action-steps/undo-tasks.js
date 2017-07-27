@@ -3,33 +3,37 @@
 class UndoTasks {
 
     constructor(params) {
-        this._logger = params.logger;
+        this._context = params.context;
+        this._logger = params.context.logger;
+        this._taskDefExpander = params.taskDefExpander;
         this._taskFactory = params.taskFactory;
     }
 
     execute(state) {
-        return this._undoTasks(state).then(() => state);
+        return this._context.settings.reduceRight('tasks',
+            (state, taskDef) => this._undoTask(taskDef, state), state
+        );
     }
 
-    _undoTasks(state) {
-        const deploymentConfig = state.deploymentConfig;
-        const deploymentOutputs = state.deploymentOutputs;
-        const dataSourceData = state.dataSourceData;
-        const outputsStore = state.outputsStore;
-
-        return state.taskDefs.reverse().reduce((promise, taskDef) => {
-            const params = {deploymentConfig, deploymentOutputs, dataSourceData};
-            return promise.then(() => this._undoTask(taskDef, params, outputsStore));
-        }, Promise.resolve());
-    }
-
-    _undoTask(taskDef, params, outputsStore) {
+    _undoTask(taskDef, state) {
         const taskId = taskDef.id;
-        const taskParams = Object.assign({}, {taskDef}, params);
-        const task = this._taskFactory.createUndoTask(taskParams);
+        const task = this._createUndoTask(taskDef, state);
+        const outputsStore = state.outputsStore;
+        this._logger.info(`\n---> Undoing task: ${taskId}`);
 
-        this._logger.info(`\n--->Undoing task: ${taskId}`);
-        return task.execute().then(() => outputsStore.remove(taskId));
+        return task.execute()
+            .then(() => outputsStore.remove(taskId))
+            .then(() => state);
+    }
+
+    _createUndoTask(taskDef, state) {
+        const expandedTaskDef = this._taskDefExpander.expand(taskDef);
+        return this._taskFactory.createUndoTask({
+            taskDef: expandedTaskDef,
+            deploymentConfig: state.deploymentConfig,
+            dataSourceData: state.dataSourceData,
+            deploymentOutputs: state.deploymentOutputs
+        });
     }
 }
 

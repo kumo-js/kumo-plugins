@@ -36,6 +36,7 @@ class ContextInitializer {
         const moduleSettings = context.settings;
         const otherSettings = _.pick(context, ['args', 'env', 'kumoSettings']);
         const params = Object.assign({moduleSettings}, otherSettings);
+
         return this._settingsBuilder.build(params).then(
             settings => Object.assign({}, context, {settings})
         );

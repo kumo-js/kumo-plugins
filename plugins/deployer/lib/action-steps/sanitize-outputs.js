@@ -3,7 +3,7 @@
 class SanitizeOutputs {
 
     execute(state) {
-        const taskIds = state.taskDefs.map(t => t.id);
+        const taskIds = state.executedTaskIds;
         return state.outputsStore.removeAllExcept(taskIds).then(() => state);
     }
 }

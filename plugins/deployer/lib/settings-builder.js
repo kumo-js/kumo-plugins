@@ -1,20 +1,19 @@
 'use strict';
 
 const _ = require('lodash');
+const PluginSettings = require('../../../common-lib/lib/plugin-settings');
 
 class SettingsBuilder {
 
-    constructor(params) {
-        this._jsonSchemaHelper = params.jsonSchemaHelper;
-    }
-
     build(params) {
-        const args = params.args;
         const env = params.env;
+        const args = params.args;
         const kumoSettings = params.kumoSettings;
         const moduleSettings = params.moduleSettings;
         const settings = this._mergeSettings(kumoSettings, moduleSettings);
-        return this._derefSettings(settings, args, env);
+        const refData = Object.assign(env.toVars(), {args});
+        const pluginSettings = new PluginSettings({settings, refData});
+        return Promise.resolve(pluginSettings);
     }
 
     _mergeSettings(kumoSettings, moduleSettings) {
@@ -22,12 +21,6 @@ class SettingsBuilder {
         const moduleOutputsStore = moduleSettings.outputsStore;
         const outputsStore = Object.assign(kumoOutputsStore, moduleOutputsStore);
         return Object.assign(moduleSettings, {outputsStore});
-    }
-
-    _derefSettings(settings, args, env) {
-        // TODO: camelCase args
-        const refData = Object.assign(env.toVars(), {args});
-        return this._jsonSchemaHelper.derefWith(settings, refData);
     }
 }
 

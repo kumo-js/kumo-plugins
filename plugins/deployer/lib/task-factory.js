@@ -4,7 +4,6 @@ const fs = require('fs');
 const runScript = require('command-promise');
 const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
 const DeleteCfStackStep = require('./task-steps/delete-cf-stack');
-const DerefTaskAttributesStep = require('./task-steps/deref-task-attributes');
 const DeploymentScriptExecutor = require('./deployment-script-executor');
 const CollectTaskOutputsStep = require('./task-steps/collect-task-outputs');
 const CreateTaskVarsStep = require('./task-steps/create-task-vars');
@@ -12,7 +11,6 @@ const CreateCfTaskVarsStep = require('./task-steps/create-cf-task-vars');
 const ExecuteScriptStep = require('./task-steps/execute-script');
 const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
 const JsonCompatibleFileReader = require('../../../common-lib/lib/json-compatible-file-reader');
-const ObjectResolver = require('../../../common-lib/lib/object-resolver');
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
@@ -49,7 +47,6 @@ class TaskFactory {
         return [
             this._createTaskVarsStep(),
             this._createCfTaskVarsStep(),
-            this._derefTaskAttributesStep(),
             this._executeScriptStep('stackTemplate'),
             this._provisionCfStackStep(),
             this._collectTaskOutputsStep()
@@ -59,7 +56,6 @@ class TaskFactory {
     _customTaskSteps() {
         return [
             this._createTaskVarsStep(),
-            this._derefTaskAttributesStep(),
             this._executeScriptStep('run'),
             this._collectTaskOutputsStep()
         ];
@@ -68,7 +64,6 @@ class TaskFactory {
     _undoCfTaskSteps() {
         return [
             this._createTaskVarsStep(),
-            this._derefTaskAttributesStep(),
             this._deleteCfStackStep()
         ];
     }
@@ -76,7 +71,6 @@ class TaskFactory {
     _undoCustomTaskSteps() {
         return [
             this._createTaskVarsStep(),
-            this._derefTaskAttributesStep(),
             this._executeScriptStep('undo')
         ];
     }
@@ -110,12 +104,6 @@ class TaskFactory {
         const deploymentScriptExecutorParams = {context, envVarsFormatter, scriptExecutor};
         const deploymentScriptExecutor = new DeploymentScriptExecutor(deploymentScriptExecutorParams);
         return new ExecuteScriptStep({context, deploymentScriptExecutor, envVarsFormatter, scriptName});
-    }
-
-    _derefTaskAttributesStep() {
-        const context = this._context;
-        const objectResolver = new ObjectResolver();
-        return new DerefTaskAttributesStep({context, objectResolver});
     }
 
     _provisionCfStackStep() {
