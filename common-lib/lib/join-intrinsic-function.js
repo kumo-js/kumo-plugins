@@ -8,7 +8,8 @@ class JoinIntrinsicFunction {
 
     evaluate() {
         const separator = this._items[0];
-        return this._items.slice(1).join(separator);
+        const elements = this._items[1];
+        return elements.join(separator);
     }
 }
 
