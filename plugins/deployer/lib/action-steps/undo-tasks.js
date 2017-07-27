@@ -3,7 +3,8 @@
 class UndoTasks {
 
     constructor(params) {
-        this._taskServiceFactory = params.taskServiceFactory;
+        this._logger = params.logger;
+        this._taskFactory = params.taskFactory;
     }
 
     execute(state) {
@@ -13,18 +14,22 @@ class UndoTasks {
     _undoTasks(state) {
         const deploymentConfig = state.deploymentConfig;
         const deploymentOutputs = state.deploymentOutputs;
-        const taskService = this._createTaskService(state);
+        const dataSourceData = state.dataSourceData;
+        const outputsStore = state.outputsStore;
 
         return state.taskDefs.reverse().reduce((promise, taskDef) => {
-            const params = {taskDef, deploymentConfig, deploymentOutputs};
-            return promise.then(() => taskService.undoTask(params));
+            const params = {deploymentConfig, deploymentOutputs, dataSourceData};
+            return promise.then(() => this._undoTask(taskDef, params, outputsStore));
         }, Promise.resolve());
     }
 
-    _createTaskService(state) {
-        return this._taskServiceFactory.createService({
-            outputsStore: state.outputsStore
-        });
+    _undoTask(taskDef, params, outputsStore) {
+        const taskId = taskDef.id;
+        const taskParams = Object.assign({}, {taskDef}, params);
+        const task = this._taskFactory.createUndoTask(taskParams);
+
+        this._logger.info(`\n--->Undoing task: ${taskId}`);
+        return task.execute().then(() => outputsStore.remove(taskId));
     }
 }
 

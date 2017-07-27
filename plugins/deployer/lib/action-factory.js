@@ -16,7 +16,7 @@ const OutputsStoreFactory = require('./outputs-store-factory');
 const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
-const TaskServiceFactory = require('./task-service-factory');
+const TaskFactory = require('./task-factory');
 const UndoTasksStep = require('./action-steps/undo-tasks');
 
 class ActionFactory {
@@ -43,8 +43,10 @@ class ActionFactory {
     createDestroyAction(context) {
         return new StepsExecutor({
             steps: [
-                this._collectDeploymentOutputsStep(context),
                 this._collectDeploymentConfigStep(context),
+                this._initialiseOutputsStoreStep(context),
+                this._collectDeploymentOutputsStep(),
+                this._collectDataSourceDataStep(context),
                 this._expandTaskDefsStep(context),
                 this._undoTasksStep(context)
             ]
@@ -82,13 +84,15 @@ class ActionFactory {
     }
 
     _executeTasksStep(context) {
-        const taskServiceFactory = this._taskServiceFactory(context);
-        return new ExecuteTasksStep({context, taskServiceFactory});
+        const logger = context.logger;
+        const taskFactory = this._taskFactory(context);
+        return new ExecuteTasksStep({logger, taskFactory});
     }
 
     _undoTasksStep(context) {
-        const taskServiceFactory = this._taskServiceFactory(context);
-        return new UndoTasksStep({taskServiceFactory});
+        const logger = context.logger;
+        const taskFactory = this._taskFactory(context);
+        return new UndoTasksStep({logger, taskFactory});
     }
 
     _sanitizeOutputsStep() {
@@ -100,8 +104,8 @@ class ActionFactory {
         return new ScriptExecutor({logger, runScript});
     }
 
-    _taskServiceFactory(context) {
-        return new TaskServiceFactory({context});
+    _taskFactory(context) {
+        return new TaskFactory({context});
     }
 
     _awsHelpers() {

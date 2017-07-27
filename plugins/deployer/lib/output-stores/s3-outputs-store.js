@@ -12,8 +12,8 @@ class S3OutputsStore {
     }
 
     initialise() {
-        return this._s3Helper().bucketExists(this._bucket).then(
-            exists => !exists ? this._s3Helper().createBucket({Bucket: this._bucket}) : null
+        return this._s3Helper().bucketExists(this._bucket).then(exists =>
+            !exists ? this._s3Helper().createBucket({Bucket: this._bucket}) : null
         );
     }
 

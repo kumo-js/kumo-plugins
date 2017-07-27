@@ -1,7 +1,5 @@
 'use strict';
 
-const Promise = require('bluebird');
-
 class ExecuteScript {
 
     constructor(params) {
