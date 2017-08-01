@@ -18,14 +18,14 @@ class CreateTaskVars {
         return {
             taskRegion: this._getTaskRegion(state.taskSection),
             taskOutputsFile: this._context.generateTempFile()
-        }
+        };
     }
-        
-     _getTaskRegion(taskSection) {
-         const deployRegion = this._context.args.region;
-         const regionOverrides = taskSection.getValue().regionOverrides || [];
-         return regionOverrides[deployRegion] || deployRegion;
-     }
+
+    _getTaskRegion(taskSection) {
+        const deployRegion = this._context.args.region;
+        const regionOverrides = taskSection.getValue().regionOverrides || [];
+        return regionOverrides[deployRegion] || deployRegion;
+    }
 }
 
 module.exports = CreateTaskVars;

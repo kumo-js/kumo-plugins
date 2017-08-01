@@ -19,7 +19,7 @@ class ExecuteTasks {
                         this._context.settings.addRefData({deploymentOutputs});
                         return state;
                     })
-                )
+                );
             }, Promise.resolve(state)
         );
     }
@@ -38,8 +38,8 @@ class ExecuteTasks {
             .then(state => Object.assign({}, state, {executedTaskIds: executedTaskIds.concat(taskId)}));
     }
 
-    _extractTaskSections() {		
-         return this._context.settings.extractCollection('tasks');		
+    _extractTaskSections() {
+        return this._context.settings.extractCollection('tasks');
     }
 }
 

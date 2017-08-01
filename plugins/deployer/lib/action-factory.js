@@ -86,10 +86,6 @@ class ActionFactory {
         return new ScriptExecutor({logger, runScript});
     }
 
-    _taskDefExpander(context) {
-        return new TaskDefExpander({context});
-    }
-
     _taskFactory(context) {
         return new TaskFactory({context});
     }

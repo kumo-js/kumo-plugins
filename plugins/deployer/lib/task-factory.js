@@ -36,7 +36,7 @@ class TaskFactory {
     }
 
     _createTask(taskSection, getStepCreators) {
-        const taskType = taskSection.getValue().type || 'custom'
+        const taskType = taskSection.getValue().type || 'custom';
         const stepCreators = getStepCreators();
         const stepCreator = stepCreators[taskType];
         const steps = stepCreator.call(this);

@@ -11,7 +11,7 @@ class UndoTasks {
     execute(state) {
         return this._extractTaskSections().reduceRight(
             (promise, taskSection) => {
-                return promise.then(state => this._undoTask(taskSection, state))
+                return promise.then(state => this._undoTask(taskSection, state));
             }, Promise.resolve(state)
         );
     }
@@ -27,8 +27,8 @@ class UndoTasks {
             .then(() => state);
     }
 
-    _extractTaskSections() {		
-         return this._context.settings.extractCollection('tasks');		
+    _extractTaskSections() {
+        return this._context.settings.extractCollection('tasks');
     }
 }
 

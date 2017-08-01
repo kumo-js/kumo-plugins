@@ -1,6 +1,6 @@
 'use strict';
 
-const _  = require('lodash');
+const _ = require('lodash');
 
 class CollectDataSourceData {
 
@@ -19,17 +19,17 @@ class CollectDataSourceData {
     }
 
     _fetchAllData(dataSourceDefs) {
-        const fetchAllData = _.map(dataSourceDefs, (dataSourceDef, name) => 
-            this._fetchData(dataSourceDef, name).then(data => ({name, data}))
-        )
-        return Promise.all(fetchAllData).then(result => 
-            result.reduce((combined, item) => 
+        const fetchAllData = _.map(dataSourceDefs, (dataSourceDef, name) =>
+            this._fetchData(dataSourceDef).then(data => ({name, data}))
+        );
+        return Promise.all(fetchAllData).then(result =>
+            result.reduce((combined, item) =>
                 Object.assign(combined, {[item.name]: item.data}), {}
             )
         );
     }
 
-    _fetchData(dataSourceDef, name) {
+    _fetchData(dataSourceDef) {
         const dataSource = this._dataSourceFactory.createDataSource(dataSourceDef);
         return dataSource.fetchData();
     }

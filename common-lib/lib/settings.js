@@ -23,15 +23,15 @@ class Settings {
 
     extractCollection(path) {
         const items = _.get(this._rawSettings, path, []);
-        return items.map((item, index) => 
+        return items.map((item, index) =>
             this._createSection(`${path}[${index}]`)
         );
     }
 
     _createSection(path) {
         return new Section({
-            path: path, 
-            rawSettings: this._rawSettings, 
+            path: path,
+            rawSettings: this._rawSettings,
             resolveValue: this._resolveValue.bind(this)
         });
     }
@@ -57,7 +57,7 @@ class Section {
     resolve(refData) {
         return this._resolveValue(this._rawSettings, refData).then(
             resolvedSettings => _.get(resolvedSettings, this._path)
-        );        
+        );
     }
 }
 
