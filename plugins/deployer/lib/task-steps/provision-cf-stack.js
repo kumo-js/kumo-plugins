@@ -13,19 +13,21 @@ class ProvisionCfStack {
     }
 
     execute(state) {
+        const taskRegion = state.taskVars.taskRegion;
         const taskOutputsFile = state.taskVars.taskOutputsFile;
         const templateFile = state.taskVars.templateOutputFile;
+
         return this._fileReader.readAsObject(templateFile)
             .then(template => JSON.stringify(template))
-            .then(template => this._provisionCfStack(template, state.taskDef))
+            .then(template => this._provisionCfStack(template, state.taskDef, taskRegion))
             .then(outputs => this._fs.writeFileAsync(taskOutputsFile, JSON.stringify(outputs)))
             .then(() => state);
     }
 
-    _provisionCfStack(template, taskDef) {
+    _provisionCfStack(template, taskDef, region) {
         const stackName = taskDef.stackName;
         const stackParams = this._buildCfStackParams(taskDef);
-        const cfHelper = this._awsHelpers.cf({region: taskDef.region});
+        const cfHelper = this._awsHelpers.cf({region});
         this._logger.info(`Provisioning stack ${stackName}`);
 
         return cfHelper.provisionStack({

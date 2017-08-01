@@ -1,5 +1,7 @@
 'use strict';
 
+const _ = require('lodash');
+
 class CollectDataSourceData {
 
     constructor(params) {
@@ -8,26 +10,34 @@ class CollectDataSourceData {
     }
 
     execute(state) {
-        return this._fetchDataFromAllDataSources().then(dataSourceData => {
-            this._context.settings.addRefData({dataSourceData});
-            return Object.assign({}, state, {dataSourceData});
-        });
+        return this._resolveDataSourceDefs()
+            .then(dataSourceDefs => this._fetchAllData(dataSourceDefs))
+            .then(dataSourceData => {
+                this._context.settings.addRefData({dataSourceData});
+                return Object.assign({}, state, {dataSourceData});
+            });
     }
 
-    _fetchDataFromAllDataSources() {
-        return this._context.settings.reduce(
-            'dataSources', (combined, dataSourceDef, name) => {
-                return this._fetchDataFromDataSource(dataSourceDef).then(
-                    data => Object.assign(combined, {[name]: data})
-                );
-            }, {}
+    _fetchAllData(dataSourceDefs) {
+        const fetchAllData = _.map(dataSourceDefs, (dataSourceDef, name) =>
+            this._fetchData(dataSourceDef).then(data => ({name, data}))
+        );
+        return Promise.all(fetchAllData).then(result =>
+            result.reduce((combined, item) =>
+                Object.assign(combined, {[item.name]: item.data}), {}
+            )
         );
     }
 
-    _fetchDataFromDataSource(dataSourceDef) {
+    _fetchData(dataSourceDef) {
         const dataSource = this._dataSourceFactory.createDataSource(dataSourceDef);
         return dataSource.fetchData();
     }
+
+    _resolveDataSourceDefs() {
+        return this._context.settings.resolve('dataSources');
+    }
+
 }
 
 module.exports = CollectDataSourceData;

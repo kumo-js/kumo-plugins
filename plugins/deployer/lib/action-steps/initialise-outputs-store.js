@@ -8,10 +8,14 @@ class InitialiseOutputsStore {
     }
 
     execute(state) {
-        return this._context.settings.extract('outputsStore')
+        return this._resolveOutputsStoreDef()
             .then(storeDef => this._outputsStoreFactory.createStore(storeDef))
             .then(store => store.initialise().then(() => store))
             .then(store => Object.assign({}, state, {outputsStore: store}));
+    }
+
+    _resolveOutputsStoreDef() {
+        return this._context.settings.resolve('outputsStore');
     }
 }
 

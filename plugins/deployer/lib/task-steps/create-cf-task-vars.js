@@ -15,7 +15,9 @@ class CreateCfTaskVars {
     }
 
     _createCfTaskVars() {
-        return {templateOutputFile: this._context.generateTempFile()};
+        return {
+            templateOutputFile: this._context.generateTempFile()
+        };
     }
 }
 

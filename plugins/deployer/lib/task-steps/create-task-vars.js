@@ -16,12 +16,15 @@ class CreateTaskVars {
 
     _createTaskVars(state) {
         return {
-            deploymentConfig: state.deploymentConfig,
-            deploymentOutputs: state.deploymentOutputs,
-            dataSourceData: state.dataSourceData,
-            taskOutputsFile: this._context.generateTempFile(),
-            taskRegion: state.taskDef.region
+            taskRegion: this._getTaskRegion(state.taskSection),
+            taskOutputsFile: this._context.generateTempFile()
         };
+    }
+
+    _getTaskRegion(taskSection) {
+        const deployRegion = this._context.args.region;
+        const regionOverrides = taskSection.getValue().regionOverrides || [];
+        return regionOverrides[deployRegion] || deployRegion;
     }
 }
 

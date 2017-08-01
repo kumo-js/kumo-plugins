@@ -7,25 +7,26 @@ class ExecuteTasks {
     constructor(params) {
         this._context = params.context;
         this._logger = params.context.logger;
-        this._taskDefExpander = params.taskDefExpander;
         this._taskFactory = params.taskFactory;
     }
 
     execute(state) {
-        return this._context.settings.reduce('tasks',
-            (state, taskDef) => {
-                return this._executeTask(taskDef, state).then(state => {
-                    const deploymentOutputs = state.deploymentOutputs;
-                    this._context.settings.addRefData({deploymentOutputs});
-                    return state;
-                });
-            }, state
+        return this._extractTaskSections().reduce(
+            (promise, taskSection) => {
+                return promise.then(state =>
+                    this._executeTask(taskSection, state).then(state => {
+                        const deploymentOutputs = state.deploymentOutputs;
+                        this._context.settings.addRefData({deploymentOutputs});
+                        return state;
+                    })
+                );
+            }, Promise.resolve(state)
         );
     }
 
-    _executeTask(taskDef, state) {
-        const taskId = taskDef.id;
-        const task = this._createTask(taskDef, state);
+    _executeTask(taskSection, state) {
+        const taskId = taskSection.getValue().id;
+        const task = this._taskFactory.createTask(taskSection);
         const outputsStore = state.outputsStore;
         const executedTaskIds = state.executedTaskIds || [];
         this._logger.info(`\n---> Executing task: ${taskId}`);
@@ -37,14 +38,8 @@ class ExecuteTasks {
             .then(state => Object.assign({}, state, {executedTaskIds: executedTaskIds.concat(taskId)}));
     }
 
-    _createTask(taskDef, state) {
-        const expandedTaskDef = this._taskDefExpander.expand(taskDef);
-        return this._taskFactory.createTask({
-            taskDef: expandedTaskDef,
-            deploymentConfig: state.deploymentConfig,
-            dataSourceData: state.dataSourceData,
-            deploymentOutputs: state.deploymentOutputs
-        });
+    _extractTaskSections() {
+        return this._context.settings.extractCollection('tasks');
     }
 }
 

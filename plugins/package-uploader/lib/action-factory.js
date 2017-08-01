@@ -5,7 +5,6 @@ const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require('fs'));
 const runScript = require('command-promise');
 const tempfile = require('tempfile2');
-
 const AwsHelpers = require('../../../common-lib/lib/aws-helpers');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
 const CreateUploadBucketStep = require('./steps/create-upload-bucket');

@@ -8,13 +8,11 @@ const CollectDataSourceDataStep = require('./action-steps/collect-data-source-da
 const DataSourceFactory = require('./data-source-factory');
 const DeploymentScriptExecutor = require('./deployment-script-executor');
 const ExecuteTasksStep = require('./action-steps/execute-tasks');
-const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
 const InitialiseOutputsStoreStep = require('./action-steps/initialise-outputs-store');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
-const TaskDefExpander = require('./task-def-expander');
 const TaskFactory = require('./task-factory');
 const UndoTasksStep = require('./action-steps/undo-tasks');
 
@@ -59,11 +57,8 @@ class ActionFactory {
     }
 
     _collectDeploymentConfigStep(context) {
-        const envVarsFormatter = new EnvVarsFormatter({});
         const scriptExecutor = this._scriptExecutor(context);
-        const deploymentScriptExecutor = new DeploymentScriptExecutor({
-            context, envVarsFormatter, scriptExecutor
-        });
+        const deploymentScriptExecutor = new DeploymentScriptExecutor({scriptExecutor});
         return new CollectDeploymentConfigStep({context, deploymentScriptExecutor});
     }
 
@@ -73,15 +68,13 @@ class ActionFactory {
     }
 
     _executeTasksStep(context) {
-        const taskDefExpander = this._taskDefExpander(context);
         const taskFactory = this._taskFactory(context);
-        return new ExecuteTasksStep({context, taskDefExpander, taskFactory});
+        return new ExecuteTasksStep({context, taskFactory});
     }
 
     _undoTasksStep(context) {
-        const taskDefExpander = this._taskDefExpander(context);
         const taskFactory = this._taskFactory(context);
-        return new UndoTasksStep({context, taskDefExpander, taskFactory});
+        return new UndoTasksStep({context, taskFactory});
     }
 
     _sanitizeOutputsStep() {
@@ -91,10 +84,6 @@ class ActionFactory {
     _scriptExecutor(context) {
         const logger = context.logger;
         return new ScriptExecutor({logger, runScript});
-    }
-
-    _taskDefExpander(context) {
-        return new TaskDefExpander({context});
     }
 
     _taskFactory(context) {
