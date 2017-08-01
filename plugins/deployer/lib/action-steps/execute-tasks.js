@@ -26,7 +26,7 @@ class ExecuteTasks {
 
     _executeTask(taskSection, state) {
         const taskId = taskSection.getValue().id;
-        const task = this._createTask(taskSection, state);
+        const task = this._taskFactory.createTask(taskSection);
         const outputsStore = state.outputsStore;
         const executedTaskIds = state.executedTaskIds || [];
         this._logger.info(`\n---> Executing task: ${taskId}`);
@@ -36,15 +36,6 @@ class ExecuteTasks {
             .then(outputs => outputsStore.save(taskId, outputs).then(() => outputs))
             .then(outputs => _.merge({}, state, {deploymentOutputs: outputs}))
             .then(state => Object.assign({}, state, {executedTaskIds: executedTaskIds.concat(taskId)}));
-    }
-
-    _createTask(taskSection, state) {
-        return this._taskFactory.createTask({
-            taskSection: taskSection,
-            deploymentConfig: state.deploymentConfig,
-            dataSourceData: state.dataSourceData,
-            deploymentOutputs: state.deploymentOutputs
-        });
     }
 
     _extractTaskSections() {		

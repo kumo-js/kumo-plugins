@@ -8,7 +8,6 @@ const CollectDataSourceDataStep = require('./action-steps/collect-data-source-da
 const DataSourceFactory = require('./data-source-factory');
 const DeploymentScriptExecutor = require('./deployment-script-executor');
 const ExecuteTasksStep = require('./action-steps/execute-tasks');
-const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
 const InitialiseOutputsStoreStep = require('./action-steps/initialise-outputs-store');
 const OutputsStoreFactory = require('./outputs-store-factory');
 const SanitizeOutputsStep = require('./action-steps/sanitize-outputs');
@@ -58,11 +57,8 @@ class ActionFactory {
     }
 
     _collectDeploymentConfigStep(context) {
-        const envVarsFormatter = new EnvVarsFormatter({});
         const scriptExecutor = this._scriptExecutor(context);
-        const deploymentScriptExecutor = new DeploymentScriptExecutor({
-            context, envVarsFormatter, scriptExecutor
-        });
+        const deploymentScriptExecutor = new DeploymentScriptExecutor({scriptExecutor});
         return new CollectDeploymentConfigStep({context, deploymentScriptExecutor});
     }
 

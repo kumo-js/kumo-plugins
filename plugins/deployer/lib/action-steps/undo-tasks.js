@@ -18,22 +18,13 @@ class UndoTasks {
 
     _undoTask(taskSection, state) {
         const taskId = taskSection.getValue().id;
-        const task = this._createUndoTask(taskSection, state);
+        const task = this._taskFactory.createUndoTask(taskSection);
         const outputsStore = state.outputsStore;
         this._logger.info(`\n---> Undoing task: ${taskId}`);
 
         return task.execute()
             .then(() => outputsStore.remove(taskId))
             .then(() => state);
-    }
-
-    _createUndoTask(taskSection, state) {
-        return this._taskFactory.createUndoTask({
-            taskSection: taskSection,
-            deploymentConfig: state.deploymentConfig,
-            dataSourceData: state.dataSourceData,
-            deploymentOutputs: state.deploymentOutputs
-        });
     }
 
     _extractTaskSections() {		
