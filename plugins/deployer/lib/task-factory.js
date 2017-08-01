@@ -12,6 +12,7 @@ const ExecuteScriptStep = require('./task-steps/execute-script');
 const EnvVarsFormatter = require('../../../common-lib/lib/env-vars-formatter');
 const JsonCompatibleFileReader = require('../../../common-lib/lib/json-compatible-file-reader');
 const ProvisionCfStackStep = require('./task-steps/provision-cf-stack');
+const ResolveTaskDefStep = require('./task-steps/resolve-task-def');
 const ScriptExecutor = require('../../../common-lib/lib/script-executor');
 const StepsExecutor = require('../../../common-lib/lib/steps-executor');
 
@@ -36,8 +37,9 @@ class TaskFactory {
     }
 
     _createTask(params, getStepCreators) {
+        const taskType = params.taskSection.getValue().type || 'custom'
         const stepCreators = getStepCreators();
-        const stepCreator = stepCreators[params.taskDef.type];
+        const stepCreator = stepCreators[taskType];
         const steps = stepCreator.call(this);
         return new StepsExecutor({initialState: params, steps: steps});
     }
@@ -46,6 +48,7 @@ class TaskFactory {
         return [
             this._createTaskVarsStep(),
             this._createCfTaskVarsStep(),
+            this._resolveTaskDef(),
             this._executeScriptStep('stackTemplate'),
             this._provisionCfStackStep(),
             this._collectTaskOutputsStep()
@@ -55,6 +58,7 @@ class TaskFactory {
     _customTaskSteps() {
         return [
             this._createTaskVarsStep(),
+            this._resolveTaskDef(),
             this._executeScriptStep('run'),
             this._collectTaskOutputsStep()
         ];
@@ -63,6 +67,7 @@ class TaskFactory {
     _undoCfTaskSteps() {
         return [
             this._createTaskVarsStep(),
+            this._resolveTaskDef(),
             this._deleteCfStackStep()
         ];
     }
@@ -70,6 +75,7 @@ class TaskFactory {
     _undoCustomTaskSteps() {
         return [
             this._createTaskVarsStep(),
+            this._resolveTaskDef(),
             this._executeScriptStep('undo')
         ];
     }
@@ -82,6 +88,10 @@ class TaskFactory {
     _createCfTaskVarsStep() {
         const context = this._context;
         return new CreateCfTaskVarsStep({context});
+    }
+
+    _resolveTaskDef() {
+        return new ResolveTaskDefStep();
     }
 
     _collectTaskOutputsStep() {

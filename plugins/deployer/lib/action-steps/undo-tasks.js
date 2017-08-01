@@ -5,19 +5,20 @@ class UndoTasks {
     constructor(params) {
         this._context = params.context;
         this._logger = params.context.logger;
-        this._taskDefExpander = params.taskDefExpander;
         this._taskFactory = params.taskFactory;
     }
 
     execute(state) {
-        return this._context.settings.reduceRight('tasks',
-            (state, taskDef) => this._undoTask(taskDef, state), state
+        return this._extractTaskSections().reduceRight(
+            (promise, taskSection) => {
+                return promise.then(state => this._undoTask(taskSection, state))
+            }, Promise.resolve(state)
         );
     }
 
-    _undoTask(taskDef, state) {
-        const taskId = taskDef.id;
-        const task = this._createUndoTask(taskDef, state);
+    _undoTask(taskSection, state) {
+        const taskId = taskSection.getValue().id;
+        const task = this._createUndoTask(taskSection, state);
         const outputsStore = state.outputsStore;
         this._logger.info(`\n---> Undoing task: ${taskId}`);
 
@@ -26,14 +27,17 @@ class UndoTasks {
             .then(() => state);
     }
 
-    _createUndoTask(taskDef, state) {
-        const expandedTaskDef = this._taskDefExpander.expand(taskDef);
+    _createUndoTask(taskSection, state) {
         return this._taskFactory.createUndoTask({
-            taskDef: expandedTaskDef,
+            taskSection: taskSection,
             deploymentConfig: state.deploymentConfig,
             dataSourceData: state.dataSourceData,
             deploymentOutputs: state.deploymentOutputs
         });
+    }
+
+    _extractTaskSections() {		
+         return this._context.settings.extractCollection('tasks');		
     }
 }
 

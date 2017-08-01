@@ -8,8 +8,9 @@ class DeleteCfStack {
     }
 
     execute(state) {
+        const taskRegion = state.taskVars.taskRegion;
         const stackName = state.taskDef.stackName;
-        const cfHelper = this._awsHelpers.cf({region: state.taskDef.region});
+        const cfHelper = this._awsHelpers.cf({region: taskRegion});
         this._logger.info(`Deleting stack ${stackName}`);
 
         return cfHelper.searchStack(stackName)
