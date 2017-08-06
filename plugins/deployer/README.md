@@ -173,8 +173,8 @@ by another module. Different data sources are supported and all data must be jso
 }
 ```
 
-The fetched data is made available to settings via the `#/__dataSourceData/..` json schema ref.
-e.g. `{"$ref": "#/__dataSourceData/moduleAOutputs/some-key"}`
+The fetched data is made available to settings via the `#/_dataSourceData/..` json schema ref.
+e.g. `{"$ref": "#/_dataSourceData/moduleAOutputs/some-key"}`
 
 #### S3 Data Source
 
