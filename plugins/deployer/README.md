@@ -2,8 +2,8 @@
 # Module Deployer
 
 The module deployer plugin is essentially a command line runner that executes a list of tasks in order.
-It records the output of each task in an s3 bucket and makes those outputs available to subsequent tasks.
-It also supports undoing all tasks in reverse order.
+It keeps track of the outputs of each task, makes those outputs available to subsequent tasks and can 
+optionally store them in an output store. It also supports undoing all tasks in reverse order.
 
 ## Usage
 
@@ -29,7 +29,7 @@ Arguments are as follows:
             level2(i.e. root): pre-prod
 
         These levels can be individually referenced in the deployment-settings file
-        via ENV vars or json schema references.
+        via json schema references.
 ```
 
 ## `deployment-settings` file
@@ -40,7 +40,7 @@ The following examples assume a `.json` file but you can also use `.yaml` or `.j
 
 Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 
-#### Built-in Json Schema Reference Variables
+#### Built-in Json Schema Reference Variables (available globally)
 
 ```js
 {"$ref": "#/_args/.."}
@@ -54,6 +54,29 @@ Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 
 {"$ref": "#/_envNamespaceLevel<X>"}
 // References a given env namespace level where <X> is >= 0
+```
+
+### Intrinsic Functions
+
+Intrintic functions are also supported throughout the settings file and can be used in 
+scenarios where you need to define more complex values. 
+
+#### `Fn:Join`
+
+Used to concatenate values using the given separator e.g.
+
+```js
+{
+  "Fn::Join": [
+    "-", 
+    [
+      {"$ref": "#/env"},
+      "bucket"
+    ]
+  ]
+}
+
+// produces 'test-bucket' if #/env evaluates to 'test'
 ```
 
 ### Script Sections
@@ -70,83 +93,101 @@ command to achieve the desired outcome. They are used in several places includin
 }
 ```
 
-#### Built-in `script` ENV variables
-
-These are similar to the [built-in json schema reference variables](#built-in-json-schema-references).
-
-```
-$KUMO_ENV
-$KUMO_ENV_NAMESPACE_ROOT
-$KUMO_ENV_NAMESPACE_LEVEL<X>  // where <X> is >= 0
-$KUMO_ARG_<XXX>  // where <XXX> is the arg name
-```
-
-### Settings Schema
+### High level Settings Schema
 
 ```js
 {
   "moduleName": "",
-  "outputsBucket": {},
-  "dependsOn": [...],
   "config": {},
+  "outputsStore": {},
+  "dataSources": {},
   "tasks": [...]
 }
 ```
+
+#### Execution Order
+
+The deployer executes by processing settings in the following order: [`config`](#config), 
+[`outputsStore`](#outputsstore), [`dataSources`](#datasources), [`tasks`](#tasks). Some sections generate 
+outputs that are made available to subsequent sections via json schema references. Details of these 
+can be found in each section.
+
 
 ### `moduleName`
 
 Required. Name of the module.
 
-### `outputsBucket`
+### `config`
 
-Required. The S3 bucket used to store the outputs of all deployment [tasks](#tasks). E.g.
+Optional. A [script](#script-sections) for obtaining any custom config for the deployment. 
+The script must output the config as a JSON string to standard out. The loaded config is then made 
+available via the `#/_deploymentConfig/..` json schema ref. 
 
-```js
-"outputsBucket": {"name": "deployment-outputs"}
-```
+### `outputsStore`
 
-The `name` can also be an array of strings to support dynamic items. In this case,
-the different items will be concatenated using the `-` separator. E.g.
+Optional. Destinaton used to store the outputs of all deployment [tasks](#tasks). Different store 
+types are supported.  
 
-```js
-"outputsBucket": {
-  "name": ["deployment-outputs", {"$ref": "#/_env"}]
-}
-// produces 'deployment-outputs-ci' if '#/_env' is ci
-```
 
-The bucket will be created if it doesn't already exist, but currently will not be
-removed if the module is destroyed.
-
-You can also define common `outputBucket` settings in your `kumo.json` file e.g.
+You can also define an `outputsStore` section in your `kumo.json` file e.g.
 
 ```js
 "deployer": {
-  "outputsBucket": {"name": ...}
+  "outputsStore": {}
+}
+
+// The 'outputsStore' section in your 'deployment-settings' file will be merged 
+// with that in 'kumo.json' and is useful in scenarios where you wish to define 
+// outputs store once for multiple modules.
+```
+
+More importantly, if you specify an outputs store then after the initial deployment of your module, 
+all subsequent deployments will have access to the outputs via the `#/_deploymentOutputs/..` json schema ref.
+
+#### S3 outputs store
+
+```js
+// example
+
+"outputsStore": {
+  "type": "s3-bucket",
+  "region": "ap-southeast-2",
+  "bucket": "my-outputs-bucket",
+  "prefix": {"Fn::Join": ["/", {"$ref": "#/_args/env"}, {"$ref": "#/moduleName"}]}
 }
 ```
 
-The `deployment-settings` file will be merged with the above settings and is useful
-in scenarios where you wish to define outputs bucket once for multiple modules.
+The bucket will be created if it does not exist, but will not be destroyed if the module is destroyed.
 
-### `dependsOn`
+### `dataSources`
 
-Optional. A list of dependent modules from which to collect [config](#config) and any existing
-[deployment outputs](#outputsbucket). These will be merged with those of the current module
-and made available as [task variables](#task-variables) for use during deployment. E.g.
+Optional. A hash of data sources from which to fetch data that is required for the deployment of the 
+current module. This is useful in scenarios where you want to grab the outputs / names of resources deployed 
+by another module. Different data sources are supported and all data must be json compatible. 
 
 ```js
-"dependsOn": ["../moduleA", "../moduleB"]
+"dataSources": {
+  "moduleAOutputs": {...},
+  "moduleBOutputs": {...}
+}
 ```
 
-Modules are given as directory paths (that must each contain a `deployment-settings` file).
-Dependencies are deeply traversed left to right.
+The fetched data is made available to settings via the `#/_dataSources/<name>/..` json schema ref.
 
-### `config`
+#### S3 Data Source
 
-Optional. A [script](#script-sections) for obtaining the environment specific configuration for the
-deployment which will be made available as [task variables](#task-variables). The script must
-output the config as a JSON string to standard out.
+```js
+// example
+
+"dataSources": {
+  "moduleAOutputs": {
+    "type": "s3-bucket",
+    "region": "ap-southeast-2",
+    "bucket": "outputs-bucket",
+    "key": {"Fn::Join": ["/", {"$ref": "#/_args/env"}, "moduleA"]}
+  }
+}
+```
 
 ### `tasks`
 
@@ -174,66 +215,40 @@ has the following common attributes:
 }
 ```
 
-#### Task Variables
+The final evaluated region for each task is accessible via the special `#/_taskRegion` json schema ref,
+which into account any `regionOverrides` for the task.
 
-All tasks have access to the following variables either via ENV variables
-(in [script sections](#script-sections)) or via json schema references:
+In addition, as mentioned previously, each task can reference deployment [config](#config), [outputs](#outputsstore) 
+and [data sources](#datasources) via json schema refs.
 
-* #### Task region
-
-  The resolved task region (taking into account any region overrides)
-  - ENV variable: `$KUMO_TASK_REGION`
-  - Json schema ref: `{"$ref": "#/_taskRegion"}`
-
-* #### Deployment Config
-
-  The merged deployment config of the module and any [dependant modules](#dependson)
-  - ENV variable: `$KUMO_DEPLOYMENT_CONFIG` (value is JSON string)
-  - Json schema ref: `{"$ref": "#/_deploymentConfig/.."}`
-
-* #### Deployment Outputs
-
-  The merged [task outputs](#task-outputs) of the module and any [dependant modules](#dependson).
-  Outputs are grouped by module name.
-
-  - ENV variable: `$KUMO_DEPLOYMENT_OUTPUTS` (value is JSON string)
-  - Json schema ref: `{"$ref": "#/_deploymentOutputs/<moduleName>/.."}`
 
 #### Task Outputs
 
 Each task can output variables in json compatible format. After each task executes, its outputs (if any)
-are uploaded to the [outputsBucket](#outputsbucket), then merged with the overall deployment outputs and
-made available to subsequent tasks.
+are uploaded to the [`outputsStore`](#outputsstore) (if provided), then merged with the overall deployment 
+outputs and made available to subsequent tasks via the `#/_deploymentOutputs/..` json schema ref.
 
-E.g. assuming we are deploying a module called `module2` which is dependent on `module1`,
-the following visualises the state of deployment outputs through the deployment process:
+E.g. assuming we are deploying a module, the following visualises the state of deployment outputs 
+through the deployment process:
 
   ```js
   // Before any tasks are executed, deployment outputs contains any exisiting outputs
-  // for the current module and any dependent modules, fetched from the outputsBucket:
-  {
-    "module1": {..}
-  }
+  // for the current module, fetched from the outputsStore. Initially this is empty:
+  {}
 
-  // Assuming module2 consists of two tasks, when the first task executes it
+  // Assuming module1 consists of two tasks, when the first task executes it
   // has access to the current outputs. On completion, it outputs {"abc": 123} which
-  // is merged with all outputs:
+  // is merged with all deployment outputs:
   {
-    "module1": {..},
-    "module2": {
-      "abc": 123
-    }
+    "abc": 123
   }
 
   // When the second task executes, it has access to the current outputs
   // (including those from the first task). On completion, it outputs {"def": 456}
-  // which is again merged with all outputs:
+  // which is again merged with all deployment outputs:
   {
-    "module1": {..},
-    "module2": {
-      "abc": 123,
-      "def": 456
-    }
+    "abc": 123,
+    "def": 456
   }
   ```
 
@@ -255,29 +270,33 @@ additional attributes:
 ```
 
 #### `stackName`
-Required. The `stackName` is used in conjunction with the `moduleName` and the `--env` arg
-to generate the full expanded name for the stack. E.g. assuming the following:
-
-```
-stackName: "buckets"
-moduleName: "module1"
---env pre-prod--ci
-```
-
-The expanded stack name would be `pre-prod--ci-module1-buckets` (using `-` as the separator)
+Required. The name of the cloud formation stack.
 
 #### `stackTemplate`
 Required. A [script](#script-sections) that generates the json compatible template used to
-create the stack. Your script must generate/copy the template to the location specified by
-the `$KUMO_TEMPLATE_OUTPUT_FILE` env variable.
+create the stack. Your script must generate/copy the template to a special location that is 
+accessible via the `#/_templateOutputFile` json schema ref.
+
+```js
+{
+  ...
+
+  "stackTemplate": {
+    "script": "cp template.json $TEMPLATE_OUTPUT_FILE",
+    "envVars": {
+      "TEMPLATE_OUTPUT_FILE": {"$ref": "#/_templateOutputFile"}
+    }
+  }
+}
+```
 
 #### `stackParams`
 Optional. If the template contains parameters, you can specify the key/value pairs here.
-Remember you can take full advantage of json schema references to extract values from
-deployment config and outputs if you wish e.g.
+Remember you can take full advantage of json schema references to extract values from deployment config, 
+deployment outputs and data sources.
 
 ```js
-// template contents
+// example template.json
 
 "Parameters": {
   "DomainName": {..},
@@ -287,12 +306,12 @@ deployment config and outputs if you wish e.g.
 ```
 
 ```js
-// task attributes
+// example cf-stack task attributes
 {
   ...
   "stackParams": {
     "DomainName": {"$ref": "#/_deploymentConfig/domainName"},
-    "IamCertificateId": {"$ref": "#/_deploymentOutputs/module1/iamCertificateId"}
+    "IamCertificateId": {"$ref": "#/_deploymentOutputs/iamCertificateId"}
   }
 }
 ```
@@ -300,7 +319,7 @@ deployment config and outputs if you wish e.g.
 #### Task Outputs
 
 Upon completion of this task the outputs of the stack are automatically extracted
-and merged with the deployment outputs.
+and merged with the deployment outputs .
 
 ### `tasks type: custom`
 
@@ -317,9 +336,21 @@ additional attributes:
 #### `run`
 
 Required. The [script](#script-sections) to run which **must be idempotent**. Any outputs
-of this task that are required by the deployment process must be saved to the
-the location specified by the `$KUMO_TASK_OUTPUTS_FILE` env variable. Outputs must be
-json compatible (i.e. json or yaml).
+of this task that are required by subsequent tasks must be saved to a special location
+that is accessible via the `#/_taskOutputsFile` json schema ref.
+
+```js
+{
+  "run": {
+    "script": "(do stuff...) > $TASK_OUTPUTS_FILE",
+    "envVars": {
+      "TASK_OUTPUTS_FILE": {"$ref": "#/_taskOutputsFile"}
+    }
+  }
+}
+```
+
+Note: outputs must be json compatible (i.e. json or yaml).
 
 #### `undo`
 
