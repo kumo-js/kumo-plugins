@@ -54,6 +54,7 @@ Json schema references i.e. `{"$ref": ".."}` are supported in the settings file.
 
 {"$ref": "#/_envNamespaceLevel<X>"}
 // References a given env namespace level where <X> is >= 0
+// e.g. If env is 'pre-prod--dev--mike', {"$ref": "#/_envNamespaceLevel1"} evaluates to 'pre-prod--dev' 
 ```
 
 ### Intrinsic Functions
@@ -70,13 +71,13 @@ Used to concatenate values using the given separator e.g.
   "Fn::Join": [
     "-", 
     [
-      {"$ref": "#/env"},
+      {"$ref": "#/_env"},
       "bucket"
     ]
   ]
 }
 
-// produces 'test-bucket' if #/env evaluates to 'test'
+// produces 'test-bucket' if #/_env evaluates to 'test'
 ```
 
 ### Script Sections
@@ -172,7 +173,8 @@ by another module. Different data sources are supported and all data must be jso
 }
 ```
 
-The fetched data is made available to settings via the `#/_dataSources/<name>/..` json schema ref.
+The fetched data is made available to settings via the `#/__dataSourceData/..` json schema ref.
+e.g. `{"$ref": "#/__dataSourceData/moduleAOutputs/some-key"}`
 
 #### S3 Data Source
 
