@@ -2,8 +2,6 @@
 
 # kumo-plugins
 
-**(UNDER DEVELOPMENT)**
-
 The usage of the each plugin is given in their README.
 
 * [Module Deployer](./plugins/deployer/README.md)
